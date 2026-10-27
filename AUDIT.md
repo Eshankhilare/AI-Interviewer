@@ -436,16 +436,22 @@ Everything below was run on `hackathon/polish` after the fixes.
 | Check | Command | Result |
 |---|---|---|
 | Backend unit + integration | `mvn test` | **11 passed** (2 rate-limit, 9 security/state/report/adaptive) |
-| AI service | `python -m pytest` | **12 passed** (rubric arithmetic, grounding, injection, retries, router auth/limits) |
+| AI service | `python -m pytest` | **14 passed** (rubric arithmetic, grounding, injection, retries, router auth/limits, resume parser) |
 | Frontend unit | `npm test` | **15 passed**, 3 files |
-| Frontend lint | `npm run lint` | **0 errors**, 33 warnings (unused vars, hook deps) |
-| Frontend build | `npm run build` | **PASS**, main chunk 984.66 kB |
+| Frontend lint | `npm run lint` | **0 errors**, 32 warnings (unused vars, hook deps) |
+| Frontend build | `npm run build` | **PASS**, main chunk 955.96 kB (PDF chunk 1,223.76 kB, lazy-loaded) |
 | Benchmark self-check | `python bench/test_bench.py` | **PASS** |
 | Benchmark run | `python bench/run.py --mode local --repeats 2` | 12 answers scored by the **heuristic** fallback; no agreement metric claimed (no labels, no key) |
 | TTS proxy | `POST /api/voice/synthesize` with a token | **200**, `audio/mpeg`, 14,544 bytes with an MP3 frame header (`FF F3`); no token → **401** |
 | TTS proxy with `AI_SERVICE_TOKEN` set on both services | same call | **200**, `audio/mpeg`, 20,448 bytes; direct AI-service call without or with a wrong token → **401**, with the right one → **200** |
 | Rubric path, real Gemini key | interview answered through the backend | matching strong answer → **91/100 A+**, all five evidence quotes grounded, radar from the rubric; off-topic answers → 16–58 with the evaluator naming the mismatch |
 | Quota exhaustion | after the free-tier limit | two retries, then the heuristic fallback; the request still returns 200 and the score is not invented |
+| PDF export | click "Download PDF Report" | **4,549-byte PDF**, 1 page, `%PDF-` header, browser console clean. `@react-pdf/renderer` 4.9.0; 4.8.1 threw `Standard font "Helvetica" is not registered` and silently fell back to `window.print()` |
+| Coding round | `/api/coding/execute` + the Monaco panel | Judge0 **Accepted**, stdout `[1, 2, 3]`, 0.019 s; editor renders, Run shows the result in the UI |
+| Voice | `/api/voice/synthesize`, `/api/voice/transcribe` | **200**, 13,248-byte `audio/mpeg`; mock transcript (`STT_PROVIDER=mock`, no Deepgram key provided) |
+| Resume upload | `/api/resumes/upload` with a PDF | **409** with "Only text resumes can be parsed right now"; the picker now offers `.txt/.md` and says so instead of advertising PDF/DOCX |
+| Feature sweep | coding languages/problems, voice voices, resume parse-text, unauthenticated GET | 200 / 200 / 200 / 200 / **401** |
+| Browser walkthrough | Playwright over every route, desktop + mobile | **0 console errors**, 0 failed API calls; remaining request failure is the external CloudFront background video |
 
 Live HTTP smoke test (backend on the `local` profile, port 8082, no AI service):
 
