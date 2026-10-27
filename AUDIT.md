@@ -14,23 +14,29 @@
 
 ## 1. Executive summary
 
-The app builds, boots and completes an interview end-to-end, but it is **not safe to demo as-is**:
-any logged-in user can read and mutate another user's interview and report, the answer key
-(`expectedAnswer`) is sent to the browser before the candidate answers, double-submitting an answer
-skips a question, and a completed interview still accepts answers. The fallback report (AI service
-down) is a hard-coded **75 / B** that looks exactly like a real result. Three sets of real
-credentials are committed to the repository.
+**Phase 0 finding.** The app built, booted and completed an interview end-to-end, but it was **not
+safe to demo as-is**: any logged-in user could read and mutate another user's interview and report,
+the answer key (`expectedAnswer`) was sent to the browser before the candidate answered,
+double-submitting an answer skipped a question, and a completed interview still accepted answers.
+The fallback report (AI service down) was a hard-coded **75 / B** that looked exactly like a real
+result. Three sets of real credentials were committed to the repository.
 
-| Severity | Count (Open) | Headline |
-|---|---|---|
-| **P0** | 6 | IDOR on interviews/reports, committed DB credentials + default JWT secret, CORS `*` + credentials, answer-key exposure |
-| **P1** | 14 | No state machine, non-idempotent answers, fabricated report, unauthenticated AI service, upload hardening, error shape, UI truthfulness |
-| **P2** | 11 | N+1/no pagination, schema drift, no health check, bundle size, a11y, docs drift |
-| **P3** | 5 | Dead code/deps, committed tooling, metadata, noisy logs |
+**Final status (Phase 5).** P0 and P1 are closed. What remains open is listed as DEFERRED with the
+reason, and none of it is a security hole in the demo path.
 
-**Phase 1 recommendation:** secret rotation list → ownership checks with tests → config/port
-consistency → validation + upload + global error handler → structured LLM output → state machine +
-idempotency → frontend error boundaries.
+| Severity | Total | Fixed | Deferred |
+|---|---|---|---|
+| **P0** | 6 | 6 | 0 |
+| **P1** | 14 | 14 | 0 |
+| **P2** | 11 | 6 | 5 |
+| **P3** | 5 | 3 | 2 |
+
+Verification evidence for the fixed items is in [section 10](#10-phase-5-verification), not in a
+claim: `mvn test` (11 tests), `pytest` (12 tests), `npm test` (15 tests), lint/build, a live HTTP
+smoke test and the evaluator benchmark.
+
+**Action still required from a human:** rotate the credentials that were committed before this
+branch. Removing them from the tree does not make them secret. Details in §8.1.
 
 ---
 
@@ -222,63 +228,65 @@ B reads resume 1: 403                       <- resume did not exist; code path s
 
 ## 6. Findings by severity (the fix list)
 
-Statuses here are Phase 0. They will be rewritten to FIXED / DEFERRED / NOT AN ISSUE in Phase 5.
+Statuses were rewritten in Phase 5. `FIXED` means the change is on
+`hackathon/polish` with a test or a live check behind it; `DEFERRED` keeps the
+reason in §8.
 
 ### P0 — security / data exposure
 
 | ID | Finding | Location | Evidence | Status |
 |---|---|---|---|---|
-| **P0-1** | **IDOR on interviews** — read, begin, next-question, answer, end another user's interview | `InterviewController.java:33-70`; `InterviewService.java:127-211,287-316` | Live: user B `GET /api/interviews/1` → 200 with A's title | OPEN |
-| **P0-2** | **IDOR on reports** — read and force-generate another user's report | `ReportController.java:22-57` | Live: user B `GET /api/reports/1` → 200 | OPEN |
-| **P0-3** | **IDOR on resumes / job descriptions** — read extracted resume text, delete resources | `ResumeController.java:156-176`; `JobDescriptionController.java:40-50` | Code path has no owner check; smoke hit a non-existent resume (403) so it needs a dedicated test | OPEN |
-| **P0-4** | **Committed credentials + public default JWT secret** | `render.yaml:14,16`; `application.properties:7,16`; `keep-alive.yml:20` | Values present at `HEAD`; JWT default is a valid public HMAC key | OPEN |
-| **P0-5** | **CORS `*` with credentials** (backend and AI service) | `render.yaml:22`; `SecurityConfig.java:79-86`; `main.py:18-22` | `allowedOriginPattern("*")` + `allowCredentials(true)` | OPEN |
-| **P0-6** | **Answer key sent to the candidate** | `SessionResponse.java:18`; `InterviewService.java:345` | Live: `expectedAnswerLeak=True` on interview creation, before any answer | OPEN |
+| **P0-1** | **IDOR on interviews** — read, begin, next-question, answer, end another user's interview | `InterviewController.java`; `InterviewService.requireOwnedInterview` | Live: user B `GET /api/interviews/{id}` → 404 | **FIXED** |
+| **P0-2** | **IDOR on reports** — read and force-generate another user's report | `ReportController.java` | Live: user B `GET /api/reports/{id}` → 404 | **FIXED** |
+| **P0-3** | **IDOR on resumes / job descriptions** — read extracted resume text, delete resources | `ResumeController.java`; `JobDescriptionController.java` | Owner resolved from the JWT; 404 for others; covered by integration tests | **FIXED** |
+| **P0-4** | **Committed credentials + public default JWT secret** | `render.yaml`; `application.properties`; `keep-alive.yml` | Removed from the tree; `JwtUtil` refuses to boot in `production` without `JWT_SECRET`. **Rotation is still a human action** (§8.1) | **FIXED** (rotation pending) |
+| **P0-5** | **CORS `*` with credentials** (backend and AI service) | `SecurityConfig.java`; `main.py` | Explicit origin lists from `APP_CORS_ALLOWED_ORIGINS` / `ALLOWED_ORIGINS` | **FIXED** |
+| **P0-6** | **Answer key sent to the candidate** | `SessionResponse.java`; `InterviewService` | `@JsonInclude(NON_NULL)` + only mapped after `COMPLETED`; live check: field absent in flight | **FIXED** |
 
 ### P1 — broken behaviour / bad failure handling
 
 | ID | Finding | Location | Evidence | Status |
 |---|---|---|---|---|
-| P1-1 | No state machine: answer/end/begin in any state; next-question before begin | `InterviewService.java:127-211,287-303` | Live: answer after COMPLETED → 200 | OPEN |
-| P1-2 | Non-idempotent submit: duplicate evaluation + index jump | `InterviewService.java:151-211` | Live: double submit → index `2/3` | OPEN |
-| P1-3 | Fabricated report `75 / B` when AI is down; report generated as a GET side effect | `InterviewService.java:226-235`; `ReportController.java:24-29` | Live: `score=75 grade=B` with AI service offline | OPEN |
-| P1-4 | AI service publicly callable, no auth, no quotas; leaks exception text | `ai_router.py:66-171`; `main.py:16-22` | No auth dependency on any route | OPEN |
-| P1-5 | Upload: path traversal, no type/size validation, binary decoded as text, ephemeral storage | `ResumeController.java:44-103` | `UUID + "_" + getOriginalFilename()`; `new String(file.getBytes())` | OPEN |
-| P1-6 | No global exception handler; wrong status codes; inconsistent error shape | whole backend (`@ControllerAdvice` absent) | `RuntimeException` → 500; docs promise 400/404 shape | OPEN |
-| P1-7 | Report DTO returns JSON **strings**; frontend re-derives values | `ReportResponse.java:20-26`; `Report.jsx:260-273` | Live: `radarType=String` | OPEN |
-| P1-8 | Dashboard average hard-coded to 75 (missing `overallScore`) | `Dashboard.jsx:25`; `InterviewResponse.java` | Field absent from DTO | OPEN |
-| P1-9 | Feedback panel shows `undefined` (DTO missing fields) | `InterviewService.java:352-358`; `Interview.jsx:112-123` | Field mismatch | OPEN |
-| P1-10 | Fragile LLM parsing, no schema validation, no retries, temperature 0.3, three prompts per answer | `evaluation_service.py:25-106`; `llm_service.py` | `json.loads` on free text; hard-coded model | OPEN |
-| P1-11 | No prompt-injection defence; untrusted text interpolated raw | `evaluation_service.py:40-65` | No delimiters/data-only instruction | OPEN |
-| P1-12 | Frontend swallows interview-load and submit errors; no app-level error boundary; client submit guard exists but does not cover retry/refresh/second tab | `Interview.jsx:52-68,102-132,294-305`; `App.jsx` | `console.error` only; guard is `disabled={submitting}` | OPEN |
-| P1-13 | Rate-limit config is dead; no login throttling | `application.properties:40-42` | No code reads `app.rate-limit` | OPEN |
-| P1-14 | Port/config drift (8000 vs 8001, `AI_SERVICE_URL` unused, AI Docker ignores `$PORT`) | `docs/API.md:281`; `application.properties:20`; `ai-service/Dockerfile:8` | See A1/A3 | OPEN |
+| P1-1 | No state machine: answer/end/begin in any state; next-question before begin | `InterviewService` | Explicit transitions; wrong state → 409. `begin`/`end` are deliberately idempotent (retry-safe) and return current state | **FIXED** |
+| P1-2 | Non-idempotent submit: duplicate evaluation + index jump | `InterviewService.submitAnswer` | Resubmitting a `sessionId` returns the stored evaluation; index advances once | **FIXED** |
+| P1-3 | Fabricated report `75 / B` when AI is down; report generated as a GET side effect | `InterviewService`; `ReportController` | Score computed from real evaluations; `N/A` + `INSUFFICIENT_DATA` when none; report written on `end`, GET is read-only | **FIXED** |
+| P1-4 | AI service publicly callable, no auth, no quotas; leaks exception text | `ai_router.py`; `main.py` | `X-AI-Service-Token` required when `AI_SERVICE_TOKEN` is set; generic 500 detail; length bounds per field | **FIXED** |
+| P1-5 | Upload: path traversal, no type/size validation, binary decoded as text, ephemeral storage | `ResumeController.java` | 5 MB, `.txt`/`.md` only, sanitised name, canonical-path escape check, PDF/DOCX → 409. Real PDF parsing **DEFERRED** | **FIXED** (parsing deferred) |
+| P1-6 | No global exception handler; wrong status codes; inconsistent error shape | `ApiExceptionHandler` | 400/401/403/404/405/409/413/500 with one body; live: wrong method → 405, unknown path → 404 (both were 500 before) | **FIXED** |
+| P1-7 | Report DTO returns JSON **strings**; frontend re-derives values | `ReportResponse`; `Report.jsx` | Root cause was Hibernate 6 double-encoding `columnDefinition="JSON"`; columns are `TEXT`; live: real arrays | **FIXED** |
+| P1-8 | Dashboard average hard-coded to 75 (missing `overallScore`) | `Dashboard.jsx` | Field present; dashboard shows the real average or says there is none | **FIXED** |
+| P1-9 | Feedback panel shows `undefined` (DTO missing fields) | `EvaluationResponse`; `Interview.jsx` | DTO and panel aligned; missing evaluation is explained, not `0` | **FIXED** |
+| P1-10 | Fragile LLM parsing, no schema validation, no retries, temperature 0.3, three prompts per answer | `rubric_evaluator.py` | Pydantic schema, temperature 0, two attempts, fails closed; one prompt instead of three | **FIXED** |
+| P1-11 | No prompt-injection defence; untrusted text interpolated raw | `rubric_evaluator.py` | Delimited `<answer>` sections, injection patterns neutralised and flagged, tests | **FIXED** |
+| P1-12 | Frontend swallows interview-load and submit errors; no app-level error boundary | `Interview.jsx`; `App.jsx` | Errors surfaced with retry; error boundary around analysis panels; only 401 logs out | **FIXED** |
+| P1-13 | Rate-limit config is dead; no login throttling | `AuthRateLimitFilter` | 60/min per IP → 429 + `Retry-After`; unit test + live check | **FIXED** |
+| P1-14 | Port/config drift (8000 vs 8001, `AI_SERVICE_URL` unused, AI Docker ignores `$PORT`) | `docs/API.md`; `application.properties`; `ai-service/Dockerfile` | One port (8001, `$PORT` honoured); `AI_SERVICE_TIMEOUT_MS` wired | **FIXED** |
 
 ### P2 — reliability / performance / UX
 
 | ID | Finding | Location | Status |
 |---|---|---|---|
-| P2-1 | N+1 on interview list; no pagination; indexes exist only in `schema.sql`, not on the entities (lost when Hibernate creates the tables) | `InterviewService.java:305-336`; `schema.sql:138-140`; `entity/*.java` | OPEN |
-| P2-2 | `schema.sql` ↔ JPA drift; `ddl-auto=update`; no migrations | `application.properties:11` | OPEN |
-| P2-3 | No backend health endpoint; keep-alive uses login with credentials | `pom.xml`; `keep-alive.yml:14-23` | OPEN |
-| P2-4 | Bundle 982 kB main; unused deps; face-api/PDF lazily loaded already | build output; `package.json` | OPEN |
-| P2-5 | Accessibility: 2 aria/alt attributes total, no `aria-live`, no reduced-motion | `frontend/src` | OPEN |
-| P2-6 | Favicon 404 (`/vite.svg` missing); no metadata/noscript/splash | `index.html`; `public/` | OPEN |
-| P2-7 | Anti-cheat modal bypassed; “Cheating Detection Active” wording | `Interview.jsx:44`; `AntiCheatModal.jsx:64` | OPEN |
-| P2-8 | No lite mode, no auto-fallback when camera/WebGL unavailable | `Interview.jsx` | OPEN |
-| P2-9 | CI swallows failures; tests skipped (`\|\| true`, `echo`); no backend tests | `.github/workflows/*` | OPEN |
-| P2-10 | `@Data` on entities with lazy relations; read paths outside transactions | `entity/*.java`; `InterviewService.java:312-316` | OPEN |
-| P2-11 | Judge0 has no HTTP timeout; untyped, unbounded code payloads | `CodingService.java:20,78`; `CodingController.java:17-25` | OPEN |
+| P2-1 | N+1 on interview list; no pagination; indexes exist only in `schema.sql`, not on the entities | `InterviewService`; `entity/*.java` | **DEFERRED** |
+| P2-2 | `schema.sql` ↔ JPA drift; `ddl-auto=update`; no migrations | `application.properties` | **DEFERRED** (JSON→TEXT drift fixed) |
+| P2-3 | No backend health endpoint; keep-alive uses login with credentials | `HealthController`; `keep-alive.yml` | **FIXED** |
+| P2-4 | Bundle 984 kB main; unused deps; face-api/PDF already lazy | build output; `package.json` | **DEFERRED** |
+| P2-5 | Accessibility: 2 aria/alt attributes total, no `aria-live`, no reduced-motion | `frontend/src` | **FIXED** (skip link, focus-visible, labelled icon buttons, `aria-current`, reduced motion; full audit deferred) |
+| P2-6 | Favicon 404 (`/vite.svg` missing); no metadata/noscript/splash | `index.html`; `public/` | **FIXED** |
+| P2-7 | Anti-cheat modal bypassed; “Cheating Detection Active” wording | `Interview.jsx`; `AntiCheatModal.jsx` | **FIXED** (modal deleted; consent banner states what is really checked) |
+| P2-8 | No lite mode, no auto-fallback when camera/WebGL unavailable | `Interview.jsx` | **DEFERRED** (panels can be switched off, and a denied camera now says so) |
+| P2-9 | CI swallows failures; tests skipped (`\|\| true`, `echo`); no backend tests | `.github/workflows/*` | **FIXED** (11 backend tests, real `npm test`/`pytest`, lint gates; audits marked advisory) |
+| P2-10 | `@Data` on entities with lazy relations; read paths outside transactions | `entity/*.java`; `InterviewService` | **DEFERRED** |
+| P2-11 | Judge0 has no HTTP timeout; untyped, unbounded code payloads | `CodingService`; `CodingController` | **FIXED** (5 s connect / 30 s read, payload validation) |
 
 ### P3 — polish / docs
 
 | ID | Finding | Location | Status |
 |---|---|---|---|
-| P3-1 | `docs/API.md` stale: port 8000, 2024 samples, no AI schemas, no 429/503 | `docs/API.md:281,320,328-341` | OPEN |
-| P3-2 | Missing `.env.example` for backend/frontend; AI one has the wrong port and omits keys | repo root | OPEN |
-| P3-3 | No `DEMO.md`, no demo mode, no sample data | repo root | OPEN |
-| P3-4 | Dead code/deps (`Scene3D`, `socket.io-client`, `shadergradient`, `wavesurfer.js`, `recordrtc`) | `frontend/src`, `package.json` | OPEN |
-| P3-5 | Committed tooling: `.claude/skills/**`, `setup-plugins.sh`, `tools/*` with foreign absolute paths | repo root | OPEN |
+| P3-1 | `docs/API.md` stale: port 8000, 2024 samples, no AI schemas, no 429/503 | `docs/API.md` | **FIXED** (rewritten from the running API) |
+| P3-2 | Missing `.env.example` for backend/frontend; AI one has the wrong port and omits keys | repo root | **FIXED** |
+| P3-3 | No `DEMO.md`, no demo mode, no sample data | repo root | **FIXED** for `DEMO.md`; demo seed **DEFERRED** |
+| P3-4 | Dead code/deps (`Scene3D`, `socket.io-client`, `shadergradient`, `wavesurfer.js`, `recordrtc`) | `frontend/src`, `package.json` | **DEFERRED** |
+| P3-5 | Committed tooling: `.claude/skills/**`, `setup-plugins.sh`, `tools/*` with foreign absolute paths | repo root | **DEFERRED** (needs an owner decision) |
 
 ---
 
@@ -321,6 +329,9 @@ These are real issues but exceed the Phase 1–3 time box or need a decision abo
 | Fairness check (name/gender/college perturbation) | Optional 2–3 h; needs the benchmark running first |
 | Secret scanning in CI (gitleaks) | Adds a third-party action; documented for the team to enable |
 | Removing `.claude/skills/**` | User may rely on them; flagged as P3, ask before deleting |
+| Demo seed (a `demo@…` user with one sample interview/report) | Additive but touches the schema story; `DEMO.md` works without it |
+| Removing dead dependencies (`socket.io-client`, `shadergradient`, `wavesurfer.js`, `recordrtc`) | Install-time only; risk of breaking an unused-but-referenced import on demo day |
+| Full accessibility audit (`aria-live` regions, focus traps, colour contrast) | The minimum (focus, labels, reduced motion, skip link) is shipped; a full pass is its own task |
 
 ---
 
@@ -381,3 +392,68 @@ git log --all --oneline -S '<redacted local DB password>' -- backend/src/main/re
 Not executed (manual follow-up): Safari/iOS autoplay, real camera/microphone on the demo device,
 Render cold start, TiDB connection from this machine, `mvn dependency-check` (NVD download),
 live Gemini/Deepgram calls (no keys in this environment).
+
+---
+
+## 8.1 Credentials that still need rotating
+
+Removing a value from the tree does not un-leak it. These were committed and must
+be treated as public:
+
+| Credential | Where it was committed | Action |
+|---|---|---|
+| TiDB user + password | `render.yaml` (history, re-added in `bbbe6e4`) | rotate in TiDB Cloud, update the Render env var |
+| Local MySQL password | `backend/src/main/resources/application.properties` (history) | rotate if that instance is reachable |
+| Default JWT secret | `application.properties` (history) | set a fresh `JWT_SECRET` in every deployed environment; old tokens are already invalid there |
+| Admin keep-alive password | `.github/workflows/keep-alive.yml` (history) | change the GitHub secret; the workflow now uses `/api/health` and no credentials |
+
+## 10. Phase 5 verification
+
+Everything below was run on `hackathon/polish` after the fixes.
+
+| Check | Command | Result |
+|---|---|---|
+| Backend unit + integration | `mvn test` | **11 passed** (2 rate-limit, 9 security/state/report/adaptive) |
+| AI service | `python -m pytest` | **12 passed** (rubric arithmetic, grounding, injection, retries, router auth/limits) |
+| Frontend unit | `npm test` | **15 passed**, 3 files |
+| Frontend lint | `npm run lint` | **0 errors**, 33 warnings (unused vars, hook deps) |
+| Frontend build | `npm run build` | **PASS**, main chunk 984.66 kB |
+| Benchmark self-check | `python bench/test_bench.py` | **PASS** |
+| Benchmark run | `python bench/run.py --mode local --repeats 2` | 12 answers scored by the **heuristic** fallback; no agreement metric claimed (no labels, no key) |
+| TTS proxy | `POST /api/voice/synthesize` with a token | **200**, `audio/mpeg`, 14,544 bytes with an MP3 frame header (`FF F3`); no token → **401** |
+
+Live HTTP smoke test (backend on the `local` profile, port 8082, no AI service):
+
+```
+PASS register returns a token
+PASS login returns a token
+PASS job description created
+PASS interview created as SCHEDULED
+PASS scheduled interview has no answer key
+PASS begin moves it to IN_PROGRESS
+PASS begin again is idempotent (200, no re-transition)
+PASS answer key is hidden in flight
+PASS answer accepted (evaluation null without the AI service)
+PASS duplicate answer returns the same evaluation
+PASS another user gets 404, not 403
+PASS report is owner-only (404)
+PASS missing token is 401
+PASS report returns arrays, not JSON strings (grade N/A, radar [])
+PASS end completes the interview
+PASS end again is idempotent (200)
+PASS auth rate limit answers 429
+```
+
+Two bugs were found by this smoke test and fixed in the same branch: an unknown
+path returned **500** instead of 404, and the wrong HTTP method returned **500**
+instead of 405 (`ApiExceptionHandler` now maps `NoResourceFoundException` and
+`HttpRequestMethodNotSupportedException`).
+
+The browser no longer talks to the AI service at all: playback goes through
+`POST /api/voice/synthesize`, which needs the same JWT as the rest of the API and
+keeps `AI_SERVICE_TOKEN` server-side. The hard-coded Render URL and the unused
+`VITE_AI_SERVICE_URL` variable are gone.
+
+Known gaps left on purpose, each with its reason in §8: pagination and entity
+indexes, migrations, bundle splitting, lite-mode auto-fallback, `@Data` on
+entities, dead dependencies, committed tooling, and a seeded demo dataset.

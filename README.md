@@ -9,17 +9,13 @@ A comprehensive AI-powered technical interview platform that conducts realistic 
 ## Architecture
 
 ```
-┌─────────────────┐     ┌─────────────────┐     ┌─────────────────┐
-│   React +       │────▶│  Spring Boot    │────▶│  Python FastAPI │
-│   Tailwind      │     │  Backend        │     │  AI Service     │
-│   Frontend      │     │  (Port 8080)    │     │  (Port 8001)    │
-└─────────────────┘     └────────┬────────┘     └─────────────────┘
-                                 │
-                                 ▼
-                        ┌─────────────────┐
-                        │  TiDB Cloud /   │
-                        │  MySQL Database │
-                        └─────────────────┘
+Browser (React + Tailwind, 5173)
+        |  REST + JWT
+        v
+Spring Boot backend (8080)  --->  Python FastAPI AI service (8001)
+        |  JPA                            |  Gemini, Edge-TTS, Deepgram
+        v                                 v
+  MySQL / TiDB (H2 with the local profile)   outbound provider calls
 ```
 
 ## Tech Stack
@@ -92,16 +88,27 @@ ai-interviewer/
 
 ### Core Features
 - User authentication with JWT
-- Resume upload and parsing (paste text or upload file)
+- Resume upload and parsing (paste text or upload `.txt` / `.md`)
 - Job description management with 20 predefined job roles
 - AI-powered question generation (Gemini 2.5 Flash)
-- Adaptive interview flow with follow-up questions
-- Answer evaluation with scoring and feedback
-- Performance reports with radar charts and PDF export
+- Adaptive interview flow: a strong answer (>= 80) pulls the next question to HARD, a weak one (<= 50) to EASY
+- Answer evaluation with a five-criterion rubric; the final score is computed in code, not by the model
+- Performance reports with radar charts and PDF export, built from real per-answer scores
 - Text, voice, and coding interview modes
 
+### Scoring
+
+Each answer is scored 0-10 on relevance, technical depth, correctness, clarity and
+evidence. The model may only return those criteria plus a verbatim quote from the
+answer for each one; the 0-100 score, grade and recommendation level are derived
+from them in code. A quote that cannot be found in the answer caps that criterion,
+and an unusable model response fails closed instead of defaulting to a middling
+score. See [bench/RESULTS.md](bench/RESULTS.md) for what the evaluator is measured
+against and [docs/API.md](docs/API.md) for the wire format.
+
 ### Camera & Analysis Features
-- **Proctoring Monitor** — face detection, gaze tracking, blink detection, integrity score
+- **Proctoring Monitor** — optional, consent-gated; face presence, gaze and blink
+  detection run in the browser and no video is uploaded
 - **Body Language Analyzer** — posture, engagement, eye contact, fidgeting detection
 - **Speech Emotion Analyzer** — pitch, energy, speaking rate analysis
 - **Digital Avatar** — 3D animated interviewer with lip sync
@@ -111,6 +118,22 @@ ai-interviewer/
 - Speech-to-Text (Deepgram)
 - Auto-speaking avatar
 - Play/pause/mute controls
+
+## Configuration
+
+All configuration is environment-driven; the committed examples list every
+variable with a safe default.
+
+| File | Copy to | Notes |
+|---|---|---|
+| `backend/.env.example` | `backend/.env` or your shell | `JWT_SECRET` is required in production (32+ bytes). Empty locally means a random key per boot. |
+| `ai-service/.env.example` | `ai-service/.env` | `LLM_API_KEY` (or `GEMINI_API_KEY`) enables the rubric evaluator; without it the heuristic fallback runs. `AI_SERVICE_TOKEN` must match the backend. |
+| `frontend/.env.example` | `frontend/.env.local` | `VITE_API_URL` only; the browser never talks to the AI service directly. |
+
+Nothing in the repository contains a real credential. If you deployed from an
+earlier commit, rotate the TiDB password, the local MySQL password, the JWT
+secret and the admin keep-alive password — they were committed and must be
+considered public.
 
 ## Deployment
 
@@ -132,6 +155,17 @@ ai-interviewer/
 ## Default Credentials
 
 Register a new account at the app. No default credentials are provided for security.
+`database/schema.sql` still contains an unused bcrypt admin hash from an earlier
+version whose password is unknown; do not assume it works.
+
+## Documentation
+
+| Document | What it covers |
+|---|---|
+| [docs/API.md](docs/API.md) | Every endpoint, error shape, auth rules |
+| [AUDIT.md](AUDIT.md) | Findings from the audit, with status and evidence |
+| [bench/RESULTS.md](bench/RESULTS.md) | Evaluator benchmark and its limits |
+| [DEMO.md](DEMO.md) | Two-minute walkthrough for a demo or judging session |
 
 ## API Documentation
 
@@ -142,25 +176,53 @@ See [docs/API.md](docs/API.md) for complete API reference.
 ### Running Locally
 
 ```bash
-# Database setup
-mysql -u root -p < database/schema.sql
-
-# Backend
-cd backend
-mvn spring-boot:run
-
-# AI Service
+# 1. AI service (port 8001)
 cd ai-service
 python -m venv venv
-source venv/bin/activate
+source venv/bin/activate          # Windows: .\venv\Scripts\activate
 pip install -r requirements.txt
 uvicorn main:app --reload --port 8001
 
-# Frontend
+# 2. Backend (port 8082 with the in-memory profile, no MySQL needed)
+cd backend
+mvn spring-boot:run -Dspring-boot.run.profiles=local
+
+# or against MySQL/TiDB:
+mysql -u root -p < database/schema.sql
+mvn spring-boot:run
+
+# 3. Frontend (port 5173)
 cd frontend
 npm install
 npm run dev
 ```
+
+The `local` profile starts H2 in memory on port 8082 and needs no database. It
+drops everything on restart and uses a random JWT key, so register again after
+each restart.
+
+### Tests and checks
+
+```bash
+cd backend  && mvn test                  # 11 tests: security, state machine, reports, rate limit
+cd ai-service && python -m pytest        # 12 tests: rubric scoring, injection, grounding, auth
+cd frontend && npm test && npm run lint && npm run build
+python bench/test_bench.py               # benchmark self-check
+```
+
+### Evaluator benchmark
+
+```bash
+# heuristic fallback (no API key) - proves the plumbing, not the accuracy
+python bench/run.py --mode local --repeats 2 --out bench/RESULTS.md
+
+# rubric evaluator, scored against your own labels
+# (set LLM_API_KEY and fill human_score in bench/answers.csv first)
+python bench/run.py --mode local --repeats 3 --out bench/RESULTS.md
+```
+
+`bench/RESULTS.md` records what the last run could and could not show, including
+the per-answer scores that the heuristic gets wrong.
 
 ### Building for Production
 
