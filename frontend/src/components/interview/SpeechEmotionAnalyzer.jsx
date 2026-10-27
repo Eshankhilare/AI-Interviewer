@@ -161,7 +161,7 @@ const SpeechEmotionAnalyzer = ({ audioStream, onEmotionChange, enabled = true })
   if (!enabled) return null
 
   return (
-    <div className="bg-white rounded-2xl shadow-card border border-ink-100 overflow-hidden">
+    <div className="glass rounded-2xl overflow-hidden">
       <div className="p-4 border-b border-ink-100 bg-gradient-brand-soft">
         <div className="flex items-center justify-between">
           <h3 className="font-semibold text-ink-900 flex items-center">

@@ -184,9 +184,9 @@ const Profile = () => {
                       </div>
                     </div>
                     <button onClick={() => setSecurity({ ...security, twoFactor: !security.twoFactor })}
-                      className="relative w-11 h-6 rounded-full transition-colors"
-                      style={{ background: security.twoFactor ? '#6366f1' : 'rgba(255,255,255,.1)' }}>
-                      <div className="absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-white transition-transform"
+                      role="switch" aria-checked={security.twoFactor} aria-label="Two-Factor Authentication"
+                      className={`toggle-track relative w-11 h-6 rounded-full transition-colors ${security.twoFactor ? 'toggle-track-on' : ''}`}>
+                      <div className="toggle-knob absolute top-0.5 left-0.5 w-5 h-5 rounded-full transition-transform"
                         style={{ transform: security.twoFactor ? 'translateX(20px)' : 'translateX(0)' }} />
                     </button>
                   </div>
@@ -224,9 +224,9 @@ const Profile = () => {
                         <p className="text-xs" style={{ color: 'rgba(255,255,255,.4)' }}>{desc}</p>
                       </div>
                       <button onClick={() => setNotifications({ ...notifications, [key]: !notifications[key] })}
-                        className="relative w-11 h-6 rounded-full transition-colors"
-                        style={{ background: notifications[key] ? '#6366f1' : 'rgba(255,255,255,.1)' }}>
-                        <div className="absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-white transition-transform"
+                        role="switch" aria-checked={notifications[key]} aria-label={label}
+                        className={`toggle-track relative w-11 h-6 rounded-full transition-colors ${notifications[key] ? 'toggle-track-on' : ''}`}>
+                        <div className="toggle-knob absolute top-0.5 left-0.5 w-5 h-5 rounded-full transition-transform"
                           style={{ transform: notifications[key] ? 'translateX(20px)' : 'translateX(0)' }} />
                       </button>
                     </div>
@@ -251,9 +251,9 @@ const Profile = () => {
                         <p className="text-xs" style={{ color: 'rgba(255,255,255,.4)' }}>{desc}</p>
                       </div>
                       <button onClick={() => setPrivacy({ ...privacy, [key]: !privacy[key] })}
-                        className="relative w-11 h-6 rounded-full transition-colors"
-                        style={{ background: privacy[key] ? '#6366f1' : 'rgba(255,255,255,.1)' }}>
-                        <div className="absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-white transition-transform"
+                        role="switch" aria-checked={privacy[key]} aria-label={label}
+                        className={`toggle-track relative w-11 h-6 rounded-full transition-colors ${privacy[key] ? 'toggle-track-on' : ''}`}>
+                        <div className="toggle-knob absolute top-0.5 left-0.5 w-5 h-5 rounded-full transition-transform"
                           style={{ transform: privacy[key] ? 'translateX(20px)' : 'translateX(0)' }} />
                       </button>
                     </div>

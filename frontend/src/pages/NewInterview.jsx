@@ -292,10 +292,8 @@ const NewInterview = () => {
                 {jobDescriptions.map((jd) => (
                   <label
                     key={jd.id}
-                    className={`block p-3 border rounded-xl cursor-pointer transition-colors ${
-                      form.jobDescriptionId === jd.id
-                        ? 'border-primary-500 bg-primary-50'
-                        : 'border-ink-200 hover:border-ink-300'
+                    className={`select-card block p-3 rounded-xl cursor-pointer transition-colors ${
+                      form.jobDescriptionId === jd.id ? 'select-card-active' : ''
                     }`}
                   >
                     <input
@@ -303,7 +301,7 @@ const NewInterview = () => {
                       name="jobDescription"
                       value={jd.id}
                       checked={form.jobDescriptionId === jd.id}
-                      onChange={(e) => setForm({ ...form, jobDescriptionId: e.target.value })}
+                      onChange={(e) => setForm({ ...form, jobDescriptionId: Number(e.target.value) })}
                       className="sr-only"
                     />
                     <div className="font-medium text-sm text-ink-900">{jd.title}</div>
@@ -344,10 +342,8 @@ const NewInterview = () => {
                 {resumes.map((resume) => (
                   <label
                     key={resume.id}
-                    className={`block p-3 border rounded-xl cursor-pointer ${
-                      form.resumeId === resume.id
-                        ? 'border-primary-500 bg-primary-50'
-                        : 'border-ink-200 hover:border-ink-300'
+                    className={`select-card block p-3 rounded-xl cursor-pointer ${
+                      form.resumeId === resume.id ? 'select-card-active' : ''
                     }`}
                   >
                     <input
@@ -355,7 +351,7 @@ const NewInterview = () => {
                       name="resume"
                       value={resume.id}
                       checked={form.resumeId === resume.id}
-                      onChange={(e) => setForm({ ...form, resumeId: e.target.value })}
+                      onChange={(e) => setForm({ ...form, resumeId: Number(e.target.value) })}
                       className="sr-only"
                     />
                     <div className="flex items-center">

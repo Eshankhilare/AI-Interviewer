@@ -44,10 +44,8 @@ export const WhiteButton = ({ children, className = '', ...props }) => (
   <motion.button
     whileHover={{ filter: 'brightness(1.08)', y: -1 }}
     whileTap={{ scale: 0.98 }}
-    className={`relative overflow-hidden ${className}`}
+    className={`cta-solid relative overflow-hidden ${className}`}
     style={{
-      background: '#fff',
-      color: '#111',
       fontWeight: 450,
       letterSpacing: '-.3px',
       borderRadius: '7px',

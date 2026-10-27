@@ -261,7 +261,6 @@ const Interview = () => {
               <InterviewerOrb
                 state={avatarSpeaking ? 'speaking' : 'idle'}
                 name="AI Interviewer"
-                message={currentQuestion.questionText}
               />
             </div>
           )}
