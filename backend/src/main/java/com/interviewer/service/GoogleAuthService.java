@@ -48,6 +48,7 @@ public class GoogleAuthService {
                 .queryParam("state", state)
                 .queryParam("prompt", "select_account")
                 .build()
+                .encode()
                 .toUriString();
     }
 
@@ -88,7 +89,7 @@ public class GoogleAuthService {
 
         String email = (String) profile.get("email");
         String name = (String) profile.get("name");
-        log.info("Google sign-in for {}", email);
+        log.debug("Google sign-in for {}", email);
         return authService.loginWithGoogle(email, name);
     }
 }
