@@ -44,7 +44,7 @@ const Register = () => {
         <GlassCard className="p-8">
           <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="text-center mb-8">
             <div className="w-14 h-14 mx-auto rounded-2xl flex items-center justify-center mb-4"
-              style={{ background: 'linear-gradient(135deg, #6366f1, #8b5cf6)', boxShadow: '0 4px 20px rgba(99,102,241,.3)' }}>
+              style={{ background: 'linear-gradient(135deg, #f59e0b, #f97316)', boxShadow: '0 4px 20px rgba(245,158,11,.3)' }}>
               <span className="text-white font-bold text-xl">AI</span>
             </div>
             <h2 className="text-2xl font-bold" style={{ color: '#fff', fontWeight: 500 }}>Create your account</h2>

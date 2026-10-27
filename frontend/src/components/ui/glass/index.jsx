@@ -100,7 +100,7 @@ export const GlassInput = ({ className = '', as, style: propStyle, ...props }) =
         resize: as === 'textarea' ? 'none' : undefined,
         ...propStyle,
       }}
-      onFocus={(e) => e.target.style.borderColor = 'rgba(99,102,241,.5)'}
+      onFocus={(e) => e.target.style.borderColor = 'rgba(245,158,11,.5)'}
       onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,.13)'}
       {...props}
     />
@@ -114,7 +114,7 @@ export const GlassBadge = ({ children, variant = 'default', className = '' }) =>
     success: { bg: 'rgba(34,197,94,.12)', color: '#4ade80', border: 'rgba(34,197,94,.2)' },
     warning: { bg: 'rgba(251,191,36,.12)', color: '#fbbf24', border: 'rgba(251,191,36,.2)' },
     danger: { bg: 'rgba(239,68,68,.12)', color: '#f87171', border: 'rgba(239,68,68,.2)' },
-    primary: { bg: 'rgba(99,102,241,.12)', color: '#818cf8', border: 'rgba(99,102,241,.2)' },
+    primary: { bg: 'rgba(245,158,11,.12)', color: '#fbbf24', border: 'rgba(245,158,11,.2)' },
   }
 
   return (

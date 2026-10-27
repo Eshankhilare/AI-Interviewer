@@ -42,7 +42,7 @@ const JobDescriptions = () => {
 
         <div className="flex justify-between items-center mb-6">
           <div>
-            <h1 className="text-2xl font-bold" style={{ color: '#fff', fontFamily: '"Reference Display", serif', fontWeight: 500 }}>Job Descriptions</h1>
+            <h1 className="text-2xl font-bold" style={{ color: '#fff', fontFamily: '"Fraunces", "Reference Display", serif', fontWeight: 500 }}>Job Descriptions</h1>
             <p className="mt-1" style={{ color: 'rgba(255,255,255,.5)' }}>Manage your job descriptions for interviews</p>
           </div>
           <WhiteButton onClick={() => setShowForm(!showForm)} className="px-4 py-2.5 flex items-center gap-2 text-sm">
@@ -95,7 +95,7 @@ const JobDescriptions = () => {
               <motion.div key={jd.id} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.06 }}>
                 <GlassCard className="flex items-center justify-between p-5">
                   <div className="flex-1">
-                    <div className="flex items-center"><Briefcase className="h-5 w-5 mr-2" style={{ color: '#818cf8' }} /><h3 className="font-medium" style={{ color: '#fff' }}>{jd.title}</h3></div>
+                    <div className="flex items-center"><Briefcase className="h-5 w-5 mr-2" style={{ color: '#fbbf24' }} /><h3 className="font-medium" style={{ color: '#fff' }}>{jd.title}</h3></div>
                     <p className="text-sm mt-1" style={{ color: 'rgba(255,255,255,.4)' }}>{jd.company} · {jd.experienceLevel} · {jd.location || 'Remote'}</p>
                   </div>
                   <div className="flex items-center gap-2">

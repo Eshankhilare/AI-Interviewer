@@ -30,7 +30,7 @@ function FloatingParticles({ count = 200 }) {
       </bufferGeometry>
       <pointsMaterial
         size={0.05}
-        color="#6366f1"
+        color="#f59e0b"
         transparent
         opacity={0.6}
         sizeAttenuation
@@ -39,7 +39,7 @@ function FloatingParticles({ count = 200 }) {
   )
 }
 
-function FloatingRing({ radius = 3, tube = 0.02, color = '#818cf8' }) {
+function FloatingRing({ radius = 3, tube = 0.02, color = '#fbbf24' }) {
   const ref = useRef()
 
   useFrame((state) => {
@@ -65,8 +65,8 @@ export default function Scene3D({ className = '', particles = true, rings = true
         {particles && <FloatingParticles />}
         {rings && (
           <>
-            <FloatingRing radius={2.5} color="#6366f1" />
-            <FloatingRing radius={3.5} color="#818cf8" />
+            <FloatingRing radius={2.5} color="#f59e0b" />
+            <FloatingRing radius={3.5} color="#fbbf24" />
             <FloatingRing radius={4.5} color="#a5b4fc" />
           </>
         )}

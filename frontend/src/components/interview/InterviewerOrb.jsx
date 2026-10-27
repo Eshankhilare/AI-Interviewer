@@ -17,7 +17,7 @@ const InterviewerOrb = ({ state = 'idle', name = 'AI Interviewer', message }) =>
 
   return (
     <div className="relative overflow-hidden rounded-[24px] border border-white/[0.12] bg-[linear-gradient(145deg,rgba(24,22,20,.84),rgba(5,12,14,.92))] px-6 pb-5 pt-6 shadow-[0_2px_10px_rgba(0,0,0,.44),inset_0_0_0_3px_rgba(255,255,255,.035)] backdrop-blur-[14px]">
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_38%,rgba(99,102,241,.18),transparent_40%)]" />
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_38%,rgba(245,158,11,.18),transparent_40%)]" />
 
       <div className="relative flex min-h-[270px] flex-col items-center justify-center">
         <motion.div
@@ -40,7 +40,7 @@ const InterviewerOrb = ({ state = 'idle', name = 'AI Interviewer', message }) =>
         ))}
 
         <motion.div
-          className="relative z-10 flex h-32 w-32 items-center justify-center rounded-full border border-white/[0.24] bg-[radial-gradient(circle_at_35%_28%,#c7d2fe_0%,#818cf8_22%,#4f46e5_54%,#17134f_100%)] shadow-[0_0_45px_rgba(99,102,241,.42),inset_10px_10px_24px_rgba(255,255,255,.28),inset_-14px_-16px_28px_rgba(5,8,35,.62)]"
+          className="relative z-10 flex h-32 w-32 items-center justify-center rounded-full border border-white/[0.24] bg-[radial-gradient(circle_at_35%_28%,#fde68a_0%,#fbbf24_22%,#d97706_54%,#17134f_100%)] shadow-[0_0_45px_rgba(245,158,11,.42),inset_10px_10px_24px_rgba(255,255,255,.28),inset_-14px_-16px_28px_rgba(5,8,35,.62)]"
           animate={{
             scale: isSpeaking ? [1, 1.08, 0.98, 1.06, 1] : isListening ? [1, 1.04, 1] : [1, 1.025, 1],
             rotate: state === 'loading' ? 360 : 0,

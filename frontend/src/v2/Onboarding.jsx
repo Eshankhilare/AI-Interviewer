@@ -111,7 +111,7 @@ export default function Onboarding({ onDone }) {
         initial={{ opacity: 0, y: 18, scale: .985 }} animate={{ opacity: 1, y: 0, scale: 1 }}
         transition={{ duration: .45, ease: [.16, 1, .3, 1] }}
       >
-        <div style={{ position: 'absolute', inset: '-40% -20% auto auto', width: 420, height: 420, borderRadius: '50%', background: 'radial-gradient(circle, rgba(99,102,241,.22), transparent 65%)', pointerEvents: 'none' }} />
+        <div style={{ position: 'absolute', inset: '-40% -20% auto auto', width: 420, height: 420, borderRadius: '50%', background: 'radial-gradient(circle, rgba(245,158,11,.22), transparent 65%)', pointerEvents: 'none' }} />
 
         <div className="st-between" style={{ position: 'relative' }}>
           <div className="st-row" style={{ gap: 8 }}>
@@ -127,8 +127,8 @@ export default function Onboarding({ onDone }) {
           {Array.from({ length: total }).map((_, index) => (
             <span key={index} style={{
               height: 3, flex: 1, borderRadius: 999,
-              background: index <= step ? 'linear-gradient(90deg,#6366f1,#a78bfa)' : 'rgba(255,255,255,.10)',
-              boxShadow: index === step ? '0 0 12px rgba(124,108,246,.6)' : 'none',
+              background: index <= step ? 'linear-gradient(90deg,#f59e0b,#fde68a)' : 'rgba(255,255,255,.10)',
+              boxShadow: index === step ? '0 0 12px rgba(245,158,11,.6)' : 'none',
               transition: 'background .2s ease',
             }} />
           ))}

@@ -289,7 +289,7 @@ const ProctoringMonitor = ({ onViolation, enabled = true }) => {
               const lCenter = leftEye.reduce((a, p) => ({ x: a.x + p.x / leftEye.length, y: a.y + p.y / leftEye.length }), { x: 0, y: 0 })
               const rCenter = rightEye.reduce((a, p) => ({ x: a.x + p.x / rightEye.length, y: a.y + p.y / rightEye.length }), { x: 0, y: 0 })
               const eyeMid = { x: (lCenter.x + rCenter.x) / 2, y: (lCenter.y + rCenter.y) / 2 }
-              ctx.fillStyle = '#6366f1'
+              ctx.fillStyle = '#f59e0b'
               ctx.beginPath()
               ctx.arc(eyeMid.x, eyeMid.y, 3, 0, 2 * Math.PI)
               ctx.fill()

@@ -187,10 +187,10 @@ const NewInterview = () => {
         {[1, 2, 3].map((s) => (
           <div key={s} className="flex items-center">
             <div className="w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold transition-all"
-              style={{ background: step >= s ? '#6366f1' : 'rgba(255,255,255,.06)', color: step >= s ? '#fff' : 'rgba(255,255,255,.4)' }}>
+              style={{ background: step >= s ? '#f59e0b' : 'rgba(255,255,255,.06)', color: step >= s ? '#fff' : 'rgba(255,255,255,.4)' }}>
               {s}
             </div>
-            <span className="ml-2 text-sm font-medium" style={{ color: step >= s ? '#818cf8' : 'rgba(255,255,255,.3)' }}>
+            <span className="ml-2 text-sm font-medium" style={{ color: step >= s ? '#fbbf24' : 'rgba(255,255,255,.3)' }}>
               {s === 1 ? 'Job Role' : s === 2 ? 'Resume' : 'Details'}
             </span>
             {s < 3 && <ChevronRight className="h-4 w-4 mx-3" style={{ color: 'rgba(255,255,255,.15)' }} />}
@@ -202,7 +202,7 @@ const NewInterview = () => {
       {step === 1 && (
         <GlassCard className="p-6">
           <h2 className="text-lg font-semibold mb-4 flex items-center" style={{ color: '#fff' }}>
-            <Briefcase className="h-5 w-5 mr-2" style={{ color: '#818cf8' }} />
+            <Briefcase className="h-5 w-5 mr-2" style={{ color: '#fbbf24' }} />
             Select Job Role
           </h2>
 
@@ -387,7 +387,7 @@ const NewInterview = () => {
                 </span>
               </div>
               <div className="h-1.5 rounded-full overflow-hidden mb-3" style={{ background: 'rgba(255,255,255,.08)' }}>
-                <div className="h-full rounded-full" style={{ width: `${roleFit.score}%`, background: '#6366f1' }} />
+                <div className="h-full rounded-full" style={{ width: `${roleFit.score}%`, background: '#f59e0b' }} />
               </div>
               <p className="text-xs mb-2" style={{ color: 'rgba(255,255,255,.5)' }}>
                 {roleFit.matched.length} of {roleFit.terms} job-description terms appear in this resume.

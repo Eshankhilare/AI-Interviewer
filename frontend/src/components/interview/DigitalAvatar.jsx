@@ -38,7 +38,7 @@ const DigitalAvatar = ({ isSpeaking, emotion, name = 'AI Interviewer', message, 
   }, [isSpeaking])
 
   const emotionGlow = {
-    neutral: 'rgba(99,102,241,.15)',
+    neutral: 'rgba(245,158,11,.15)',
     happy: 'rgba(52,211,153,.15)',
     thinking: 'rgba(251,191,36,.12)',
     concerned: 'rgba(248,113,113,.12)',

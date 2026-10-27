@@ -91,11 +91,11 @@ const BodyLanguageAnalyzer = ({ onAnalysisUpdate, enabled = true }) => {
 
         if (results.poseLandmarks) {
           drawConnectors(ctx, results.poseLandmarks, Pose.POSE_CONNECTIONS, {
-            color: '#6366f1',
+            color: '#f59e0b',
             lineWidth: 2,
           })
           drawLandmarks(ctx, results.poseLandmarks, {
-            color: '#8b5cf6',
+            color: '#f97316',
             lineWidth: 1,
             radius: 3,
           })
