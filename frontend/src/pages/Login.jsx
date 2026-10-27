@@ -4,16 +4,22 @@ import { useAuth } from '../context/AuthContext'
 import { Mail, Lock, ArrowRight } from 'lucide-react'
 import { motion } from 'framer-motion'
 import { GlassCard, WhiteButton, GlassInput, BackgroundVideo } from '../components/ui/glass'
+import GoogleButton from '../components/auth/GoogleButton'
 import { errorMessage } from '../services/api'
 
 const Login = () => {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
-  const [error, setError] = useState('')
-  const [loading, setLoading] = useState(false)
   const { login } = useAuth()
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
+  const [error, setError] = useState(() => {
+    const reason = searchParams.get('error')
+    if (reason === 'google_failed') return 'Google sign-in did not complete. Please try again or use email/phone.'
+    if (reason === 'google_not_configured') return 'Google sign-in is not configured on this deployment yet.'
+    return ''
+  })
+  const [loading, setLoading] = useState(false)
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -47,13 +53,8 @@ const Login = () => {
             transition={{ delay: 0.2 }}
             className="text-center mb-8"
           >
-            <div className="w-14 h-14 mx-auto rounded-2xl flex items-center justify-center mb-4"
-              style={{
-                background: 'linear-gradient(135deg, #f59e0b, #f97316)',
-                boxShadow: '0 4px 20px rgba(245,158,11,.3)',
-              }}>
-              <span className="text-white font-bold text-xl">AI</span>
-            </div>
+            <img src="/logo.jpeg" alt="AI Interviewer" className="w-14 h-14 mx-auto rounded-2xl object-cover mb-4"
+              style={{ border: '1px solid rgba(245,158,11,.35)', boxShadow: '0 4px 20px rgba(245,158,11,.3)' }} />
             <h2 className="text-2xl font-bold" style={{ color: '#fff', fontWeight: 500 }}>Welcome back</h2>
             <p className="mt-1" style={{ color: 'rgba(255,255,255,.5)' }}>Sign in to continue your interview prep</p>
           </motion.div>
@@ -71,16 +72,17 @@ const Login = () => {
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="block text-sm font-medium mb-1.5" style={{ color: 'rgba(255,255,255,.6)' }}>Email</label>
+              <label className="block text-sm font-medium mb-1.5" style={{ color: 'rgba(255,255,255,.6)' }}>Email or phone</label>
               <div className="relative">
                 <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4" style={{ color: 'rgba(255,255,255,.25)' }} />
                 <GlassInput
-                  type="email"
+                  type="text"
                   required
+                  autoComplete="username"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   className="pl-10"
-                  placeholder="you@example.com"
+                  placeholder="you@example.com or +91 98765 43210"
                 />
               </div>
             </div>
@@ -113,11 +115,16 @@ const Login = () => {
             </WhiteButton>
           </form>
 
+          <GoogleButton />
+
           <p className="mt-6 text-center text-sm" style={{ color: 'rgba(255,255,255,.4)' }}>
             Don&apos;t have an account?{' '}
             <Link to="/register" className="font-semibold hover:opacity-80" style={{ color: '#fff' }}>
               Create one
             </Link>
+          </p>
+          <p className="mt-4 text-center text-xs" style={{ color: 'rgba(255,255,255,.3)' }}>
+            <Link to="/privacy">Privacy</Link> · <Link to="/terms">Terms</Link> · <Link to="/cookies">Cookies</Link>
           </p>
         </GlassCard>
       </motion.div>

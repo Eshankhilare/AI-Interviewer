@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect } from 'react'
+import { createContext, useCallback, useContext, useState, useEffect } from 'react'
 import api from '../services/api'
 
 const AuthContext = createContext(null)
@@ -34,6 +34,23 @@ export const AuthProvider = ({ children }) => {
     return userData
   }
 
+  /** Used by the Google callback: the JWT arrives in the URL fragment. */
+  const loginWithToken = useCallback(async (token) => {
+    localStorage.setItem('token', token)
+    try {
+      const { data } = await api.get('/users/profile')
+      const userData = { userId: data.id, email: data.email, fullName: data.fullName, role: data.role }
+      localStorage.setItem('user', JSON.stringify(userData))
+      setUser(userData)
+      return userData
+    } catch (err) {
+      localStorage.removeItem('token')
+      localStorage.removeItem('user')
+      setUser(null)
+      throw err
+    }
+  }, [])
+
   const logout = () => {
     localStorage.removeItem('token')
     localStorage.removeItem('user')
@@ -41,7 +58,7 @@ export const AuthProvider = ({ children }) => {
   }
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, register, logout }}>
+    <AuthContext.Provider value={{ user, loading, login, register, loginWithToken, logout }}>
       {children}
     </AuthContext.Provider>
   )

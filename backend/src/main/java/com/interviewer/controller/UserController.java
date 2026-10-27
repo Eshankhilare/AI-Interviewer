@@ -33,7 +33,15 @@ public class UserController {
             @Valid @RequestBody ProfileUpdateRequest request) {
         User user = findUser(principal);
         if (request.getFullName() != null) user.setFullName(request.getFullName());
-        user.setPhone(request.getPhone());
+        String phone = com.interviewer.service.AuthService.normalizePhone(request.getPhone());
+        if (phone != null) {
+            userRepository.findByPhone(phone).ifPresent(existing -> {
+                if (!existing.getId().equals(user.getId())) {
+                    throw new com.interviewer.exception.ConflictException("Phone number already exists");
+                }
+            });
+        }
+        user.setPhone(phone);
         user.setProfileSummary(request.getProfileSummary());
         user.setLinkedinUrl(request.getLinkedinUrl());
         user.setGithubUrl(request.getGithubUrl());

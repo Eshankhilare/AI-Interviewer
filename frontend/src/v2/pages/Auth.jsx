@@ -4,6 +4,7 @@ import { ArrowLeftRight, ArrowRight } from 'lucide-react'
 import { useAuth } from '../../context/AuthContext'
 import { errorMessage } from '../../services/api'
 import { setUIVersion } from '../store'
+import GoogleButton from '../../components/auth/GoogleButton'
 import '../ui.css'
 
 export default function AuthStudio({ mode = 'login' }) {
@@ -49,7 +50,7 @@ export default function AuthStudio({ mode = 'login' }) {
         <aside className="st-auth-aside">
           <div>
             <div className="st-row" style={{ gap: 10 }}>
-              <span className="st-rail-logo" style={{ marginBottom: 0 }}>AI</span>
+              <img src="/logo.jpeg" alt="" className="st-rail-logo" style={{ marginBottom: 0, objectFit: 'cover' }} />
               <span style={{ fontWeight: 600, letterSpacing: '-.02em' }}>AI Interviewer</span>
             </div>
             <div style={{ marginTop: 64, maxWidth: 430 }}>
@@ -98,8 +99,8 @@ export default function AuthStudio({ mode = 'login' }) {
                 </div>
               )}
               <div>
-                <label className="st-label" htmlFor="auth-email">Email</label>
-                <input id="auth-email" type="email" className="st-input" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} required autoComplete="email" />
+                <label className="st-label" htmlFor="auth-email">{isLogin ? 'Email or phone' : 'Email'}</label>
+                <input id="auth-email" type={isLogin ? 'text' : 'email'} className="st-input" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} required autoComplete={isLogin ? 'username' : 'email'} />
               </div>
               <div>
                 <label className="st-label" htmlFor="auth-password">Password</label>
@@ -110,6 +111,7 @@ export default function AuthStudio({ mode = 'login' }) {
                 <div>
                   <label className="st-label" htmlFor="auth-phone">Phone (optional)</label>
                   <input id="auth-phone" className="st-input" value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} autoComplete="tel" />
+                  <p className="st-dim" style={{ fontSize: 11.5, margin: '6px 0 0' }}>You can sign in with this number and your password. It is not SMS-verified yet.</p>
                 </div>
               )}
               {error && <div className="st-banner st-banner-bad">{error}</div>}
@@ -118,9 +120,14 @@ export default function AuthStudio({ mode = 'login' }) {
               </button>
             </form>
 
+            <GoogleButton />
+
             <p className="st-dim" style={{ fontSize: 12.5, marginTop: 18 }}>
               {isLogin ? "Don't have an account? " : 'Already have an account? '}
               <Link to={other + otherQuery} style={{ color: 'var(--st-text)' }}>{isLogin ? 'Create one' : 'Sign in'}</Link>
+            </p>
+            <p className="st-dim" style={{ fontSize: 11, marginTop: 14 }}>
+              <Link to="/privacy">Privacy</Link> · <Link to="/terms">Terms</Link> · <Link to="/cookies">Cookies</Link>
             </p>
           </div>
         </main>

@@ -22,8 +22,19 @@ services:
         sync: false
       - key: JWT_SECRET
         sync: false
+      - key: JAVA_TOOL_OPTIONS
+        value: -Xmx320m
+      # Google sign-in (free). Leave unset to hide the button.
+      - key: GOOGLE_CLIENT_ID
+        sync: false
+      - key: GOOGLE_CLIENT_SECRET
+        sync: false
+      - key: GOOGLE_REDIRECT_URI
+        sync: false
+      - key: FRONTEND_URL
+        sync: false
       - key: APP_CORS_ALLOWED_ORIGINS
-        value: https://ai-interviewer-rho-hazel.vercel.app
+        sync: false
 
   - type: web
     name: ai-interviewer-ai-service
@@ -43,10 +54,11 @@ services:
       - key: TTS_PROVIDER
         value: edge
       - key: STT_PROVIDER
-        value: deepgram
+        value: mock
+      # Only needed when STT_PROVIDER=deepgram. The mock returns a fixed transcript.
       - key: DEEPGRAM_API_KEY
         sync: false
       - key: AI_SERVICE_TOKEN
         sync: false
       - key: ALLOWED_ORIGINS
-        value: https://ai-interviewer-rho-hazel.vercel.app
+        sync: false

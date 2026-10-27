@@ -126,9 +126,9 @@ variable with a safe default.
 
 | File | Copy to | Notes |
 |---|---|---|
-| `backend/.env.example` | `backend/.env` or your shell | `JWT_SECRET` is required in production (32+ bytes). Empty locally means a random key per boot. |
+| `backend/.env.example` | `backend/.env` or your shell | `JWT_SECRET` is required in production (32+ bytes). Empty locally means a random key per boot. `GOOGLE_CLIENT_ID`/`GOOGLE_CLIENT_SECRET` enable Google sign-in (free); without them the button is hidden. Set `GOOGLE_REDIRECT_URI` to the backend callback and `FRONTEND_URL` to the browser origin. |
 | `ai-service/.env.example` | `ai-service/.env` | `LLM_API_KEY` (or `GEMINI_API_KEY`) enables the rubric evaluator; without it the heuristic fallback runs. The free tier allows about 20 requests per model per day, which is roughly two three-question interviews. `AI_SERVICE_TOKEN` must match the backend. |
-| `frontend/.env.example` | `frontend/.env.local` | `VITE_API_URL` only; the browser never talks to the AI service directly. |
+| `frontend/.env.example` | `frontend/.env.local` | `VITE_API_URL` only; the browser never talks to the AI service directly. `VITE_CONTACT_EMAIL` and `VITE_CONTACT_PHONE` fill the contact box on the legal pages (the phone is hidden when empty). |
 
 Nothing in the repository contains a real credential. If you deployed from an
 earlier commit, rotate the TiDB password, the local MySQL password, the JWT

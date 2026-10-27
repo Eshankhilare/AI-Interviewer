@@ -1,5 +1,5 @@
 import { lazy } from 'react'
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
+import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom'
 import { AuthProvider, useAuth } from './context/AuthContext'
 import Landing from './pages/Landing'
 import Login from './pages/Login'
@@ -13,6 +13,8 @@ import Resumes from './pages/Resumes'
 import Practice from './pages/Practice'
 import ProtectedRoute from './components/common/ProtectedRoute'
 import Profile from './pages/Profile'
+import AuthCallback from './pages/AuthCallback'
+import { Privacy, Terms, Cookies } from './pages/Legal'
 import ErrorBoundary from './components/common/ErrorBoundary'
 import { UIChrome, UIPage } from './v2/UISwitch'
 
@@ -43,6 +45,10 @@ function AppRoutes() {
       <Route path="/register" element={user ? <Navigate to="/" replace /> : (
         <UIPage classic={<Register />} studio={<StudioAuth mode="register" />} />
       )} />
+      <Route path="/privacy" element={<Privacy />} />
+      <Route path="/terms" element={<Terms />} />
+      <Route path="/cookies" element={<Cookies />} />
+      <Route path="/auth/callback" element={<AuthCallback />} />
       <Route
         path="/"
         element={
@@ -73,26 +79,35 @@ function AppRoutes() {
   )
 }
 
+const HIDE_GLOBAL_VIDEO = ['/privacy', '/terms', '/cookies', '/auth/callback']
+
+function GlobalBackdrop() {
+  const { pathname } = useLocation()
+  if (HIDE_GLOBAL_VIDEO.includes(pathname)) return null
+  return (
+    <div style={{ position: 'fixed', inset: 0, zIndex: 0, overflow: 'hidden' }}>
+      <video
+        style={{
+          position: 'absolute', inset: 0,
+          width: '100%', height: '100%',
+          objectFit: 'cover', objectPosition: 'center',
+          filter: 'blur(2px) brightness(1.4) saturate(1.15)',
+          transform: 'scale(1.05)',
+          pointerEvents: 'none', userSelect: 'none',
+        }}
+        autoPlay muted loop playsInline disablePictureInPicture aria-hidden="true"
+      >
+        <source src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260808_064556_051587f1-74a1-4336-8c05-4dde3594ed05.mp4" type="video/mp4" />
+      </video>
+    </div>
+  )
+}
+
 function App() {
   return (
     <AuthProvider>
       <Router>
-        {/* Global background video - always visible behind all content */}
-        <div style={{ position: 'fixed', inset: 0, zIndex: 0, overflow: 'hidden' }}>
-          <video
-            style={{
-              position: 'absolute', inset: 0,
-              width: '100%', height: '100%',
-              objectFit: 'cover', objectPosition: 'center',
-              filter: 'blur(2px) brightness(1.4) saturate(1.15)',
-              transform: 'scale(1.05)',
-              pointerEvents: 'none', userSelect: 'none',
-            }}
-            autoPlay muted loop playsInline disablePictureInPicture aria-hidden="true"
-          >
-            <source src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260808_064556_051587f1-74a1-4336-8c05-4dde3594ed05.mp4" type="video/mp4" />
-          </video>
-        </div>
+        <GlobalBackdrop />
         <ErrorBoundary label="app">
           <AppRoutes />
         </ErrorBoundary>

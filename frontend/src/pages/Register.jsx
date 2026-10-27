@@ -4,6 +4,7 @@ import { useAuth } from '../context/AuthContext'
 import { UserPlus, Mail, Lock, User, Phone } from 'lucide-react'
 import { motion } from 'framer-motion'
 import { GlassCard, WhiteButton, GlassInput, BackgroundVideo } from '../components/ui/glass'
+import GoogleButton from '../components/auth/GoogleButton'
 import { errorMessage } from '../services/api'
 
 const Register = () => {
@@ -43,10 +44,8 @@ const Register = () => {
       >
         <GlassCard className="p-8">
           <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="text-center mb-8">
-            <div className="w-14 h-14 mx-auto rounded-2xl flex items-center justify-center mb-4"
-              style={{ background: 'linear-gradient(135deg, #f59e0b, #f97316)', boxShadow: '0 4px 20px rgba(245,158,11,.3)' }}>
-              <span className="text-white font-bold text-xl">AI</span>
-            </div>
+            <img src="/logo.jpeg" alt="AI Interviewer" className="w-14 h-14 mx-auto rounded-2xl object-cover mb-4"
+              style={{ border: '1px solid rgba(245,158,11,.35)', boxShadow: '0 4px 20px rgba(245,158,11,.3)' }} />
             <h2 className="text-2xl font-bold" style={{ color: '#fff', fontWeight: 500 }}>Create your account</h2>
             <p className="mt-1" style={{ color: 'rgba(255,255,255,.5)' }}>Start practicing interviews with AI</p>
           </motion.div>
@@ -89,6 +88,9 @@ const Register = () => {
                 <Phone className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4" style={{ color: 'rgba(255,255,255,.25)' }} />
                 <GlassInput type="tel" name="phone" value={formData.phone} onChange={handleChange} className="pl-10" placeholder="+1 234 567 8900" />
               </div>
+              <p className="mt-1.5 text-xs" style={{ color: 'rgba(255,255,255,.35)' }}>
+                You can sign in with this number and your password. It is not SMS-verified yet.
+              </p>
             </div>
 
             <WhiteButton type="submit" disabled={loading} className="w-full flex items-center justify-center gap-2 py-3">
@@ -96,8 +98,13 @@ const Register = () => {
             </WhiteButton>
           </form>
 
+          <GoogleButton label="Sign up with Google" />
+
           <p className="mt-6 text-center text-sm" style={{ color: 'rgba(255,255,255,.4)' }}>
             Already have an account? <Link to="/login" className="font-semibold hover:opacity-80" style={{ color: '#fff' }}>Sign in</Link>
+          </p>
+          <p className="mt-4 text-center text-xs" style={{ color: 'rgba(255,255,255,.3)' }}>
+            <Link to="/privacy">Privacy</Link> · <Link to="/terms">Terms</Link> · <Link to="/cookies">Cookies</Link>
           </p>
         </GlassCard>
       </motion.div>

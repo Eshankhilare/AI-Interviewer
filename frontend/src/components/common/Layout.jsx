@@ -41,10 +41,8 @@ const Layout = () => {
             <div className="flex justify-between h-16">
               <div className="flex items-center">
                 <Link to="/" className="flex items-center gap-2.5 group">
-                  <div className="w-8 h-8 rounded-xl flex items-center justify-center"
-                    style={{ background: 'linear-gradient(135deg, #f59e0b, #f97316)' }}>
-                    <span className="text-white font-bold text-sm">AI</span>
-                  </div>
+                  <img src="/logo.jpeg" alt="AI Interviewer" className="w-8 h-8 rounded-xl object-cover"
+                    style={{ border: '1px solid rgba(245,158,11,.35)' }} />
                   <span className="text-lg font-bold" style={{ color: '#fff' }}>Interviewer</span>
                 </Link>
               </div>
@@ -106,6 +104,15 @@ const Layout = () => {
             </motion.div>
           </AnimatePresence>
         </main>
+
+        <footer className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+          <div className="flex flex-wrap items-center gap-x-5 gap-y-2 text-xs" style={{ color: 'rgba(255,255,255,.3)' }}>
+            <span>© 2026 AI Interviewer</span>
+            <Link to="/privacy" className="hover:opacity-80">Privacy</Link>
+            <Link to="/terms" className="hover:opacity-80">Terms</Link>
+            <Link to="/cookies" className="hover:opacity-80">Cookies</Link>
+          </div>
+        </footer>
       </div>
     </div>
   )
