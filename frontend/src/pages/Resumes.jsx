@@ -76,7 +76,10 @@ const Resumes = () => {
             {error && <div className="mb-4 p-3 rounded-xl" style={{ background: 'rgba(239,68,68,.1)', border: '1px solid rgba(239,68,68,.2)' }}><p className="text-sm" style={{ color: '#f87171' }}>{error}</p></div>}
             {!pasteMode ? (
               <form onSubmit={handleFileUpload}>
-                <input type="file" accept=".pdf,.doc,.docx,.txt" onChange={handleFileUpload} className="w-full text-sm" style={{ color: 'rgba(255,255,255,.5)' }} />
+                <input type="file" accept=".txt,.md" onChange={handleFileUpload} className="w-full text-sm" style={{ color: 'rgba(255,255,255,.5)' }} />
+                <p className="mt-2 text-xs" style={{ color: 'rgba(255,255,255,.4)' }}>
+                  Text files only (.txt, .md). PDF and DOCX are not parsed yet — paste the text instead.
+                </p>
               </form>
             ) : (
               <div>

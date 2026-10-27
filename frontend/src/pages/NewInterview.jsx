@@ -217,13 +217,13 @@ const NewInterview = () => {
             </div>
 
             {showRoleDropdown && (
-              <div className="absolute z-10 w-full mt-1 bg-white rounded-xl shadow-lg border border-ink-200 max-h-80 overflow-hidden">
+              <div className="absolute z-10 w-full mt-1 glass rounded-xl shadow-lg max-h-80 overflow-hidden">
                 {/* Category tabs */}
-                <div className="flex gap-1 p-2 border-b border-ink-100 overflow-x-auto">
+                <div className="flex gap-1 p-2 border-b border-white/10 overflow-x-auto">
                   <button
                     onClick={() => setActiveCategory(null)}
                     className={`px-3 py-1 rounded-lg text-xs font-medium whitespace-nowrap transition-colors ${
-                      !activeCategory ? 'bg-primary-100 text-primary-700' : 'text-ink-500 hover:bg-ink-50'
+                      !activeCategory ? 'bg-primary-500/25 text-primary-200' : 'text-white/50 hover:bg-white/5'
                     }`}
                   >
                     All
@@ -233,7 +233,7 @@ const NewInterview = () => {
                       key={cat}
                       onClick={() => setActiveCategory(cat)}
                       className={`px-3 py-1 rounded-lg text-xs font-medium whitespace-nowrap transition-colors ${
-                        activeCategory === cat ? 'bg-primary-100 text-primary-700' : 'text-ink-500 hover:bg-ink-50'
+                        activeCategory === cat ? 'bg-primary-500/25 text-primary-200' : 'text-white/50 hover:bg-white/5'
                       }`}
                     >
                       {cat}
@@ -244,18 +244,18 @@ const NewInterview = () => {
                 {/* Role list */}
                 <div className="max-h-60 overflow-y-auto">
                   {groupedRoles.length === 0 ? (
-                    <div className="p-4 text-center text-ink-400 text-sm">No roles found</div>
+                    <div className="p-4 text-center text-white/40 text-sm">No roles found</div>
                   ) : (
                     groupedRoles.map(role => (
                       <button
                         key={role.title}
                         onClick={() => handleRoleSelect(role)}
-                        className={`w-full text-left px-4 py-3 hover:bg-primary-50 transition-colors border-b border-ink-50 last:border-0 ${
-                          selectedRole?.title === role.title ? 'bg-primary-50' : ''
+                        className={`w-full text-left px-4 py-3 hover:bg-white/5 transition-colors border-b border-white/5 last:border-0 ${
+                          selectedRole?.title === role.title ? 'bg-primary-500/15' : ''
                         }`}
                       >
-                        <div className="font-medium text-ink-900 text-sm">{role.title}</div>
-                        <div className="text-xs text-ink-500 mt-0.5">
+                        <div className="font-medium text-white text-sm">{role.title}</div>
+                        <div className="text-xs text-white/50 mt-0.5">
                           {role.skills.slice(0, 4).join(' · ')}
                         </div>
                       </button>
@@ -268,15 +268,15 @@ const NewInterview = () => {
 
           {/* Selected role preview */}
           {selectedRole && (
-            <div className="mb-6 p-4 bg-primary-50 border border-primary-200 rounded-xl">
+            <div className="mb-6 p-4 rounded-xl border border-primary-500/30 bg-primary-500/10">
               <div className="flex items-center justify-between mb-2">
-                <h3 className="font-semibold text-primary-900">{selectedRole.title}</h3>
-                <span className="text-xs px-2 py-0.5 bg-primary-100 text-primary-700 rounded-full">{selectedRole.category}</span>
+                <h3 className="font-semibold text-white">{selectedRole.title}</h3>
+                <span className="text-xs px-2 py-0.5 bg-primary-500/20 text-primary-200 rounded-full">{selectedRole.category}</span>
               </div>
-              <p className="text-sm text-primary-800 mb-2">{selectedRole.description}</p>
+              <p className="text-sm text-white/65 mb-2">{selectedRole.description}</p>
               <div className="flex flex-wrap gap-1">
                 {selectedRole.skills.map(skill => (
-                  <span key={skill} className="px-2 py-0.5 bg-white text-primary-700 rounded text-xs border border-primary-200">
+                  <span key={skill} className="px-2 py-0.5 bg-white/10 text-primary-100 rounded text-xs border border-primary-500/30">
                     {skill}
                   </span>
                 ))}
@@ -315,7 +315,7 @@ const NewInterview = () => {
           <div className="flex justify-between items-center mt-6">
             <Link
               to="/job-descriptions"
-              className="text-sm text-primary-600 hover:text-primary-700 font-medium"
+              className="text-sm text-primary-400 hover:text-primary-300 font-medium"
             >
               + Create custom Job Description
             </Link>
@@ -332,7 +332,7 @@ const NewInterview = () => {
 
       {/* Step 2: Resume */}
       {step === 2 && (
-        <div className="p-6">
+        <div className="glass rounded-2xl p-6">
           <h2 className="text-lg font-semibold mb-4">Add Resume (Optional)</h2>
 
           {resumes.length > 0 && (
@@ -374,12 +374,12 @@ const NewInterview = () => {
               value={resumeText}
               onChange={(e) => setResumeText(e.target.value)}
               placeholder="Paste your resume text here..."
-              className="w-full h-32 p-3 border border-ink-200 rounded-xl text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+              className="input w-full h-32 p-3 text-sm"
             />
             <button
               onClick={handleResumeTextSubmit}
               disabled={!resumeText.trim() || uploadingResume}
-              className="mt-2 px-3 py-1.5 text-sm bg-ink-100 text-ink-700 rounded-lg hover:bg-ink-200 disabled:opacity-50"
+              className="btn-secondary mt-2 px-3 py-1.5 text-sm disabled:opacity-50"
             >
               {uploadingResume ? 'Parsing...' : 'Parse & Use'}
             </button>
@@ -401,7 +401,7 @@ const NewInterview = () => {
 
       {/* Step 3: Interview Details */}
       {step === 3 && (
-        <div className="p-6">
+        <div className="glass rounded-2xl p-6">
           <h2 className="text-lg font-semibold mb-4">Interview Details</h2>
 
           <div className="space-y-4">
@@ -412,7 +412,7 @@ const NewInterview = () => {
                 value={form.title}
                 onChange={(e) => setForm({ ...form, title: e.target.value })}
                 placeholder="e.g., Senior Developer Interview"
-                className="w-full p-2.5 border border-ink-200 rounded-xl text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                className="input w-full p-2.5 text-sm"
               />
             </div>
 
@@ -422,7 +422,7 @@ const NewInterview = () => {
                 <select
                   value={form.mode}
                   onChange={(e) => setForm({ ...form, mode: e.target.value })}
-                  className="w-full p-2.5 border border-ink-200 rounded-xl text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                  className="input w-full p-2.5 text-sm"
                 >
                   <option value="TEXT">Text</option>
                   <option value="VOICE">Voice</option>
@@ -438,7 +438,7 @@ const NewInterview = () => {
                   onChange={(e) => setForm({ ...form, durationMinutes: parseInt(e.target.value) })}
                   min="10"
                   max="120"
-                  className="w-full p-2.5 border border-ink-200 rounded-xl text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                  className="input w-full p-2.5 text-sm"
                 />
               </div>
             </div>
@@ -462,7 +462,7 @@ const NewInterview = () => {
                 value={form.notes}
                 onChange={(e) => setForm({ ...form, notes: e.target.value })}
                 placeholder="Any specific areas to focus on..."
-                className="w-full h-20 p-2.5 border border-ink-200 rounded-xl text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                className="input w-full h-20 p-2.5 text-sm"
               />
             </div>
           </div>

@@ -4,59 +4,60 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Override Tailwind preflight backgrounds */
-*, *::before, *::after {
-  background-color: transparent !important;
-}
-
-/* Tailwind preflight is not loaded, so the browser underlines every link. */
+/* Tailwind preflight is not loaded: restore the few defaults the app relies on.
+   Never zero backgrounds globally again - that hid every solid CTA. */
 a {
   text-decoration: none;
 }
 
-/* Tailwind preflight is not loaded, so the browser draws native button frames. */
 button {
   border: 0;
   background: transparent;
 }
 
-/* Small bordered control that survives the background reset. */
+input[type="file"]::file-selector-button {
+  margin-right: 12px;
+  padding: 8px 14px;
+  border: 1px solid rgba(255, 255, 255, .16);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, .08);
+  color: #fff;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+/* Small bordered control used inside the interview panels. */
 .chip-btn {
-  background: rgba(255, 255, 255, .08) !important;
-  border: 1px solid rgba(255, 255, 255, .18) !important;
-  color: #fff !important;
+  background: rgba(255, 255, 255, .08);
+  border: 1px solid rgba(255, 255, 255, .18);
+  color: #fff;
 }
 
 .video-well {
-  background: #0a0a0a !important;
+  background: #0a0a0a;
 }
 
-/* The reset above also strips the backgrounds that must stay solid. Name the
-   exceptions here instead of weakening the reset. */
-.btn-primary,
-.btn-primary:hover {
-  background: #fff !important;
-}
+/* Solid CTA that must stay white on the dark page. */
 .cta-solid {
-  background: #fff !important;
-  color: #111 !important;
+  background: #fff;
+  color: #111;
 }
 .toggle-knob {
-  background: #fff !important;
+  background: #fff;
 }
 .toggle-track {
-  background: rgba(255, 255, 255, .1) !important;
+  background: rgba(255, 255, 255, .1);
 }
 .toggle-track-on {
-  background: #6366f1 !important;
+  background: #6366f1;
 }
 .select-card {
-  background: rgba(255, 255, 255, .03) !important;
-  border: 1px solid rgba(255, 255, 255, .16) !important;
+  background: rgba(255, 255, 255, .03);
+  border: 1px solid rgba(255, 255, 255, .16);
 }
 .select-card-active {
-  background: rgba(99, 102, 241, .16) !important;
-  border-color: rgba(99, 102, 241, .8) !important;
+  background: rgba(99, 102, 241, .16);
+  border-color: rgba(99, 102, 241, .8);
 }
 
 html, body, #root {
@@ -98,7 +99,8 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Force dark backgrounds on all elements - override Tailwind preflight */
+/* Keep raw controls (inputs, selects) from falling back to native light chrome.
+   Class utilities still win because this rule is not !important. */
 *, *::before, *::after {
   background-color: transparent;
 }
@@ -299,6 +301,17 @@ html, body {
     background: oklch(100% 0 0 / 0.06);
     color: oklch(100% 0 0 / 0.5);
     border: 1px solid oklch(100% 0 0 / 0.08);
+  }
+
+  .badge-primary {
+    background: oklch(65% 0.15 265 / 0.15);
+    color: oklch(82% 0.10 265);
+    border: 1px solid oklch(65% 0.15 265 / 0.24);
+  }
+
+  /* Brand gradient used by the primary CTAs on the wizard. */
+  .bg-gradient-brand {
+    background-image: linear-gradient(135deg, #6366f1, #8b5cf6);
   }
 
   /* Gradient text */

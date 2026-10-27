@@ -243,10 +243,10 @@ const Report = () => {
   if (error || !report) {
     return (
       <div className="max-w-4xl mx-auto py-12 px-4 text-center">
-        <div className="bg-white rounded-2xl p-8 shadow-card border border-ink-100">
+        <div className="glass rounded-2xl p-8 shadow-card">
           <AlertCircle className="h-12 w-12 text-amber-500 mx-auto mb-4" />
-          <h2 className="text-xl font-bold text-ink-900 mb-2">Report Not Available</h2>
-          <p className="text-ink-500 mb-6">{error || 'Report could not be found for this interview.'}</p>
+          <h2 className="text-xl font-bold text-white mb-2">Report Not Available</h2>
+          <p className="text-white/50 mb-6">{error || 'Report could not be found for this interview.'}</p>
           <Link
             to="/"
             className="inline-flex items-center px-4 py-2 bg-gradient-brand text-white rounded-lg font-medium hover:opacity-90 transition-opacity"
@@ -260,7 +260,9 @@ const Report = () => {
   }
 
   // Never invent skill scores: if the report has no per-skill data, say so.
+  const RADAR_LABELS = { 'Technical Depth': 'Technical' }
   const radarData = safeParseChartData(report.skillRadarData, [])
+    .map((point) => ({ ...point, skill: RADAR_LABELS[point.skill] || point.skill }))
   const categoryScores = safeParseChartData(report.categoryScores, [])
   const strengths = safeParseArray(report.strengths)
   const weaknesses = safeParseArray(report.weaknesses)
@@ -361,10 +363,10 @@ const Report = () => {
               </p>
             ) : (
             <ResponsiveContainer width="100%" height="100%">
-              <RadarChart data={radarData}>
+              <RadarChart data={radarData} margin={{ top: 10, right: 36, bottom: 10, left: 36 }} outerRadius="72%">
                 <PolarGrid stroke="oklch(30% 0.008 40)" />
-                <PolarAngleAxis dataKey="skill" tick={{ fill: 'oklch(72% 0.006 40)', fontSize: 12 }} />
-                <PolarRadiusAxis angle={30} domain={[0, 100]} stroke="oklch(35% 0.006 40)" />
+                <PolarAngleAxis dataKey="skill" tick={{ fill: 'oklch(72% 0.006 40)', fontSize: 11 }} />
+                <PolarRadiusAxis angle={30} domain={[0, 100]} stroke="oklch(35% 0.006 40)" tick={false} />
                 <Radar name="Proficiency" dataKey="score" stroke="#6366f1" fill="#6366f1" fillOpacity={0.3} />
               </RadarChart>
             </ResponsiveContainer>
@@ -479,7 +481,7 @@ const Report = () => {
               Hiring Recommendation
             </span>
             <span className="badge badge-primary">
-              {report.recommendationLevel || 'RECOMMENDED'}
+              {report.recommendationLevel || 'NOT ENOUGH DATA'}
             </span>
           </div>
         </div>

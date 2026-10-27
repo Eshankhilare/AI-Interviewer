@@ -45,7 +45,7 @@ const Landing = () => {
           <Link to="/login" className="text-sm text-white/70 hover:text-white transition-colors">Sign In</Link>
           <Link
             to="/register"
-            className="px-5 py-2 bg-white text-black text-sm font-medium rounded-lg hover:bg-white/90 transition-colors"
+            className="cta-solid px-5 py-2 bg-white text-black text-sm font-medium rounded-lg hover:bg-white/90 transition-colors"
           >
             Start Free
           </Link>
@@ -94,7 +94,7 @@ const Landing = () => {
           >
             <Link
               to="/register"
-              className="group flex items-center gap-3 px-7 py-3.5 bg-white text-black font-medium rounded-xl hover:bg-white/90 transition-all"
+              className="cta-solid group flex items-center gap-3 px-7 py-3.5 bg-white text-black font-medium rounded-xl hover:bg-white/90 transition-all"
             >
               Start Practicing Free
               <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
@@ -279,7 +279,7 @@ const Landing = () => {
           </p>
           <Link
             to="/register"
-            className="inline-flex items-center gap-2 px-8 py-3.5 bg-white text-black font-medium rounded-xl hover:bg-white/90 transition-all"
+            className="cta-solid inline-flex items-center gap-2 px-8 py-3.5 bg-white text-black font-medium rounded-xl hover:bg-white/90 transition-all"
           >
             Start Practicing Free
             <ChevronRight className="w-4 h-4" />
