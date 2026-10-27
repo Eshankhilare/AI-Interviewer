@@ -35,7 +35,7 @@ public class JobDescription {
     private String description;
 
     @Lob
-    @Column(columnDefinition = "JSON")
+    @Column(columnDefinition = "TEXT")
     private String parsedRequirements;
 
     @Enumerated(EnumType.STRING)

@@ -34,19 +34,19 @@ public class Report {
     private String summary;
 
     @Lob
-    @Column(columnDefinition = "JSON")
+    @Column(columnDefinition = "TEXT")
     private String skillRadarData;
 
     @Lob
-    @Column(columnDefinition = "JSON")
+    @Column(columnDefinition = "TEXT")
     private String categoryScores;
 
     @Lob
-    @Column(columnDefinition = "JSON")
+    @Column(columnDefinition = "TEXT")
     private String strengths;
 
     @Lob
-    @Column(columnDefinition = "JSON")
+    @Column(columnDefinition = "TEXT")
     private String weaknesses;
 
     @Lob
@@ -54,7 +54,7 @@ public class Report {
     private String recommendations;
 
     @Lob
-    @Column(columnDefinition = "JSON")
+    @Column(columnDefinition = "TEXT")
     private String questionBreakdown;
 
     @Column(length = 30)

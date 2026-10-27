@@ -39,7 +39,7 @@ public class Resume {
     private String extractedText;
 
     @Lob
-    @Column(columnDefinition = "JSON")
+    @Column(columnDefinition = "TEXT")
     private String parsedData;
 
     @Enumerated(EnumType.STRING)

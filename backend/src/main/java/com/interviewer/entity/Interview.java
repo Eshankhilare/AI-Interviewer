@@ -62,7 +62,7 @@ public class Interview {
     private String notes;
 
     @Lob
-    @Column(columnDefinition = "JSON")
+    @Column(columnDefinition = "TEXT")
     private String interviewConfig;
 
     @CreationTimestamp

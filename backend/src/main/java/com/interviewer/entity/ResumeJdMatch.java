@@ -30,15 +30,15 @@ public class ResumeJdMatch {
     private Double matchScore;
 
     @Lob
-    @Column(columnDefinition = "JSON")
+    @Column(columnDefinition = "TEXT")
     private String matchedSkills;
 
     @Lob
-    @Column(columnDefinition = "JSON")
+    @Column(columnDefinition = "TEXT")
     private String missingSkills;
 
     @Lob
-    @Column(columnDefinition = "JSON")
+    @Column(columnDefinition = "TEXT")
     private String analysisDetails;
 
     @CreationTimestamp

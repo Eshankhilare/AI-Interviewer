@@ -39,7 +39,7 @@ public class Question {
     private String expectedAnswer;
 
     @Lob
-    @Column(columnDefinition = "JSON")
+    @Column(columnDefinition = "TEXT")
     private String evaluationCriteria;
 
     @Column(length = 100)
