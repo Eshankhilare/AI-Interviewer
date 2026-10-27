@@ -1,11 +1,19 @@
+import logging
 import os
 from typing import Dict, Optional
+
+from app.services.rubric_evaluator import RubricEvaluator
+
+log = logging.getLogger(__name__)
 
 
 class EvaluationService:
     def __init__(self):
         self.llm_provider = os.getenv("LLM_PROVIDER", "mock")
         self.api_key = os.getenv("LLM_API_KEY", os.getenv("GEMINI_API_KEY", os.getenv("GOOGLE_API_KEY", "")))
+        # rubric = structured, code-computed score (default); naive = legacy multi-prompt path.
+        self.mode = os.getenv("EVALUATOR_MODE", "rubric").strip().lower()
+        self.rubric = RubricEvaluator()
 
     async def evaluate(
         self,
@@ -13,8 +21,14 @@ class EvaluationService:
         answer: str,
         expected_answer: Optional[str] = ""
     ) -> Dict:
-        # Try Gemini LLM evaluation first
-        if self.api_key:
+        if self.mode == "rubric" and self.api_key:
+            result = await self.rubric.evaluate(question, answer, expected_answer)
+            if result:
+                return result
+            log.warning("rubric evaluator unavailable; falling back to heuristic")
+
+        # Legacy LLM path, kept for EVALUATOR_MODE=naive.
+        if self.mode != "rubric" and self.api_key:
             result = await self._evaluate_with_llm(question, answer, expected_answer)
             if result:
                 return result
@@ -102,7 +116,7 @@ Return ONLY a JSON object: {{"score": <0-100>, "feedback": "<1-2 sentences>"}}""
                 "technical_depth": f"{tech_score}/100",
             }
         except Exception as e:
-            print(f"Multi-agent evaluation error: {e}")
+            log.warning("multi-agent evaluation failed: %s", e)
             return None
 
     def _evaluate_heuristic(self, question: str, answer: str, expected_answer: str) -> Dict:
@@ -123,7 +137,9 @@ Return ONLY a JSON object: {{"score": <0-100>, "feedback": "<1-2 sentences>"}}""
         }
 
     def _calculate_score(self, question: str, answer: str, expected_answer: str) -> int:
-        if not answer or len(answer.strip()) < 10:
+        if not answer or not answer.strip():
+            return 0
+        if len(answer.strip()) < 10:
             return 20
         base_score = 50
         if len(answer) > 100:

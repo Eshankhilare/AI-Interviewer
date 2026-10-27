@@ -1,3 +1,5 @@
+import logging
+
 from fastapi import APIRouter, Depends, HTTPException, UploadFile, File
 from fastapi.responses import Response
 from pydantic import BaseModel, Field
@@ -9,7 +11,16 @@ from app.services.evaluation_service import EvaluationService
 from app.services.voice_service import VoiceService
 from app.services.emotion_service import EmotionService
 
+log = logging.getLogger(__name__)
+
 router = APIRouter(dependencies=[Depends(require_service_token)])
+
+
+def _internal_error(exc: Exception) -> HTTPException:
+    """Log the real cause; never return stack traces or provider text to callers."""
+    log.exception("AI service request failed", exc_info=exc)
+    return HTTPException(status_code=500, detail="AI service error")
+
 
 llm_service = LLMService()
 resume_parser = ResumeParser()
@@ -19,49 +30,49 @@ emotion_service = EmotionService()
 
 
 class QuestionGenerationRequest(BaseModel):
-    job_description: str
-    resume_text: Optional[str] = ""
-    count: int = 10
-    experience_level: str = "MID"
+    job_description: str = Field(max_length=20000)
+    resume_text: Optional[str] = Field(default="", max_length=50000)
+    count: int = Field(default=10, ge=1, le=30)
+    experience_level: str = Field(default="MID", max_length=20)
 
 
 class FollowUpRequest(BaseModel):
-    question: str
-    answer: str
+    question: str = Field(max_length=2000)
+    answer: str = Field(max_length=20000)
 
 
 class EvaluationRequest(BaseModel):
-    question: str
-    answer: str
-    expected_answer: Optional[str] = ""
+    question: str = Field(max_length=2000)
+    answer: str = Field(max_length=20000)
+    expected_answer: Optional[str] = Field(default="", max_length=5000)
 
 
 class ResumeParseRequest(BaseModel):
-    resume_text: str
+    resume_text: str = Field(max_length=100000)
 
 
 class JDAnalysisRequest(BaseModel):
-    job_description: str
+    job_description: str = Field(max_length=20000)
 
 
 class ReportGenerationRequest(BaseModel):
     interview_id: int
-    evaluations: List[dict] = []
+    evaluations: List[dict] = Field(default_factory=list, max_length=50)
     average_score: int = 0
     total_questions: int = 0
     answered_questions: int = 0
-    job_description: str = ""
+    job_description: str = Field(default="", max_length=500)
 
 
 class SynthesizeRequest(BaseModel):
-    text: str
-    voice: str = "en-US-AriaNeural"
-    rate: float = 1.0
+    text: str = Field(max_length=5000)
+    voice: str = Field(default="en-US-AriaNeural", max_length=60)
+    rate: float = Field(default=1.0, ge=0.5, le=2.0)
 
 
 class EmotionAnalysisRequest(BaseModel):
     audio_features: dict
-    transcript: Optional[str] = ""
+    transcript: Optional[str] = Field(default="", max_length=20000)
 
 
 @router.post("/generate-questions")
@@ -75,7 +86,7 @@ async def generate_questions(request: QuestionGenerationRequest):
         )
         return questions
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        raise _internal_error(e)
 
 
 @router.post("/generate-followup")
@@ -87,7 +98,7 @@ async def generate_followup(request: FollowUpRequest):
         )
         return {"follow_up": follow_up}
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        raise _internal_error(e)
 
 
 @router.post("/evaluate-answer")
@@ -100,7 +111,7 @@ async def evaluate_answer(request: EvaluationRequest):
         )
         return evaluation
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        raise _internal_error(e)
 
 
 @router.post("/parse-resume")
@@ -109,7 +120,7 @@ async def parse_resume(request: ResumeParseRequest):
         parsed_data = resume_parser.parse(request.resume_text)
         return parsed_data
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        raise _internal_error(e)
 
 
 @router.post("/analyze-jd")
@@ -118,7 +129,7 @@ async def analyze_jd(request: JDAnalysisRequest):
         analysis = await llm_service.analyze_job_description(request.job_description)
         return analysis
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        raise _internal_error(e)
 
 
 @router.post("/generate-report")
@@ -134,7 +145,7 @@ async def generate_report(request: ReportGenerationRequest):
         )
         return report
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        raise _internal_error(e)
 
 
 @router.post("/transcribe")
@@ -144,7 +155,7 @@ async def transcribe_audio(audio: UploadFile = File(...)):
         transcript = await voice_service.transcribe(audio_data)
         return {"transcript": transcript, "confidence": 0.95, "language": "en-US"}
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        raise _internal_error(e)
 
 
 @router.post("/synthesize")
@@ -160,7 +171,7 @@ async def synthesize_speech(request: SynthesizeRequest):
             media_type = "audio/mpeg"
         return Response(content=audio_data, media_type=media_type)
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        raise _internal_error(e)
 
 
 @router.post("/analyze-emotion")
@@ -169,7 +180,7 @@ async def analyze_emotion(request: EmotionAnalysisRequest):
         emotion_data = emotion_service.analyze(request.audio_features, request.transcript)
         return emotion_data
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        raise _internal_error(e)
 
 
 @router.get("/voices")
