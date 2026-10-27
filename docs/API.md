@@ -278,7 +278,7 @@ POST /api/match
 
 ## AI Service Endpoints (Internal)
 
-Base URL: `http://localhost:8000/ai`
+Base URL: `http://localhost:8001/ai`
 
 ### Generate Questions
 ```
