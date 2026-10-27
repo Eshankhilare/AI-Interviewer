@@ -1,6 +1,6 @@
 import { GlassCard, BackgroundVideo } from "../components/ui/glass"
 import { useState, useEffect, lazy, Suspense, Component } from 'react'
-import { useParams, Link } from 'react-router-dom'
+import { useParams, Link, useNavigate } from 'react-router-dom'
 import api from '../services/api'
 import {
   RadarChart,
@@ -46,6 +46,7 @@ import { useAuth } from '../context/AuthContext'
 import AnswerInsights from '../components/interview/AnswerInsights'
 import PracticePlan from '../components/report/PracticePlan'
 import { analyzeAnswer } from '../utils/answerInsights'
+import { addToPractice, loadSchedule, saveSchedule } from '../utils/spacedRepetition'
 
 class PDFErrorBoundary extends Component {
   constructor(props) {
@@ -207,6 +208,7 @@ const safeParseChartData = (data, defaultData = []) => {
 const Report = () => {
   const { id } = useParams()
   const { user } = useAuth()
+  const navigate = useNavigate()
   const [report, setReport] = useState(null)
   const [interview, setInterview] = useState(null)
   const [loading, setLoading] = useState(true)
@@ -276,6 +278,22 @@ const Report = () => {
     if (Array.isArray(raw)) return raw
     try { return JSON.parse(raw) } catch { return [] }
   })()
+
+  const addQuestionToPractice = (q, index) => {
+    const item = {
+      interviewId: Number(id),
+      order: q.questionOrder ?? index + 1,
+      question: q.question,
+      questionType: q.questionType,
+      score: q.score,
+      expectedAnswer: q.expectedAnswer,
+      sampleResponse: q.sampleResponse,
+      feedback: q.feedback,
+      sourceTitle: interview?.title || 'Interview report',
+    }
+    saveSchedule(user, addToPractice(loadSchedule(user), item))
+    navigate('/practice')
+  }
 
   const getGradeColor = (grade) => {
     if (!grade) return 'bg-primary-50 text-primary-700 border-primary-200'
@@ -565,6 +583,16 @@ const Report = () => {
                         {q.sampleResponse}
                       </p>
                     </details>
+                  )}
+
+                  {q.question && (
+                    <button
+                      onClick={() => addQuestionToPractice(q, index)}
+                      className="text-xs font-semibold"
+                      style={{ color: '#a5b4fc' }}
+                    >
+                      Practice this question →
+                    </button>
                   )}
                 </div>
               </div>

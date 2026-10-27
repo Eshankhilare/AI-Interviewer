@@ -1,11 +1,14 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import api from '../services/api'
-import { Plus, Clock, CheckCircle, XCircle, TrendingUp, BarChart3 } from 'lucide-react'
+import { Plus, Clock, CheckCircle, XCircle, TrendingUp, BarChart3, Brain } from 'lucide-react'
 import { motion } from 'framer-motion'
 import { GlassCard, WhiteButton, GlassBadge, BackgroundVideo } from '../components/ui/glass'
+import { useAuth } from '../context/AuthContext'
+import { dueItems, loadSchedule } from '../utils/spacedRepetition'
 
 const Dashboard = () => {
+  const { user } = useAuth()
   const [interviews, setInterviews] = useState([])
   const [loading, setLoading] = useState(true)
 
@@ -40,6 +43,8 @@ const Dashboard = () => {
     return 'default'
   }
 
+  const dueCount = dueItems(loadSchedule(user)).length
+
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -66,6 +71,30 @@ const Dashboard = () => {
             </Link>
           </motion.div>
         </div>
+
+        {/* Spaced repetition */}
+        {dueCount > 0 && (
+          <Link to="/practice" className="block mb-6">
+            <GlassCard className="p-4">
+              <div className="flex items-center justify-between gap-4">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 rounded-xl" style={{ background: 'rgba(251,191,36,.12)' }}>
+                    <Brain className="h-5 w-5" style={{ color: '#fbbf24' }} />
+                  </div>
+                  <div>
+                    <p className="text-sm font-semibold" style={{ color: '#fff' }}>
+                      {dueCount} question{dueCount === 1 ? '' : 's'} due for review
+                    </p>
+                    <p className="text-xs" style={{ color: 'rgba(255,255,255,.45)' }}>
+                      Spaced repetition from your reports — ten minutes now saves an hour later.
+                    </p>
+                  </div>
+                </div>
+                <span className="text-sm flex-shrink-0" style={{ color: '#a5b4fc' }}>Practice →</span>
+              </div>
+            </GlassCard>
+          </Link>
+        )}
 
         {/* Stats */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">

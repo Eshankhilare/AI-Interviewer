@@ -10,6 +10,7 @@ import Interview from './pages/Interview'
 import Report from './pages/Report'
 import JobDescriptions from './pages/JobDescriptions'
 import Resumes from './pages/Resumes'
+import Practice from './pages/Practice'
 import ProtectedRoute from './components/common/ProtectedRoute'
 import Profile from './pages/Profile'
 import ErrorBoundary from './components/common/ErrorBoundary'
@@ -62,6 +63,7 @@ function AppRoutes() {
             <Route path="report/:id" element={<UIPage classic={<Report />} studio={<StudioReport />} />} />
             <Route path="job-descriptions" element={<UIPage classic={<JobDescriptions />} studio={<StudioLibrary initialTab="jobs" />} />} />
             <Route path="resumes" element={<UIPage classic={<Resumes />} studio={<StudioLibrary initialTab="resumes" />} />} />
+            <Route path="practice" element={<UIPage classic={<Practice />} studio={<Practice />} />} />
             <Route path="profile" element={<UIPage classic={<Profile />} studio={<StudioSettings />} />} />
           </>
         )}

@@ -56,10 +56,10 @@ const AnswerInsights = ({ insights, behavioral = false, compact = false }) => {
       </div>
 
       <div className="flex flex-wrap gap-1.5 mb-3">
-        {talkingPoints.map((point) => (
+        {behavioral && talkingPoints.map((point) => (
           <span key={point.key} style={chip(point.hit)}>{point.hit ? '✓' : '·'} {point.label}</span>
         ))}
-        {missedPoints.length > 0 && (
+        {behavioral && missedPoints.length > 0 && (
           <span style={{ color: 'rgba(255,255,255,.3)', fontSize: 11, alignSelf: 'center' }}>
             missing: {missedPoints.map((p) => p.label.toLowerCase()).join(', ')}
           </span>

@@ -1,9 +1,10 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { ArrowRight, Clock, Play, Sparkles, Target, TrendingUp, BarChart3, Award } from 'lucide-react'
+import { ArrowRight, Clock, Play, Sparkles, Target, TrendingUp, BarChart3, Award, Brain } from 'lucide-react'
 import api from '../../services/api'
 import { useAuth } from '../../context/AuthContext'
+import { dueItems, loadSchedule } from '../../utils/spacedRepetition'
 import { BarRow, Empty, PageHead, ScoreRing, SkeletonBlock, formatDate } from '../ui'
 
 const byNewest = (a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0)
@@ -60,6 +61,7 @@ export default function Home() {
   const active = (interviews || []).find((i) => i.status === 'IN_PROGRESS')
   const scheduled = (interviews || []).find((i) => i.status === 'SCHEDULED')
   const resume = active || scheduled
+  const dueCount = dueItems(loadSchedule(user)).length
 
   const skills = Array.isArray(report?.skillRadarData) ? report.skillRadarData : []
   const weakest = [...skills].sort((a, b) => a.score - b.score).slice(0, 3)
@@ -157,6 +159,23 @@ export default function Home() {
           </div>
         </div>
       </motion.section>
+
+      {dueCount > 0 && (
+        <motion.section className="st-card" style={{ marginTop: 16 }} {...rise(.05)}>
+          <div className="st-between" style={{ gap: 16, flexWrap: 'wrap' }}>
+            <div className="st-row" style={{ gap: 12, minWidth: 0 }}>
+              <span className="st-chip st-chip-warn"><Brain size={12} /> {dueCount} due</span>
+              <div style={{ minWidth: 0 }}>
+                <p className="st-label" style={{ margin: 0 }}>Spaced review</p>
+                <p className="st-sub" style={{ marginTop: 4 }}>
+                  {dueCount} question{dueCount === 1 ? '' : 's'} from your reports are due. Ten minutes now saves an hour later.
+                </p>
+              </div>
+            </div>
+            <Link to="/practice" className="st-btn st-btn-sm">Practice <ArrowRight size={14} /></Link>
+          </div>
+        </motion.section>
+      )}
 
       <motion.div className="st-stat-grid" style={{ marginTop: 18 }} {...rise(.08)}>
         <div className="st-stat"><strong>{interviews.length}</strong><span>Sessions</span></div>

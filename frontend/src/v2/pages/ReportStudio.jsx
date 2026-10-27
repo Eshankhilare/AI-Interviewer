@@ -1,5 +1,5 @@
 import { lazy, Suspense, useEffect, useMemo, useState } from 'react'
-import { Link, useParams } from 'react-router-dom'
+import { Link, useParams, useNavigate } from 'react-router-dom'
 import { ArrowLeft, BookOpen, Sparkles, Target } from 'lucide-react'
 import {
   RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar, ResponsiveContainer,
@@ -9,6 +9,7 @@ import { useAuth } from '../../context/AuthContext'
 import { BarRow, PageHead, ScoreRing, SkeletonBlock, formatDate, gradeClass, scoreColor } from '../ui'
 import AnswerInsights from '../../components/interview/AnswerInsights'
 import { analyzeAnswer } from '../../utils/answerInsights'
+import { addToPractice, loadSchedule, saveSchedule } from '../../utils/spacedRepetition'
 
 const PDFReportGenerator = lazy(() => import('../../components/report/PDFReportGenerator'))
 
@@ -35,6 +36,7 @@ const asArray = (value) => {
 export default function ReportStudio() {
   const { id } = useParams()
   const { user } = useAuth()
+  const navigate = useNavigate()
   const [report, setReport] = useState(null)
   const [interview, setInterview] = useState(null)
   const [error, setError] = useState('')
@@ -60,6 +62,22 @@ export default function ReportStudio() {
   const strengths = asArray(report?.strengths)
   const weaknesses = asArray(report?.weaknesses)
   const weakest = [...rubric].sort((a, b) => a.score - b.score).slice(0, 3)
+
+  const addQuestionToPractice = (item, index) => {
+    const entry = {
+      interviewId: Number(id),
+      order: item.questionOrder ?? index + 1,
+      question: item.question,
+      questionType: item.questionType,
+      score: item.score,
+      expectedAnswer: item.expectedAnswer,
+      sampleResponse: item.sampleResponse,
+      feedback: item.feedback,
+      sourceTitle: interview?.title || 'Interview report',
+    }
+    saveSchedule(user, addToPractice(loadSchedule(user), entry))
+    navigate('/practice')
+  }
 
   if (error) {
     return (
@@ -251,6 +269,16 @@ export default function ReportStudio() {
                   <summary className="st-dim" style={{ cursor: 'pointer', fontSize: 12.5 }}>Stronger sample answer</summary>
                   <p className="st-pre" style={{ marginTop: 8 }}>{item.sampleResponse}</p>
                 </details>
+              )}
+              {item.question && (
+                <button
+                  type="button"
+                  className="st-btn st-btn-sm"
+                  style={{ marginTop: 10 }}
+                  onClick={() => addQuestionToPractice(item, index)}
+                >
+                  Practice this question
+                </button>
               )}
             </div>
           </details>

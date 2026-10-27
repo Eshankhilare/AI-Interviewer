@@ -11,7 +11,17 @@ for its own sake.
 | [InterviewStar AI](https://interviewstar-ai.com/) | STAR structure guidance for behavioural answers | STAR chips (Situation/Task/Action/Result) when the question is behavioural |
 | [Interviewer.AI](https://interviewer.ai/how-it-works) / [Jobscan](https://www.jobscan.co/) | Resume ↔ job-description match with the terms the resume never mentions | `frontend/src/utils/roleMatch.js`; “Role fit” card on the resume step |
 | [AI Interview Buddy](https://aiinterviewbuddy.com/) | Structured feedback on every answer, not just a final score | Existing rubric + per-question review; now also delivery insights per answer |
-| [interviewKata](https://github.com/sdeonvacation/interviewKata) | A concrete next drill instead of a generic summary | “Your practice plan” on the report, derived from the weakest question and criteria |
+| [interviewKata](https://github.com/sdeonvacation/interviewKata) | A concrete next drill, plus spaced repetition instead of one-off practice | “Your practice plan” on the report; `/practice` queue with self-graded drills (`frontend/src/utils/spacedRepetition.js`) |
+
+## Practice queue
+
+A finished report can send any question to `/practice`. The queue uses a
+lighter SM-2 schedule: *Again* returns in 10 minutes, *Hard* in a day, *Good*
+in two days and then at growing intervals, *Easy* longer. A drill hides the
+old answer, asks for a fresh attempt from memory, then reveals the computed
+insights, the previous review, the expected answer and the sample response.
+The grade is the candidate's own, so no model call or backend write is needed;
+the schedule is stored per user in `localStorage`.
 
 ## Deliberately not copied
 
