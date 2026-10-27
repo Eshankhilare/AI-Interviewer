@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import api from '../services/api'
-import { Plus, Clock, CheckCircle, XCircle, TrendingUp, BarChart3, Brain } from 'lucide-react'
+import { Plus, Clock, CheckCircle, XCircle, TrendingUp, BarChart3, Brain, Flame } from 'lucide-react'
 import { motion } from 'framer-motion'
 import { GlassCard, WhiteButton, GlassBadge, BackgroundVideo } from '../components/ui/glass'
 import { useAuth } from '../context/AuthContext'
 import { dueItems, loadSchedule, subscribeSchedule } from '../utils/spacedRepetition'
+import { currentStreak, sessionsThisWeek } from '../utils/progressStats'
 
 const Dashboard = () => {
   const { user } = useAuth()
@@ -50,6 +51,9 @@ const Dashboard = () => {
     return 'default'
   }
 
+  const streak = currentStreak(interviews)
+  const weekly = sessionsThisWeek(interviews)
+
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -67,6 +71,12 @@ const Dashboard = () => {
           <motion.div initial={{ opacity: 0, x: -12 }} animate={{ opacity: 1, x: 0 }}>
             <h1 className="text-3xl font-bold" style={{ color: '#fff', fontFamily: '"Reference Display", serif', fontWeight: 500 }}>Dashboard</h1>
             <p className="mt-1" style={{ color: 'rgba(255,255,255,.5)' }}>Track your interview progress</p>
+            {interviews.length > 0 && (
+              <p className="mt-2 inline-flex items-center gap-1.5 text-xs" style={{ color: 'rgba(255,255,255,.45)' }}>
+                <Flame className="h-3.5 w-3.5" style={{ color: '#fbbf24' }} />
+                {streak > 0 ? `${streak}-day streak` : 'Start a streak today'} · {weekly} session{weekly === 1 ? '' : 's'} this week
+              </p>
+            )}
           </motion.div>
           <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.2 }}>
             <Link to="/interview/new">

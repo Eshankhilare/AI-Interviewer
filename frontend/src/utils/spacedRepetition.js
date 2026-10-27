@@ -128,3 +128,24 @@ export const subscribeSchedule = (callback) => {
     window.removeEventListener('focus', onFocus)
   }
 }
+
+export const exportSchedule = (schedule) => JSON.stringify({
+  version: 1,
+  exportedAt: new Date().toISOString(),
+  items: schedule?.items || {},
+}, null, 2)
+
+export const importSchedule = (raw) => {
+  try {
+    const parsed = typeof raw === 'string' ? JSON.parse(raw) : raw
+    if (!parsed || typeof parsed.items !== 'object' || parsed.items === null) return null
+    const items = {}
+    for (const [key, item] of Object.entries(parsed.items)) {
+      if (!item || typeof item.question !== 'string' || !item.dueAt) continue
+      items[key] = item
+    }
+    return Object.keys(items).length > 0 ? { version: 1, items } : null
+  } catch {
+    return null
+  }
+}

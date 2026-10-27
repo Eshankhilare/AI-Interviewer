@@ -1,6 +1,5 @@
 import { describe, expect, it } from 'vitest'
 import { analyzeAnswer } from './answerInsights'
-
 describe('analyzeAnswer', () => {
   it('counts fillers, words and result language', () => {
     const insights = analyzeAnswer({
@@ -47,5 +46,13 @@ describe('analyzeAnswer', () => {
     expect(insights.words).toBe(0)
     expect(insights.topWords).toEqual([])
     expect(insights.fillerCount).toBe(0)
+  })
+
+  it('flags weak words and long sentences', () => {
+    const longSentence = Array.from({ length: 30 }, () => 'word').join(' ')
+    const insights = analyzeAnswer({ text: `This is very really just stuff. ${longSentence}.` })
+
+    expect(insights.weakCount).toBeGreaterThanOrEqual(3)
+    expect(insights.longSentences).toBe(1)
   })
 })

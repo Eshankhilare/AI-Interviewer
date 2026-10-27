@@ -2,7 +2,9 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import {
   addToPractice,
   dueItems,
+  exportSchedule,
   gradePracticeItem,
+  importSchedule,
   intervalLabel,
   loadSchedule,
   practiceItemKey,
@@ -123,5 +125,14 @@ describe('spaced repetition', () => {
     stop()
     window.dispatchEvent(new Event('focus'))
     expect(spy).toHaveBeenCalledTimes(2)
+  })
+
+  it('exports and imports a queue, rejecting junk', () => {
+    const schedule = addToPractice({ version: 1, items: {} }, item, NOW)
+    const restored = importSchedule(exportSchedule(schedule))
+
+    expect(restored.items[practiceItemKey(7, 2)].question).toContain('replication')
+    expect(importSchedule('not json')).toBeNull()
+    expect(importSchedule('{"items":{}}')).toBeNull()
   })
 })

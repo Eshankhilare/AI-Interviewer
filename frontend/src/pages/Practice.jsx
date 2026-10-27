@@ -1,11 +1,13 @@
-import { useEffect, useState } from 'react'
-import { CalendarClock, Trash2, Zap } from 'lucide-react'
+import { useEffect, useRef, useState } from 'react'
+import { CalendarClock, Download, RotateCcw, Trash2, Upload, Zap } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
 import { GlassCard, GlassBadge, WhiteButton } from '../components/ui/glass'
 import PracticeDrill from '../components/practice/PracticeDrill'
 import {
   dueItems,
+  exportSchedule,
   gradePracticeItem,
+  importSchedule,
   loadSchedule,
   removeFromPractice,
   saveSchedule,
@@ -25,6 +27,8 @@ const Practice = () => {
   const { user } = useAuth()
   const [schedule, setSchedule] = useState({ version: 1, items: {} })
   const [selectedKey, setSelectedKey] = useState(null)
+  const [notice, setNotice] = useState('')
+  const fileRef = useRef(null)
 
   useEffect(() => {
     const refresh = () => setSchedule(loadSchedule(user))
@@ -50,6 +54,38 @@ const Practice = () => {
   const remove = (key) => {
     persist(removeFromPractice(schedule, key))
     if (selectedKey === key) setSelectedKey(null)
+  }
+
+  const exportAll = () => {
+    const blob = new Blob([exportSchedule(schedule)], { type: 'application/json' })
+    const url = URL.createObjectURL(blob)
+    const link = document.createElement('a')
+    link.href = url
+    link.download = 'practice-queue.json'
+    link.click()
+    URL.revokeObjectURL(url)
+    setNotice('Queue exported.')
+  }
+
+  const importFile = async (event) => {
+    const file = event.target.files?.[0]
+    event.target.value = ''
+    if (!file) return
+    const imported = importSchedule(await file.text())
+    if (!imported) {
+      setNotice('That file is not a practice queue.')
+      return
+    }
+    persist(imported)
+    setSelectedKey(null)
+    setNotice(`Imported ${Object.keys(imported.items).length} question(s).`)
+  }
+
+  const resetQueue = () => {
+    if (!window.confirm('Clear every scheduled question? This cannot be undone.')) return
+    persist({ version: 1, items: {} })
+    setSelectedKey(null)
+    setNotice('Queue cleared.')
   }
 
   if (selected) {
@@ -98,6 +134,22 @@ const Practice = () => {
         <p className="mt-1 text-sm" style={{ color: 'rgba(255,255,255,.5)' }}>
           Questions you chose to revisit, on a spaced schedule. Self-graded — no model call, nothing leaves this browser.
         </p>
+        <div className="flex flex-wrap items-center gap-2 mt-3">
+          <button type="button" onClick={exportAll} disabled={Object.keys(schedule.items).length === 0}
+            className="chip-btn inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs disabled:opacity-40">
+            <Download className="h-3.5 w-3.5" /> Export
+          </button>
+          <button type="button" onClick={() => fileRef.current?.click()}
+            className="chip-btn inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs">
+            <Upload className="h-3.5 w-3.5" /> Import
+          </button>
+          <input ref={fileRef} type="file" accept="application/json,.json" className="hidden" onChange={importFile} />
+          <button type="button" onClick={resetQueue} disabled={Object.keys(schedule.items).length === 0}
+            className="chip-btn inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs disabled:opacity-40">
+            <RotateCcw className="h-3.5 w-3.5" /> Reset
+          </button>
+          {notice && <span className="text-xs" style={{ color: 'rgba(255,255,255,.45)' }}>{notice}</span>}
+        </div>
       </div>
 
       {due.length === 0 && upcoming.length === 0 ? (

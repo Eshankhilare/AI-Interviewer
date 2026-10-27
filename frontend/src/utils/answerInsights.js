@@ -11,6 +11,8 @@ const FILLERS = [
   'basically', 'literally', 'actually', 'honestly',
 ]
 
+const WEAK_WORDS = ['very', 'really', 'quite', 'just', 'stuff', 'things', 'lot', 'maybe', 'probably']
+
 const STOPWORDS = new Set(`
 a an the and or but if then than that this these those it its it's i i'm i've i'd
 we we're we've you you're he she they them their our your my me us
@@ -77,6 +79,14 @@ export function analyzeAnswer({ text = '', seconds = null, behavioral = false } 
 
   const sentences = clean ? clean.split(/[.!?]+(?:\s|$)/).map((s) => s.trim()).filter(Boolean).length : 0
   const avgSentenceWords = sentences > 0 ? Math.round(words / sentences) : 0
+  const sentenceTexts = clean ? clean.split(/[.!?]+(?:\s|$)/).map((s) => s.trim()).filter(Boolean) : []
+  const longSentences = sentenceTexts.filter((sentence) => sentence.split(/\s+/).filter(Boolean).length > 28).length
+
+  const weakItems = WEAK_WORDS
+    .map((word) => ({ word, count: countPhrase(lower, word) }))
+    .filter((entry) => entry.count > 0)
+    .sort((a, b) => b.count - a.count)
+  const weakCount = weakItems.reduce((sum, entry) => sum + entry.count, 0)
 
   const talkingPoints = TALKING_POINTS.map(({ key, label, re }) => ({
     key, label, hit: re.test(clean),
@@ -90,7 +100,21 @@ export function analyzeAnswer({ text = '', seconds = null, behavioral = false } 
     ? { wpm: Math.round((words / seconds) * 60), ...paceBand(Math.round((words / seconds) * 60)) }
     : null
 
-  return { words, sentences, avgSentenceWords, fillerCount, fillerRate, fillerItems, topWords, talkingPoints, star, pace }
+  return {
+    words,
+    sentences,
+    avgSentenceWords,
+    longSentences,
+    weakCount,
+    weakItems,
+    fillerCount,
+    fillerRate,
+    fillerItems,
+    topWords,
+    talkingPoints,
+    star,
+    pace,
+  }
 }
 
 export { FILLERS, STOPWORDS }

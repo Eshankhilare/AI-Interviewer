@@ -32,7 +32,7 @@ const Stat = ({ label, value, tone = 'muted', hint }) => (
 
 const AnswerInsights = ({ insights, behavioral = false, compact = false }) => {
   if (!insights) return null
-  const { words, fillerCount, fillerRate, fillerItems, topWords, talkingPoints, star, pace, avgSentenceWords } = insights
+  const { words, fillerCount, fillerRate, fillerItems, topWords, talkingPoints, star, pace, avgSentenceWords, weakCount, weakItems, longSentences } = insights
   const missedPoints = talkingPoints.filter((p) => !p.hit)
   const starHits = star ? star.filter((s) => s.hit).length : 0
 
@@ -65,6 +65,22 @@ const AnswerInsights = ({ insights, behavioral = false, compact = false }) => {
           </span>
         )}
       </div>
+
+      {(weakCount > 0 || longSentences > 0) && (
+        <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs mb-3" style={{ color: 'rgba(255,255,255,.45)' }}>
+          {weakCount > 0 && (
+            <span>
+              <span style={{ color: '#fbbf24' }}>{weakCount} weak word{weakCount === 1 ? '' : 's'}</span>
+              {' '}· {weakItems.slice(0, 3).map((item) => `“${item.word}”`).join(', ')}
+            </span>
+          )}
+          {longSentences > 0 && (
+            <span style={{ color: '#fbbf24' }}>
+              {longSentences} sentence{longSentences === 1 ? '' : 's'} over 28 words
+            </span>
+          )}
+        </div>
+      )}
 
       {star && (
         <div className="flex flex-wrap items-center gap-1.5 mb-3">

@@ -218,16 +218,27 @@ const Report = () => {
     fetchReport()
   }, [id])
 
+  const [previousScore, setPreviousScore] = useState(null)
+
   const fetchReport = async () => {
     setLoading(true)
     setError(null)
     try {
-      const [reportRes, interviewRes] = await Promise.all([
+      const [reportRes, interviewRes, listRes] = await Promise.all([
         api.get(`/reports/${id}`),
         api.get(`/interviews/${id}`).catch(() => ({ data: null })),
+        api.get('/interviews').catch(() => ({ data: [] })),
       ])
       setReport(reportRes.data)
       setInterview(interviewRes.data)
+      const currentCreated = interviewRes.data?.createdAt
+      const previous = (listRes.data || [])
+        .filter((item) => Number(item.id) !== Number(id)
+          && item.status === 'COMPLETED'
+          && typeof item.overallScore === 'number'
+          && (!currentCreated || !item.createdAt || new Date(item.createdAt) <= new Date(currentCreated)))
+        .sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0))[0]
+      setPreviousScore(previous?.overallScore ?? null)
     } catch (err) {
       console.error('Failed to fetch report:', err)
       setError('Unable to load the report. Please ensure the interview is completed.')
@@ -352,6 +363,11 @@ const Report = () => {
               <span className="text-xs font-medium text-ink-500 uppercase tracking-wider block mt-1">
                 Overall Score
               </span>
+              {previousScore != null && (
+                <span className="text-[11px] block mt-1" style={{ color: report.overallScore >= previousScore ? '#4ade80' : '#f87171' }}>
+                  {report.overallScore >= previousScore ? '▲' : '▼'} {Math.abs((report.overallScore ?? 0) - previousScore)} vs last
+                </span>
+              )}
             </div>
             <div className="h-10 w-[1px] bg-ink-200" />
             <div className="text-center">

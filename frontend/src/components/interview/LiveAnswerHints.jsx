@@ -1,15 +1,22 @@
 import { useMemo } from 'react'
 import { analyzeAnswer } from '../../utils/answerInsights'
+import { extractKeywords } from '../../utils/roleMatch'
 
 const tone = (rate) => (rate <= 3 ? '#4ade80' : rate <= 8 ? '#fbbf24' : '#f87171')
+const coverageTone = (ratio) => (ratio >= 0.7 ? '#4ade80' : ratio >= 0.4 ? '#fbbf24' : '#f87171')
 
 // Live coaching while the answer is being written or spoken. Same counts as the
 // post-answer panel, just earlier — so the candidate can correct mid-answer.
-const LiveAnswerHints = ({ text, behavioral = false }) => {
+const LiveAnswerHints = ({ text, question = '', behavioral = false }) => {
   const insights = useMemo(
     () => analyzeAnswer({ text, behavioral }),
     [text, behavioral],
   )
+  const terms = useMemo(() => (question ? extractKeywords(question, 6) : []), [question])
+  const covered = useMemo(() => {
+    const haystack = String(text || '').toLowerCase()
+    return terms.filter((term) => haystack.includes(term))
+  }, [terms, text])
 
   if (!text || !text.trim()) {
     return (
@@ -20,12 +27,22 @@ const LiveAnswerHints = ({ text, behavioral = false }) => {
   }
 
   const starHits = insights.star ? insights.star.filter((part) => part.hit).length : 0
+  const target = behavioral ? [80, 220] : [40, 180]
+  const lengthTone = insights.words < target[0] || insights.words > target[1] ? '#fbbf24' : 'rgba(255,255,255,.35)'
 
   return (
     <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 mt-2 text-xs">
       <span style={{ color: 'rgba(255,255,255,.45)' }}>
         {insights.words} word{insights.words === 1 ? '' : 's'}
       </span>
+      <span style={{ color: lengthTone }}>
+        aim {target[0]}–{target[1]}
+      </span>
+      {terms.length >= 3 && (
+        <span style={{ color: coverageTone(covered.length / terms.length) }} title={`${covered.length} of ${terms.length} question terms used`}>
+          question {covered.length}/{terms.length}
+        </span>
+      )}
       <span style={{ color: insights.fillerCount ? tone(insights.fillerRate) : 'rgba(255,255,255,.35)' }}>
         fillers {insights.fillerCount} ({insights.fillerRate}%)
       </span>

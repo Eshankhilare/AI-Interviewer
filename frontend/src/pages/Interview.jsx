@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import api, { errorMessage } from '../services/api'
-import { Send, SkipForward, MessageSquare, Mic, Code, ChevronRight, ThumbsUp, ThumbsDown, Minus } from 'lucide-react'
+import { Send, SkipForward, MessageSquare, Mic, Code, ChevronRight, ThumbsUp, ThumbsDown, Minus, Clock } from 'lucide-react'
 import VoiceRecorder from '../components/interview/VoiceRecorder'
 import VoicePlayer from '../components/interview/VoicePlayer'
 import CodingEnvironment from '../components/interview/CodingEnvironment'
@@ -15,10 +15,13 @@ import LiveAnswerHints from '../components/interview/LiveAnswerHints'
 import { analyzeAnswer } from '../utils/answerInsights'
 import { motion } from 'framer-motion'
 import { GlassCard, WhiteButton, GlassBadge, GlassInput, BackgroundVideo } from '../components/ui/glass'
+import { useAuth } from '../context/AuthContext'
+import { clearDraft, loadDraft, saveDraft } from '../utils/drafts'
 
 const Interview = () => {
   const { id } = useParams()
   const navigate = useNavigate()
+  const { user } = useAuth()
   const [interview, setInterview] = useState(null)
   const [currentQuestion, setCurrentQuestion] = useState(null)
   const [error, setError] = useState(null)
@@ -36,9 +39,30 @@ const Interview = () => {
   const [proctoringAccepted, setProctoringAccepted] = useState(false)
   const [feedback, setFeedback] = useState(null)
   const [answerSeconds, setAnswerSeconds] = useState(null)
+  const [elapsed, setElapsed] = useState(0)
 
   const audioStreamRef = useRef(null)
   const recordingStartedRef = useRef(null)
+  const draftTimerRef = useRef(null)
+
+  useEffect(() => {
+    const timer = setInterval(() => setElapsed((seconds) => seconds + 1), 1000)
+    return () => clearInterval(timer)
+  }, [])
+
+  useEffect(() => {
+    if (!currentQuestion?.id) return
+    setAnswer(loadDraft(user, id, currentQuestion.id))
+  }, [currentQuestion?.id, user, id])
+
+  useEffect(() => {
+    if (!currentQuestion?.id) return
+    clearTimeout(draftTimerRef.current)
+    draftTimerRef.current = setTimeout(() => {
+      saveDraft(user, id, currentQuestion.id, answer)
+    }, 400)
+    return () => clearTimeout(draftTimerRef.current)
+  }, [answer, currentQuestion?.id, user, id])
 
   useEffect(() => {
     fetchInterview()
@@ -126,6 +150,9 @@ const Interview = () => {
         sessionId: currentQuestion.id,
         answer: answer,
       })
+
+      clearTimeout(draftTimerRef.current)
+      clearDraft(user, id, currentQuestion.id)
 
       const evalData = response.data?.evaluation
       if (evalData) {
@@ -267,7 +294,13 @@ const Interview = () => {
           <GlassCard className="mb-6 p-6">
             <div className="flex justify-between items-center mb-4">
               <h1 className="text-xl font-bold" style={{ color: '#fff' }}>{interview.title}</h1>
-              <GlassBadge variant="primary">Question {interview.currentQuestionIndex + 1} of {interview.totalQuestions}</GlassBadge>
+              <div className="flex items-center gap-3">
+                <span className="inline-flex items-center gap-1 text-xs" style={{ color: 'rgba(255,255,255,.4)' }}>
+                  <Clock className="h-3.5 w-3.5" />
+                  {Math.floor(elapsed / 60)}:{String(elapsed % 60).padStart(2, '0')}
+                </span>
+                <GlassBadge variant="primary">Question {interview.currentQuestionIndex + 1} of {interview.totalQuestions}</GlassBadge>
+              </div>
             </div>
             <div className="w-full h-2 rounded-full overflow-hidden" style={{ background: 'rgba(255,255,255,.05)' }}>
               <div className="h-2 rounded-full transition-all duration-500"
@@ -341,12 +374,23 @@ const Interview = () => {
               ) : (
                 <>
                   <label className="block text-sm font-medium mb-2" style={{ color: 'rgba(255,255,255,.6)' }}>Your Answer</label>
-                  <GlassInput as="textarea" rows={6} value={answer} onChange={(e) => setAnswer(e.target.value)} placeholder="Type your answer here..." style={{ resize: 'none' }} />
+                  <GlassInput as="textarea" rows={6} value={answer} onChange={(e) => setAnswer(e.target.value)} placeholder="Type your answer here..." style={{ resize: 'none' }}
+                    onKeyDown={(e) => {
+                      if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
+                        e.preventDefault()
+                        handleSubmitAnswer()
+                      }
+                    }} />
                 </>
               )}
 
               {!feedback && (
-                <LiveAnswerHints text={answer} behavioral={currentQuestion.questionType === 'BEHAVIORAL'} />
+                <>
+                  <LiveAnswerHints text={answer} question={currentQuestion.questionText} behavioral={currentQuestion.questionType === 'BEHAVIORAL'} />
+                  <p className="text-[11px] mt-1" style={{ color: 'rgba(255,255,255,.25)' }}>
+                    Draft saves on this device · Ctrl/⌘ + Enter to submit
+                  </p>
+                </>
               )}
 
               {feedback ? (

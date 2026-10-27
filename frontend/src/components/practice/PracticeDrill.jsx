@@ -67,7 +67,7 @@ const PracticeDrill = ({ item, onGrade, onBack }) => {
         placeholder="Say it out loud, then type the version you would give in the interview..."
         style={{ resize: 'vertical' }}
       />
-      <LiveAnswerHints text={answer} behavioral={item.questionType === 'BEHAVIORAL'} />
+      <LiveAnswerHints text={answer} question={item.question} behavioral={item.questionType === 'BEHAVIORAL'} />
 
       {!revealed ? (
         <div className="mt-4 flex justify-end">

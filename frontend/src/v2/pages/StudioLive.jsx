@@ -11,6 +11,7 @@ import BodyLanguageAnalyzer from '../../components/interview/BodyLanguageAnalyze
 import ProctoringMonitor from '../../components/interview/ProctoringMonitor'
 import AnswerInsights from '../../components/interview/AnswerInsights'
 import LiveAnswerHints from '../../components/interview/LiveAnswerHints'
+import CrystalizedBall from '../../components/ui/CrystalizedBall'
 import { analyzeAnswer } from '../../utils/answerInsights'
 import { ScoreRing, SkeletonBlock } from '../ui'
 
@@ -264,7 +265,18 @@ export default function StudioLive() {
             transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
           >
             <div className="st-stage">
-              <div className="st-orb st-orb-sm" aria-hidden="true" />
+              <div className="st-orb-ball" aria-hidden="true">
+                <CrystalizedBall
+                  preset="plasma"
+                  color="#F25BD0"
+                  size={0.78}
+                  crackle={0.85}
+                  fill={0.5}
+                  speed={0.8}
+                  interactive
+                  hoverStrength={0.7}
+                />
+              </div>
               <div>
                 <p className="st-eyebrow" style={{ margin: 0 }}>AI interviewer</p>
                 <div className="st-row" style={{ gap: 8, marginTop: 4 }}>
@@ -387,7 +399,7 @@ export default function StudioLive() {
                 </div>
 
                 {!feedback && (
-                  <LiveAnswerHints text={answer} behavioral={question?.questionType === 'BEHAVIORAL'} />
+                  <LiveAnswerHints text={answer} question={question?.questionText} behavioral={question?.questionType === 'BEHAVIORAL'} />
                 )}
 
                 <div className="st-between" style={{ marginTop: 14 }}>
