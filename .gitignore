@@ -96,3 +96,6 @@ medusa/
 VulnHunter/
 nuclei/
 strix/
+
+# Browser MCP artifacts
+.playwright-mcp/

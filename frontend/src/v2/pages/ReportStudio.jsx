@@ -7,6 +7,8 @@ import {
 import api from '../../services/api'
 import { useAuth } from '../../context/AuthContext'
 import { BarRow, PageHead, ScoreRing, SkeletonBlock, formatDate, gradeClass, scoreColor } from '../ui'
+import AnswerInsights from '../../components/interview/AnswerInsights'
+import { analyzeAnswer } from '../../utils/answerInsights'
 
 const PDFReportGenerator = lazy(() => import('../../components/report/PDFReportGenerator'))
 
@@ -230,6 +232,13 @@ export default function ReportStudio() {
                   <p className="st-label">Review</p>
                   <p className="st-pre">{item.feedback}</p>
                 </div>
+              )}
+              {item.answer && (
+                <AnswerInsights
+                  insights={analyzeAnswer({ text: item.answer, behavioral: item.questionType === 'BEHAVIORAL' })}
+                  behavioral={item.questionType === 'BEHAVIORAL'}
+                  compact
+                />
               )}
               {item.expectedAnswer && (
                 <details>

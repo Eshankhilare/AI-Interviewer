@@ -18,6 +18,13 @@ vi.mock('./components/common/Layout', () => ({
   default: () => <Outlet />,
 }))
 
+// The studio UI is a separate shell; this test covers the classic routes.
+vi.mock('./v2/store', () => ({
+  useUIVersion: () => ({ version: 'classic', setVersion: () => {} }),
+  getUIVersion: () => 'classic',
+  setUIVersion: () => {},
+}))
+
 vi.mock('./pages/Profile', () => ({
   default: () => <h1>Profile route content</h1>,
 }))

@@ -3,6 +3,7 @@ import { useNavigate, useLocation, Link } from 'react-router-dom'
 import api from '../services/api'
 import { ArrowLeft, Briefcase, ChevronRight, Plus, ChevronDown, Search, X } from 'lucide-react'
 import { JOB_ROLES, JOB_CATEGORIES, searchRoles } from '../data/jobRoles'
+import { analyzeRoleFit, resumeTextFrom } from '../utils/roleMatch'
 import { motion } from 'framer-motion'
 import { GlassCard, WhiteButton, GlassInput, GlassBadge, BackgroundVideo } from '../components/ui/glass'
 
@@ -152,6 +153,15 @@ const NewInterview = () => {
   const groupedRoles = activeCategory
     ? filteredRoles.filter(r => r.category === activeCategory)
     : filteredRoles
+
+  const selectedJd = jobDescriptions.find((jd) => jd.id === form.jobDescriptionId)
+  const selectedResume = resumes.find((r) => r.id === form.resumeId)
+  const roleFit = selectedJd && selectedResume
+    ? analyzeRoleFit({
+        jobDescription: `${selectedJd.title} ${selectedJd.description || ''}`,
+        resumeText: resumeTextFrom(selectedResume.parsedData),
+      })
+    : null
 
   return (
     <div className="max-w-3xl mx-auto">
@@ -365,6 +375,29 @@ const NewInterview = () => {
                   </label>
                 ))}
               </div>
+            </div>
+          )}
+
+          {roleFit && roleFit.terms >= 5 && (
+            <div className="mb-6 p-4 rounded-xl" style={{ border: '1px solid rgba(255,255,255,.1)', background: 'rgba(255,255,255,.03)' }}>
+              <div className="flex items-center justify-between mb-2">
+                <p className="text-sm font-semibold" style={{ color: '#fff' }}>Role fit with {selectedJd.title}</p>
+                <span className="text-sm font-bold" style={{ color: roleFit.score >= 60 ? '#4ade80' : roleFit.score >= 35 ? '#fbbf24' : '#f87171' }}>
+                  {roleFit.score}%
+                </span>
+              </div>
+              <div className="h-1.5 rounded-full overflow-hidden mb-3" style={{ background: 'rgba(255,255,255,.08)' }}>
+                <div className="h-full rounded-full" style={{ width: `${roleFit.score}%`, background: '#6366f1' }} />
+              </div>
+              <p className="text-xs mb-2" style={{ color: 'rgba(255,255,255,.5)' }}>
+                {roleFit.matched.length} of {roleFit.terms} job-description terms appear in this resume.
+                Keyword overlap only — the interview scores your answers, not your resume.
+              </p>
+              {roleFit.missing.length > 0 && (
+                <p className="text-xs" style={{ color: 'rgba(255,255,255,.4)' }}>
+                  Not mentioned: {roleFit.missing.slice(0, 8).join(', ')}
+                </p>
+              )}
             </div>
           )}
 

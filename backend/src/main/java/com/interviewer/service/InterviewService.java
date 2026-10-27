@@ -477,6 +477,7 @@ public class InterviewService {
             Map<String, Object> item = new LinkedHashMap<>();
             item.put("question", session.getQuestion().getText());
             item.put("questionOrder", session.getQuestionOrder());
+            item.put("questionType", session.getQuestion().getType().name());
             item.put("status", session.getStatus().name());
             item.put("answer", session.getCandidateAnswer());
             item.put("expectedAnswer", session.getQuestion().getExpectedAnswer());

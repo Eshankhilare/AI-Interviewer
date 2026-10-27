@@ -43,6 +43,9 @@ const PDFReportGenerator = lazy(() =>
   }))
 )
 import { useAuth } from '../context/AuthContext'
+import AnswerInsights from '../components/interview/AnswerInsights'
+import PracticePlan from '../components/report/PracticePlan'
+import { analyzeAnswer } from '../utils/answerInsights'
 
 class PDFErrorBoundary extends Component {
   constructor(props) {
@@ -261,7 +264,8 @@ const Report = () => {
 
   // Never invent skill scores: if the report has no per-skill data, say so.
   const RADAR_LABELS = { 'Technical Depth': 'Technical' }
-  const radarData = safeParseChartData(report.skillRadarData, [])
+  const radarRaw = safeParseChartData(report.skillRadarData, [])
+  const radarData = radarRaw
     .map((point) => ({ ...point, skill: RADAR_LABELS[point.skill] || point.skill }))
   const categoryScores = safeParseChartData(report.categoryScores, [])
   const strengths = safeParseArray(report.strengths)
@@ -447,6 +451,8 @@ const Report = () => {
         </div>
       </div>
 
+      <PracticePlan radar={radarRaw} breakdown={questionBreakdown} />
+
       {/* Summary and Recommendations */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Executive Summary */}
@@ -529,6 +535,14 @@ const Report = () => {
                       <p className="text-xs font-semibold uppercase tracking-wider mb-1" style={{ color: 'oklch(100% 0 0 / 0.4)' }}>Review</p>
                       <p className="text-sm" style={{ color: 'oklch(100% 0 0 / 0.7)' }}>{q.feedback}</p>
                     </div>
+                  )}
+
+                  {q.answer && (
+                    <AnswerInsights
+                      insights={analyzeAnswer({ text: q.answer, behavioral: q.questionType === 'BEHAVIORAL' })}
+                      behavioral={q.questionType === 'BEHAVIORAL'}
+                      compact
+                    />
                   )}
 
                   {q.expectedAnswer && (

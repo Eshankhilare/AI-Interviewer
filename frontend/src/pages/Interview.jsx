@@ -10,6 +10,8 @@ import ProctoringMonitor from '../components/interview/ProctoringMonitor'
 import SpeechEmotionAnalyzer from '../components/interview/SpeechEmotionAnalyzer'
 import InterviewerOrb from '../components/interview/InterviewerOrb'
 import ErrorBoundary from '../components/common/ErrorBoundary'
+import AnswerInsights from '../components/interview/AnswerInsights'
+import { analyzeAnswer } from '../utils/answerInsights'
 import { motion } from 'framer-motion'
 import { GlassCard, WhiteButton, GlassBadge, GlassInput, BackgroundVideo } from '../components/ui/glass'
 
@@ -32,8 +34,10 @@ const Interview = () => {
   const [bodyAnalysis, setBodyAnalysis] = useState(null)
   const [proctoringAccepted, setProctoringAccepted] = useState(false)
   const [feedback, setFeedback] = useState(null)
+  const [answerSeconds, setAnswerSeconds] = useState(null)
 
   const audioStreamRef = useRef(null)
+  const recordingStartedRef = useRef(null)
 
   useEffect(() => {
     fetchInterview()
@@ -75,6 +79,7 @@ const Interview = () => {
 
   const handleRecordingChange = async (recording) => {
     if (recording) {
+      recordingStartedRef.current = Date.now()
       try {
         const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
         audioStreamRef.current = stream
@@ -83,6 +88,11 @@ const Interview = () => {
         setError('Microphone access was denied. You can type your answer instead.')
       }
     } else if (audioStreamRef.current) {
+      if (recordingStartedRef.current) {
+        const seconds = Math.max(1, Math.round((Date.now() - recordingStartedRef.current) / 1000))
+        setAnswerSeconds((prev) => (prev || 0) + seconds)
+        recordingStartedRef.current = null
+      }
       audioStreamRef.current.getTracks().forEach((track) => track.stop())
       audioStreamRef.current = null
       setAudioStream(null)
@@ -101,6 +111,12 @@ const Interview = () => {
 
   const handleSubmitAnswer = async () => {
     if (!answer.trim() || submitting) return
+
+    const insights = analyzeAnswer({
+      text: answer,
+      seconds: inputMode === 'voice' ? answerSeconds : null,
+      behavioral: currentQuestion?.questionType === 'BEHAVIORAL',
+    })
 
     setError(null)
     setSubmitting(true)
@@ -121,12 +137,14 @@ const Interview = () => {
           sampleResponse: evalData.sampleResponse,
           communicationScore: evalData.communicationScore,
           technicalDepth: evalData.technicalDepth,
+          insights,
         })
       } else {
         setFeedback({
           score: null,
           grade: null,
           feedback: 'Answer saved, but the AI evaluator is unavailable. You can continue; the report will say so instead of inventing a score.',
+          insights,
         })
       }
     } catch (err) {
@@ -151,6 +169,7 @@ const Interview = () => {
       setInterview({ ...interview, currentQuestionIndex: interview.currentQuestionIndex + 1 })
       setFeedback(null)
       setAnswer('')
+      setAnswerSeconds(null)
     } catch (err) {
       setError(errorMessage(err, 'Could not move to the next question. Please retry.'))
     } finally {
@@ -337,6 +356,12 @@ const Interview = () => {
                     <details className="mb-4"><summary className="text-xs font-semibold cursor-pointer hover:opacity-80" style={{ color: '#818cf8' }}>Sample Response</summary>
                       <p className="mt-2 text-sm leading-relaxed p-3 rounded-xl" style={{ color: 'rgba(255,255,255,.6)', background: 'rgba(255,255,255,.04)', border: '1px solid rgba(255,255,255,.06)' }}>{feedback.sampleResponse}</p>
                     </details>
+                  )}
+                  {feedback.insights && (
+                    <AnswerInsights
+                      insights={feedback.insights}
+                      behavioral={currentQuestion.questionType === 'BEHAVIORAL'}
+                    />
                   )}
                   <WhiteButton onClick={handleContinue} disabled={submitting} className="w-full py-2.5 text-sm mt-2">
                     {submitting ? 'Generating...' : interview.currentQuestionIndex + 1 >= interview.totalQuestions ? 'View Report' : 'Continue to Next Question'}
