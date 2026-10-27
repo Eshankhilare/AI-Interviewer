@@ -93,8 +93,18 @@ optional `UPSTASH_REDIS_REST_URL/TOKEN`. The backend receives `AI_SERVICE_URL`
 automatically through the `bindings` entry.
 
 After redeploying, check `https://<deployment>/api/health`; it must return
-`{"status":"UP","database":"UP",...}`. A 500 here means the backend container
-is not answering — check the backend service logs, not the frontend.
+`{"status":"UP","database":"UP","aiService":"UP"}`. A 500 here means the backend
+container is not answering — check the backend service logs, not the frontend.
+When `aiService` is `DOWN`, the response also carries `aiServiceError`.
+
+Two Vercel-specific details, both handled in code:
+
+- Bound services live on `*.services.vercel-infra.com` behind a private CA that
+  the Node/Python runtimes get injected but a JRE truststore does not. The AI
+  client trusts that host only; everything else keeps normal TLS validation.
+- The browser sends `Origin` on same-origin POSTs, so the backend also allows
+  the Vercel-generated `VERCEL_*` host names. Without this, register returns
+  `403 Invalid CORS request`.
 
 ## Architecture
 
