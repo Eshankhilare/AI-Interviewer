@@ -183,6 +183,7 @@ const VoicePlayer = ({ text, voice = 'en-US-AndrewNeural', rate = 0.9, autoPlay 
         <button
           onClick={isPlaying ? pause : play}
           disabled={!text || isLoading}
+          aria-label={isPlaying ? 'Pause question audio' : 'Play question audio'}
           className={`flex items-center justify-center w-12 h-12 rounded-full transition-all ${
             isPlaying
               ? 'bg-red-500 hover:bg-red-600 shadow-lg'
@@ -199,7 +200,9 @@ const VoicePlayer = ({ text, voice = 'en-US-AndrewNeural', rate = 0.9, autoPlay 
         </button>
 
         <button onClick={toggleMute}
-          className="flex items-center justify-center w-9 h-9 rounded-full bg-ink-100 hover:bg-ink-200 text-ink-600 transition-colors">
+          aria-label={isMuted ? 'Unmute audio' : 'Mute audio'}
+          className="flex items-center justify-center w-9 h-9 rounded-full transition-colors"
+          style={{ background: 'rgba(255,255,255,.08)', color: 'rgba(255,255,255,.7)' }}>
           {isMuted ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
         </button>
 

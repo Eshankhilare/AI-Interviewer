@@ -5,7 +5,7 @@ import { Plus, Clock, CheckCircle, XCircle, TrendingUp, BarChart3, Brain, Flame 
 import { motion } from 'framer-motion'
 import { GlassCard, WhiteButton, GlassBadge, BackgroundVideo } from '../components/ui/glass'
 import { useAuth } from '../context/AuthContext'
-import { dueItems, loadSchedule, subscribeSchedule } from '../utils/spacedRepetition'
+import { dueItems, loadSchedule, mergeSchedules, saveSchedule, serverItemsToSchedule, subscribeSchedule } from '../utils/spacedRepetition'
 import { currentStreak, sessionsThisWeek } from '../utils/progressStats'
 
 const Dashboard = () => {
@@ -17,9 +17,20 @@ const Dashboard = () => {
   useEffect(() => { fetchInterviews() }, [])
 
   useEffect(() => {
+    let alive = true
     const refresh = () => setDueCount(dueItems(loadSchedule(user)).length)
-    refresh()
-    return subscribeSchedule(refresh)
+    const sync = async () => {
+      try {
+        const { data } = await api.get('/practice')
+        saveSchedule(user, mergeSchedules(loadSchedule(user), serverItemsToSchedule(data)))
+      } catch {
+        // offline: the local queue is still authoritative
+      }
+      if (alive) refresh()
+    }
+    sync()
+    const stop = subscribeSchedule(refresh)
+    return () => { alive = false; stop() }
   }, [user])
 
   const fetchInterviews = async () => {
@@ -69,7 +80,7 @@ const Dashboard = () => {
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
           <motion.div initial={{ opacity: 0, x: -12 }} animate={{ opacity: 1, x: 0 }}>
-            <h1 className="text-3xl font-bold" style={{ color: '#fff', fontFamily: '"Reference Display", serif', fontWeight: 500 }}>Dashboard</h1>
+            <h1 className="text-3xl font-bold" style={{ color: '#fff', fontFamily: '"Fraunces", "Reference Display", serif', fontWeight: 500 }}>Dashboard</h1>
             <p className="mt-1" style={{ color: 'rgba(255,255,255,.5)' }}>Track your interview progress</p>
             {interviews.length > 0 && (
               <p className="mt-2 inline-flex items-center gap-1.5 text-xs" style={{ color: 'rgba(255,255,255,.45)' }}>
@@ -163,7 +174,7 @@ const Dashboard = () => {
                     {interview.totalQuestions > 0 && (
                       <div className="mt-3 h-1 rounded-full overflow-hidden" style={{ background: 'rgba(255,255,255,.09)' }}>
                         <div className="h-full rounded-full transition-all duration-500"
-                          style={{ width: `${(interview.currentQuestionIndex / interview.totalQuestions) * 100}%`, background: interview.status === 'COMPLETED' ? '#34d399' : '#6366f1' }} />
+                          style={{ width: `${(interview.currentQuestionIndex / interview.totalQuestions) * 100}%`, background: interview.status === 'COMPLETED' ? '#34d399' : '#f59e0b' }} />
                       </div>
                     )}
                     <p className="mt-3 text-xs" style={{ color: 'rgba(255,255,255,.25)' }}>

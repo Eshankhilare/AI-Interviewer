@@ -46,7 +46,7 @@ import { useAuth } from '../context/AuthContext'
 import AnswerInsights from '../components/interview/AnswerInsights'
 import PracticePlan from '../components/report/PracticePlan'
 import { analyzeAnswer } from '../utils/answerInsights'
-import { addToPractice, loadSchedule, saveSchedule } from '../utils/spacedRepetition'
+import { addToPractice, loadSchedule, saveSchedule, toServerPayload } from '../utils/spacedRepetition'
 
 class PDFErrorBoundary extends Component {
   constructor(props) {
@@ -303,6 +303,7 @@ const Report = () => {
       sourceTitle: interview?.title || 'Interview report',
     }
     saveSchedule(user, addToPractice(loadSchedule(user), item))
+    api.put(`/practice/${item.interviewId}/${item.order}`, toServerPayload(item)).catch(() => {})
     navigate('/practice')
   }
 
@@ -392,7 +393,7 @@ const Report = () => {
         <div className="p-6" style={{ background: "var(--surface-1)", border: "1px solid var(--border)", borderRadius: "16px" }}>
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-bold" style={{ color: 'var(--color-ink)' }}>Skill Competency Radar</h2>
-            <span className="text-xs" style={{ color: 'oklch(100% 0 0 / 0.4)' }}>Proficiency Breakdown</span>
+            <span className="text-xs" style={{ color: 'oklch(100% 0 0 / 0.55)' }}>Proficiency Breakdown</span>
           </div>
           <div className="h-[280px] w-full">
             {radarData.length === 0 ? (
@@ -405,7 +406,7 @@ const Report = () => {
                 <PolarGrid stroke="oklch(30% 0.008 40)" />
                 <PolarAngleAxis dataKey="skill" tick={{ fill: 'oklch(72% 0.006 40)', fontSize: 11 }} />
                 <PolarRadiusAxis angle={30} domain={[0, 100]} stroke="oklch(35% 0.006 40)" tick={false} />
-                <Radar name="Proficiency" dataKey="score" stroke="#6366f1" fill="#6366f1" fillOpacity={0.3} />
+                <Radar name="Proficiency" dataKey="score" stroke="#f59e0b" fill="#f59e0b" fillOpacity={0.3} />
               </RadarChart>
             </ResponsiveContainer>
             )}
@@ -416,7 +417,7 @@ const Report = () => {
         <div className="p-6" style={{ background: "var(--surface-1)", border: "1px solid var(--border)", borderRadius: "16px" }}>
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-bold" style={{ color: 'var(--color-ink)' }}>Category Performance</h2>
-            <span className="text-xs" style={{ color: 'oklch(100% 0 0 / 0.4)' }}>Scores by Domain</span>
+            <span className="text-xs" style={{ color: 'oklch(100% 0 0 / 0.55)' }}>Scores by Domain</span>
           </div>
           <div className="h-[280px] w-full">
             {categoryScores.length === 0 ? (
@@ -430,7 +431,7 @@ const Report = () => {
                 <XAxis dataKey="category" tick={{ fill: 'oklch(72% 0.006 40)', fontSize: 12 }} />
                 <YAxis domain={[0, 100]} tick={{ fill: 'oklch(72% 0.006 40)', fontSize: 12 }} />
                 <Tooltip contentStyle={{ borderRadius: '8px', background: 'var(--surface-2)', border: '1px solid var(--border)', color: 'var(--color-ink)' }} />
-                <Bar dataKey="score" fill="#6366f1" radius={[4, 4, 0, 0]} name="Score" />
+                <Bar dataKey="score" fill="#f59e0b" radius={[4, 4, 0, 0]} name="Score" />
               </BarChart>
             </ResponsiveContainer>
             )}
@@ -458,7 +459,7 @@ const Report = () => {
               ))}
             </ul>
           ) : (
-            <p className="text-sm italic" style={{ color: 'oklch(100% 0 0 / 0.35)' }}>No specific strengths recorded.</p>
+            <p className="text-sm italic" style={{ color: 'oklch(100% 0 0 / 0.6)' }}>No specific strengths recorded.</p>
           )}
         </div>
 
@@ -480,7 +481,7 @@ const Report = () => {
               ))}
             </ul>
           ) : (
-            <p className="text-sm italic" style={{ color: 'oklch(100% 0 0 / 0.35)' }}>No major weakness areas identified.</p>
+            <p className="text-sm italic" style={{ color: 'oklch(100% 0 0 / 0.6)' }}>No major weakness areas identified.</p>
           )}
         </div>
       </div>
@@ -517,7 +518,7 @@ const Report = () => {
           </div>
 
           <div className="pt-4 flex items-center justify-between" style={{ borderTop: '1px solid var(--border)' }}>
-            <span className="text-xs font-semibold uppercase tracking-wider" style={{ color: 'oklch(100% 0 0 / 0.4)' }}>
+            <span className="text-xs font-semibold uppercase tracking-wider" style={{ color: 'oklch(100% 0 0 / 0.55)' }}>
               Hiring Recommendation
             </span>
             <span className="badge badge-primary">
@@ -560,13 +561,13 @@ const Report = () => {
                 {/* Answer & Feedback */}
                 <div className="px-5 py-4 space-y-4">
                   <div>
-                    <p className="text-xs font-semibold uppercase tracking-wider mb-1" style={{ color: 'oklch(100% 0 0 / 0.4)' }}>Your Answer</p>
+                    <p className="text-xs font-semibold uppercase tracking-wider mb-1" style={{ color: 'oklch(100% 0 0 / 0.55)' }}>Your Answer</p>
                     <p className="text-sm card" style={{ color: 'oklch(100% 0 0 / 0.7)' }}>{q.answer || 'No answer provided'}</p>
                   </div>
 
                   {q.feedback && (
                     <div>
-                      <p className="text-xs font-semibold uppercase tracking-wider mb-1" style={{ color: 'oklch(100% 0 0 / 0.4)' }}>Review</p>
+                      <p className="text-xs font-semibold uppercase tracking-wider mb-1" style={{ color: 'oklch(100% 0 0 / 0.55)' }}>Review</p>
                       <p className="text-sm" style={{ color: 'oklch(100% 0 0 / 0.7)' }}>{q.feedback}</p>
                     </div>
                   )}

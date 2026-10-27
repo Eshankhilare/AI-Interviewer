@@ -49,8 +49,8 @@ const Login = () => {
           >
             <div className="w-14 h-14 mx-auto rounded-2xl flex items-center justify-center mb-4"
               style={{
-                background: 'linear-gradient(135deg, #6366f1, #8b5cf6)',
-                boxShadow: '0 4px 20px rgba(99,102,241,.3)',
+                background: 'linear-gradient(135deg, #f59e0b, #f97316)',
+                boxShadow: '0 4px 20px rgba(245,158,11,.3)',
               }}>
               <span className="text-white font-bold text-xl">AI</span>
             </div>

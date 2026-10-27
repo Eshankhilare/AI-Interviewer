@@ -42,7 +42,7 @@ const Layout = () => {
               <div className="flex items-center">
                 <Link to="/" className="flex items-center gap-2.5 group">
                   <div className="w-8 h-8 rounded-xl flex items-center justify-center"
-                    style={{ background: 'linear-gradient(135deg, #6366f1, #8b5cf6)' }}>
+                    style={{ background: 'linear-gradient(135deg, #f59e0b, #f97316)' }}>
                     <span className="text-white font-bold text-sm">AI</span>
                   </div>
                   <span className="text-lg font-bold" style={{ color: '#fff' }}>Interviewer</span>
@@ -62,12 +62,12 @@ const Layout = () => {
 
               <div className="flex items-center gap-3">
                 <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full" style={{ background: 'rgba(255,255,255,.04)', border: '1px solid rgba(255,255,255,.06)' }}>
-                  <div className="w-6 h-6 rounded-full flex items-center justify-center" style={{ background: 'linear-gradient(135deg, #818cf8, #6366f1)' }}>
+                  <div className="w-6 h-6 rounded-full flex items-center justify-center" style={{ background: 'linear-gradient(135deg, #fbbf24, #f59e0b)' }}>
                     <span className="text-white text-xs font-bold">{user?.fullName?.charAt(0)}</span>
                   </div>
                   <span className="text-sm font-medium" style={{ color: 'rgba(255,255,255,.7)' }}>{user?.fullName}</span>
                 </div>
-                <button onClick={() => setUIVersion('studio')} aria-label="Switch to the new studio UI" title="Open the new Studio UI" className="inline-flex items-center gap-2 px-3 py-2 text-xs font-semibold rounded-xl transition-all duration-200" style={{ color: '#d8d2ff', background: 'rgba(124,108,246,.16)', border: '1px solid rgba(139,92,246,.35)' }}>
+                <button onClick={() => setUIVersion('studio')} aria-label="Switch to the new studio UI" title="Open the new Studio UI" className="inline-flex items-center gap-2 px-3 py-2 text-xs font-semibold rounded-xl transition-all duration-200" style={{ color: '#d8d2ff', background: 'rgba(245,158,11,.16)', border: '1px solid rgba(249,115,22,.35)' }}>
                   <ArrowLeftRight className="h-4 w-4" aria-hidden="true" />
                   <span className="hidden sm:inline">Studio</span>
                 </button>

@@ -53,7 +53,7 @@ const Resumes = () => {
 
         <div className="flex justify-between items-center mb-6">
           <div>
-            <h1 className="text-2xl font-bold" style={{ color: '#fff', fontFamily: '"Reference Display", serif', fontWeight: 500 }}>Resumes</h1>
+            <h1 className="text-2xl font-bold" style={{ color: '#fff', fontFamily: '"Fraunces", "Reference Display", serif', fontWeight: 500 }}>Resumes</h1>
             <p className="mt-1" style={{ color: 'rgba(255,255,255,.5)' }}>Upload or paste your resume</p>
           </div>
           <WhiteButton onClick={() => setShowForm(!showForm)} className="px-4 py-2.5 flex items-center gap-2 text-sm">
@@ -76,9 +76,9 @@ const Resumes = () => {
             {error && <div className="mb-4 p-3 rounded-xl" style={{ background: 'rgba(239,68,68,.1)', border: '1px solid rgba(239,68,68,.2)' }}><p className="text-sm" style={{ color: '#f87171' }}>{error}</p></div>}
             {!pasteMode ? (
               <form onSubmit={handleFileUpload}>
-                <input type="file" accept=".txt,.md" onChange={handleFileUpload} className="w-full text-sm" style={{ color: 'rgba(255,255,255,.5)' }} />
+                <input type="file" accept=".pdf,.docx,.txt,.md" onChange={handleFileUpload} className="w-full text-sm" style={{ color: 'rgba(255,255,255,.5)' }} />
                 <p className="mt-2 text-xs" style={{ color: 'rgba(255,255,255,.4)' }}>
-                  Text files only (.txt, .md). PDF and DOCX are not parsed yet — paste the text instead.
+                  PDF, DOCX, TXT or MD up to 5 MB. Scanned PDFs without a text layer are rejected — paste the text instead.
                 </p>
               </form>
             ) : (
@@ -106,7 +106,7 @@ const Resumes = () => {
               <motion.div key={resume.id} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.06 }}>
                 <GlassCard className="flex items-center justify-between p-5">
                   <div className="flex-1">
-                    <div className="flex items-center"><FileText className="h-5 w-5 mr-2" style={{ color: '#818cf8' }} /><h3 className="font-medium" style={{ color: '#fff' }}>{resume.name || resume.fileName}</h3></div>
+                    <div className="flex items-center"><FileText className="h-5 w-5 mr-2" style={{ color: '#fbbf24' }} /><h3 className="font-medium" style={{ color: '#fff' }}>{resume.name || resume.fileName}</h3></div>
                     <p className="text-sm mt-1" style={{ color: 'rgba(255,255,255,.4)' }}>{resume.skills ? `${resume.skills.split(',').length} skills detected` : 'Uploaded'}</p>
                   </div>
                   <button onClick={() => handleDelete(resume.id)} className="p-2 hover:opacity-80" style={{ color: 'rgba(255,255,255,.3)' }}><Trash2 className="h-4 w-4" /></button>

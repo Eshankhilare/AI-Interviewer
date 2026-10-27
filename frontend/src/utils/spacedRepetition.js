@@ -149,3 +149,41 @@ export const importSchedule = (raw) => {
     return null
   }
 }
+
+/** The API returns an array; the local store is keyed by interview:order. */
+export const serverItemsToSchedule = (items = []) => {
+  const map = {}
+  for (const item of items) {
+    if (item?.key) map[item.key] = item
+  }
+  return { version: 1, items: map }
+}
+
+/**
+ * Union of local and server items. When both know a question, the copy with
+ * more completed reviews wins; snapshots are merged so edits are not lost.
+ */
+export const mergeSchedules = (local, remote) => {
+  const items = { ...(local?.items || {}) }
+  for (const [key, remoteItem] of Object.entries(remote?.items || {})) {
+    const localItem = items[key]
+    if (!localItem) {
+      items[key] = remoteItem
+      continue
+    }
+    items[key] = (remoteItem.reps || 0) >= (localItem.reps || 0)
+      ? { ...localItem, ...remoteItem }
+      : { ...remoteItem, ...localItem }
+  }
+  return { version: 1, items }
+}
+
+export const toServerPayload = (item) => ({
+  question: item.question,
+  questionType: item.questionType,
+  score: item.score,
+  expectedAnswer: item.expectedAnswer,
+  sampleResponse: item.sampleResponse,
+  feedback: item.feedback,
+  sourceTitle: item.sourceTitle,
+})

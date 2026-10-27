@@ -27,17 +27,17 @@ built yet.
 | 15 | Submitting takes a mouse trip and breaks flow | Ctrl/⌘ + Enter submits the answer from the textarea | **Shipped** |
 | 16 | Practice is not a habit, so progress stalls | Day streak and sessions-this-week on the dashboard | **Shipped** |
 | 17 | A score means nothing without a baseline | Report shows the delta against the previous completed interview | **Shipped** |
-| 18 | A practice schedule trapped in one browser is fragile | Export/import the queue as JSON; reset with confirmation | **Shipped** |
+| 18 | A practice schedule trapped in one browser is fragile | Export/import JSON, reset, and a server-side copy that follows the account | **Shipped** |
 | 19 | Technical screens need real code execution, not whiteboarding | Monaco editor backed by Judge0 (run/submit, language switch, stdin) | Earlier |
 | 20 | Candidates cannot practise spoken answers | Browser speech-to-text, TTS questions, transcript-driven insights | Earlier (STT mock without a Deepgram key) |
 | 21 | Webcam presence and posture matter in video interviews | Optional on-device pose panel: presence, posture, engagement, fidgeting | Earlier |
 | 22 | Mock interviews do not rehearse integrity rules | Optional proctoring: tab switches, clipboard, face count, repeated alerts end the session | Earlier |
-| 23 | Uploading a resume is high-friction | Paste text and parse it; text files accepted, PDF/DOCX parsing explicitly deferred | Earlier |
+| 23 | Uploading a resume is high-friction | PDF, DOCX, TXT and MD uploads; PDFBox text extraction; scanned PDFs rejected with a clear message | **Shipped** |
 | 24 | Writing a job description from scratch is slow | 25+ role templates, custom JDs, and JD analysis | Earlier |
 | 25 | Model quotas and outages break a demo | Two retries then an honest keyword fallback; the request still succeeds and the report says the mode | Earlier |
 | 26 | Feedback cannot be shared with a mentor | One-click PDF report with the score, radar, review and plan | Earlier |
-| 27 | Accessibility is an afterthought | Skip link, focus-visible, labelled icon buttons, `aria-current`, reduced motion, live counters without screen-reader spam | Earlier (full WCAG audit deferred) |
-| 28 | Practice data should not leave the device by default | Self-graded schedule and drafts stay in `localStorage`; the backend stores only submitted answers | **Shipped** |
+| 27 | Accessibility is an afterthought | Automated WCAG 2 A/AA pass on six key pages: **0 violations**; skip link, focus, labels, reduced motion fixed | **Shipped** (manual screen-reader pass still planned) |
+| 28 | Practice data should not leave the device by default | Self-graded schedule syncs to the account; unsent drafts stay local; no third-party analytics | **Shipped** |
 
 ## Problems this project deliberately does **not** solve
 
@@ -59,14 +59,22 @@ built yet.
 | Streak and weekly activity | `frontend/src/utils/progressStats.js`, `pages/Dashboard.jsx` |
 | Score delta | `frontend/src/pages/Report.jsx` |
 | Queue export/import/reset | `frontend/src/utils/spacedRepetition.js`, `pages/Practice.jsx` |
+| Server-side queue | `PracticeItem`, `PracticeItemRepository`, `PracticeScheduler`, `PracticeController`; sync in `pages/Practice.jsx` and both dashboards |
+| PDF/DOCX resumes | `ResumeTextExtractor` (PDFBox + DOCX zip reader), `ResumeController`, `pages/Resumes.jsx` |
+| Calendar and email reminders | `frontend/src/utils/reminders.js`, `pages/Practice.jsx` |
+| WCAG pass | `Profile.jsx` labels, `VoicePlayer.jsx` names, report contrast tokens, interview mode contrast |
 | Tests | `utils/answerInsights.test.js`, `drafts.test.js`, `progressStats.test.js`, `spacedRepetition.test.js` |
 
 ## Next, in order of real-world value
 
-1. **Server-side practice sync** so the queue follows the account across
-   devices (needs a small table and an endpoint).
-2. **Streaming rubric feedback** so the 20–30 s evaluation becomes progressive.
-3. **Real resume parsing** for PDF/DOCX, then feed the parsed skills into the
-   role-fit card automatically.
-4. **Email/calendar reminders** for due practice, opt-in only.
-5. **Full WCAG 2.2 AA pass**, including contrast tokens and a keyboard-only run.
+1. **Streaming rubric feedback** so the 20–30 s evaluation becomes progressive.
+   This needs token streaming from the AI provider plus an SSE proxy in the
+   backend; the current call is bounded and already shows a pending state.
+2. **Server-side email delivery** (the current reminder opens the user's mail
+   client; calendar export is the reliable path without SMTP credentials).
+3. **A manual screen-reader pass** and contrast tokens shared across the studio
+   and classic shells (the automated WCAG A/AA run is clean on six key pages).
+4. **Question-level adaptive drills** that pull the exact past question into a
+   new session, instead of practising it from the report snapshot.
+5. **A real benchmark with labelled answers** so the rubric can be compared to
+   human raters instead of only checked for internal consistency.

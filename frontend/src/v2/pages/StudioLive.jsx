@@ -270,7 +270,7 @@ export default function StudioLive() {
               <div className="st-orb-ball" aria-hidden="true">
                 <CrystalizedBall
                   preset="plasma"
-                  color={background === 'flux' ? '#22D3EE' : '#8B5CF6'}
+                  color={background === 'flux' ? '#22D3EE' : '#F59E0B'}
                   size={0.78}
                   crackle={0.85}
                   fill={0.5}

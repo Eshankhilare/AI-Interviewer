@@ -9,6 +9,7 @@ import com.interviewer.repository.ResumeRepository;
 import com.interviewer.repository.UserRepository;
 import com.interviewer.security.CurrentUser;
 import com.interviewer.service.AiServiceClient;
+import com.interviewer.service.ResumeTextExtractor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
@@ -16,7 +17,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -24,7 +24,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -35,9 +34,6 @@ public class ResumeController {
 
     private static final long MAX_UPLOAD_BYTES = 5L * 1024 * 1024;
     private static final int MAX_PASTED_TEXT = 100_000;
-
-    /** Formats we can turn into plain text without extra dependencies. */
-    private static final Set<String> TEXT_EXTENSIONS = Set.of("txt", "md", "text");
 
     private final ResumeRepository resumeRepository;
     private final UserRepository userRepository;
@@ -82,14 +78,14 @@ public class ResumeController {
                 throw new IllegalArgumentException("File is larger than 5 MB");
             }
             String extension = extensionOf(resume.getFileName());
-            if (!TEXT_EXTENSIONS.contains(extension)) {
+            if (!ResumeTextExtractor.SUPPORTED_EXTENSIONS.contains(extension)) {
                 throw new ConflictException(
-                        "Only text resumes can be parsed right now. Paste your resume text or upload a .txt/.md file.");
+                        "Upload a PDF, DOCX, TXT or MD file, or paste the resume text.");
             }
 
             try {
                 byte[] bytes = file.getBytes();
-                resume.setExtractedText(limitText(new String(bytes, StandardCharsets.UTF_8)));
+                resume.setExtractedText(limitText(ResumeTextExtractor.extract(bytes, extension)));
                 resume.setStatus(Resume.Status.PARSING);
 
                 Path baseDir = Paths.get(uploadDir, "resumes").toAbsolutePath().normalize();
@@ -101,7 +97,7 @@ public class ResumeController {
                 Files.write(target, bytes);
                 resume.setFilePath(target.toString());
             } catch (IOException e) {
-                throw new IllegalStateException("Could not store the uploaded file", e);
+                throw new ConflictException(e.getMessage());
             }
         }
 

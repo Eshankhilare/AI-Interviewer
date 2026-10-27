@@ -76,7 +76,7 @@ const Profile = () => {
 
         {/* Header */}
         <div className="flex items-center gap-4 mb-8">
-          <div className="w-16 h-16 rounded-2xl flex items-center justify-center" style={{ background: 'linear-gradient(135deg, #6366f1, #8b5cf6)' }}>
+          <div className="w-16 h-16 rounded-2xl flex items-center justify-center" style={{ background: 'linear-gradient(135deg, #f59e0b, #f97316)' }}>
             <span className="text-white font-bold text-2xl">{user?.fullName?.charAt(0)}</span>
           </div>
           <div>
@@ -97,7 +97,7 @@ const Profile = () => {
                     className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all"
                     style={{
                       color: activeTab === id ? '#fff' : 'rgba(255,255,255,.5)',
-                      background: activeTab === id ? 'rgba(99,102,241,.15)' : 'transparent',
+                      background: activeTab === id ? 'rgba(245,158,11,.15)' : 'transparent',
                     }}
                   >
                     <Icon className="h-4 w-4" />
@@ -126,31 +126,31 @@ const Profile = () => {
                 <div className="space-y-4">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-sm font-medium mb-1.5" style={{ color: 'rgba(255,255,255,.6)' }}>Full Name</label>
-                      <GlassInput value={profile.fullName} onChange={(e) => setProfile({ ...profile, fullName: e.target.value })} />
+                      <label htmlFor="profile-full-name" className="block text-sm font-medium mb-1.5" style={{ color: 'rgba(255,255,255,.6)' }}>Full Name</label>
+                      <GlassInput id="profile-full-name" value={profile.fullName} onChange={(e) => setProfile({ ...profile, fullName: e.target.value })} />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium mb-1.5" style={{ color: 'rgba(255,255,255,.6)' }}>Email</label>
-                      <GlassInput value={profile.email} onChange={(e) => setProfile({ ...profile, email: e.target.value })} disabled />
+                      <label htmlFor="profile-email" className="block text-sm font-medium mb-1.5" style={{ color: 'rgba(255,255,255,.6)' }}>Email</label>
+                      <GlassInput id="profile-email" value={profile.email} onChange={(e) => setProfile({ ...profile, email: e.target.value })} disabled />
                     </div>
                   </div>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-sm font-medium mb-1.5" style={{ color: 'rgba(255,255,255,.6)' }}>Phone</label>
-                      <GlassInput value={profile.phone} onChange={(e) => setProfile({ ...profile, phone: e.target.value })} placeholder="+1 234 567 890" />
+                      <label htmlFor="profile-phone" className="block text-sm font-medium mb-1.5" style={{ color: 'rgba(255,255,255,.6)' }}>Phone</label>
+                      <GlassInput id="profile-phone" value={profile.phone} onChange={(e) => setProfile({ ...profile, phone: e.target.value })} placeholder="+1 234 567 890" />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium mb-1.5" style={{ color: 'rgba(255,255,255,.6)' }}>Job Title</label>
-                      <GlassInput value={profile.jobTitle} onChange={(e) => setProfile({ ...profile, jobTitle: e.target.value })} placeholder="Software Engineer" />
+                      <label htmlFor="profile-job-title" className="block text-sm font-medium mb-1.5" style={{ color: 'rgba(255,255,255,.6)' }}>Job Title</label>
+                      <GlassInput id="profile-job-title" value={profile.jobTitle} onChange={(e) => setProfile({ ...profile, jobTitle: e.target.value })} placeholder="Software Engineer" />
                     </div>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium mb-1.5" style={{ color: 'rgba(255,255,255,.6)' }}>Company</label>
-                    <GlassInput value={profile.company} onChange={(e) => setProfile({ ...profile, company: e.target.value })} placeholder="Company name" />
+                    <label htmlFor="profile-company" className="block text-sm font-medium mb-1.5" style={{ color: 'rgba(255,255,255,.6)' }}>Company</label>
+                    <GlassInput id="profile-company" value={profile.company} onChange={(e) => setProfile({ ...profile, company: e.target.value })} placeholder="Company name" />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium mb-1.5" style={{ color: 'rgba(255,255,255,.6)' }}>Bio</label>
-                    <GlassInput as="textarea" rows={3} value={profile.bio} onChange={(e) => setProfile({ ...profile, bio: e.target.value })} placeholder="Tell us about yourself..." style={{ resize: 'none' }} />
+                    <label htmlFor="profile-bio" className="block text-sm font-medium mb-1.5" style={{ color: 'rgba(255,255,255,.6)' }}>Bio</label>
+                    <GlassInput id="profile-bio" as="textarea" rows={3} value={profile.bio} onChange={(e) => setProfile({ ...profile, bio: e.target.value })} placeholder="Tell us about yourself..." style={{ resize: 'none' }} />
                   </div>
                   <button onClick={handleSave} disabled={saving} className="btn-primary">
                     {saving ? 'Saving...' : 'Save Changes'}
@@ -275,8 +275,8 @@ const Profile = () => {
                       { id: 'system', label: 'System', icon: Monitor },
                     ].map(({ id, label, icon: Icon }) => (
                       <button key={id} className="flex flex-col items-center gap-2 p-4 rounded-xl transition-all"
-                        style={{ background: id === 'dark' ? 'rgba(99,102,241,.15)' : 'oklch(100% 0 0 / 0.03)', border: `1px solid ${id === 'dark' ? 'rgba(99,102,241,.3)' : 'oklch(100% 0 0 / 0.06)'}` }}>
-                        <Icon className="h-5 w-5" style={{ color: id === 'dark' ? '#818cf8' : 'rgba(255,255,255,.5)' }} />
+                        style={{ background: id === 'dark' ? 'rgba(245,158,11,.15)' : 'oklch(100% 0 0 / 0.03)', border: `1px solid ${id === 'dark' ? 'rgba(245,158,11,.3)' : 'oklch(100% 0 0 / 0.06)'}` }}>
+                        <Icon className="h-5 w-5" style={{ color: id === 'dark' ? '#fbbf24' : 'rgba(255,255,255,.5)' }} />
                         <span className="text-xs font-medium" style={{ color: '#fff' }}>{label}</span>
                       </button>
                     ))}
@@ -285,9 +285,9 @@ const Profile = () => {
                   <div className="mt-4">
                     <p className="text-sm" style={{ color: 'rgba(255,255,255,.6)' }}>Accent Color</p>
                     <div className="flex gap-3 mt-2">
-                      {['#6366f1', '#8b5cf6', '#ec4899', '#14b8a6', '#f59e0b'].map(color => (
+                      {['#f59e0b', '#f97316', '#ec4899', '#14b8a6', '#f59e0b'].map(color => (
                         <button key={color} className="w-8 h-8 rounded-full border-2 transition-all"
-                          style={{ background: color, borderColor: color === '#6366f1' ? '#fff' : 'transparent' }} />
+                          style={{ background: color, borderColor: color === '#f59e0b' ? '#fff' : 'transparent' }} />
                       ))}
                     </div>
                   </div>

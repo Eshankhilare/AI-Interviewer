@@ -4,7 +4,7 @@ import { motion } from 'framer-motion'
 import { ArrowRight, Clock, Play, Sparkles, Target, TrendingUp, BarChart3, Award, Brain } from 'lucide-react'
 import api from '../../services/api'
 import { useAuth } from '../../context/AuthContext'
-import { dueItems, loadSchedule, subscribeSchedule } from '../../utils/spacedRepetition'
+import { dueItems, loadSchedule, mergeSchedules, saveSchedule, serverItemsToSchedule, subscribeSchedule } from '../../utils/spacedRepetition'
 import { BarRow, Empty, PageHead, ScoreRing, SkeletonBlock, formatDate } from '../ui'
 
 const byNewest = (a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0)
@@ -23,9 +23,19 @@ export default function Home() {
   const [dueCount, setDueCount] = useState(0)
 
   useEffect(() => {
+    let alive = true
     const refresh = () => setDueCount(dueItems(loadSchedule(user)).length)
-    refresh()
-    return subscribeSchedule(refresh)
+    const sync = async () => {
+      try {
+        const { data } = await api.get('/practice')
+        saveSchedule(user, mergeSchedules(loadSchedule(user), serverItemsToSchedule(data)))
+      } catch {
+        // offline: local queue only
+      }
+      if (alive) refresh()
+    }
+    sync()
+    return () => { alive = false }
   }, [user])
 
   useEffect(() => {
@@ -139,7 +149,7 @@ export default function Home() {
 
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 26 }}>
             <div style={{ position: 'relative', display: 'grid', placeItems: 'center' }}>
-              <div style={{ position: 'absolute', width: 190, height: 190, borderRadius: '50%', background: 'radial-gradient(circle, rgba(99,102,241,.28), transparent 65%)', filter: 'blur(6px)' }} />
+              <div style={{ position: 'absolute', width: 190, height: 190, borderRadius: '50%', background: 'radial-gradient(circle, rgba(245,158,11,.28), transparent 65%)', filter: 'blur(6px)' }} />
               <ScoreRing value={readiness} size={156} />
             </div>
             <div style={{ minWidth: 0 }}>

@@ -7,11 +7,14 @@ import {
   importSchedule,
   intervalLabel,
   loadSchedule,
+  mergeSchedules,
   practiceItemKey,
   removeFromPractice,
   saveSchedule,
   scheduleKey,
+  serverItemsToSchedule,
   subscribeSchedule,
+  toServerPayload,
   upcomingItems,
 } from './spacedRepetition'
 
@@ -134,5 +137,19 @@ describe('spaced repetition', () => {
     expect(restored.items[practiceItemKey(7, 2)].question).toContain('replication')
     expect(importSchedule('not json')).toBeNull()
     expect(importSchedule('{"items":{}}')).toBeNull()
+  })
+
+  it('merges server and local queues without losing either side', () => {
+    const local = addToPractice({ version: 1, items: {} }, item, NOW)
+    const remote = serverItemsToSchedule([
+      { ...local.items[practiceItemKey(7, 2)], reps: 2, intervalDays: 5, dueAt: new Date(NOW + 5 * DAY).toISOString() },
+      { key: '9:1', interviewId: 9, order: 1, question: 'Remote only', dueAt: new Date(NOW).toISOString(), reps: 0 },
+    ])
+    const merged = mergeSchedules(local, remote)
+
+    expect(Object.keys(merged.items)).toHaveLength(2)
+    expect(merged.items[practiceItemKey(7, 2)].reps).toBe(2)
+    expect(merged.items['9:1'].question).toBe('Remote only')
+    expect(toServerPayload(merged.items['9:1'])).toEqual({ question: 'Remote only' })
   })
 })

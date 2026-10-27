@@ -31,7 +31,7 @@ const Landing = () => {
         className="relative z-10 flex items-center justify-between px-8 py-5 max-w-7xl mx-auto"
       >
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg shadow-indigo-500/30">
+          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center shadow-lg shadow-amber-500/30">
             <span className="text-white font-bold text-sm">AI</span>
           </div>
           <span className="text-lg font-semibold tracking-tight">AI Interviewer</span>
@@ -121,9 +121,9 @@ const Landing = () => {
           className="absolute right-8 bottom-32 w-64 hidden lg:block"
         >
           <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-4 shadow-2xl">
-            <div className="aspect-[4/3] rounded-xl overflow-hidden mb-3 bg-gradient-to-br from-indigo-900/50 to-purple-900/50 flex items-center justify-center">
+            <div className="aspect-[4/3] rounded-xl overflow-hidden mb-3 bg-gradient-to-br from-amber-900/50 to-orange-900/50 flex items-center justify-center">
               <div className="text-center p-4">
-                <Brain className="w-12 h-12 text-indigo-400 mx-auto mb-2" />
+                <Brain className="w-12 h-12 text-amber-400 mx-auto mb-2" />
                 <p className="text-xs text-white/60">AI Interview Simulation</p>
               </div>
             </div>
@@ -237,7 +237,7 @@ const Landing = () => {
               className="relative p-6 bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl"
             >
               <span className="absolute top-4 right-4 text-4xl font-bold text-white/10">{item.step}</span>
-              <item.icon className="w-8 h-8 text-indigo-400 mb-4" />
+              <item.icon className="w-8 h-8 text-amber-400 mb-4" />
               <h3 className="text-lg font-semibold mb-2">{item.title}</h3>
               <p className="text-sm text-white/50">{item.desc}</p>
             </motion.div>
@@ -279,7 +279,7 @@ const Landing = () => {
               transition={{ duration: 0.5, delay: i * 0.08 }}
               className="p-5 bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl hover:bg-white/10 transition-all"
             >
-              <feature.icon className="w-7 h-7 text-indigo-400 mb-3" />
+              <feature.icon className="w-7 h-7 text-amber-400 mb-3" />
               <h3 className="text-base font-semibold mb-1.5">{feature.title}</h3>
               <p className="text-sm text-white/50 leading-relaxed">{feature.desc}</p>
             </motion.div>

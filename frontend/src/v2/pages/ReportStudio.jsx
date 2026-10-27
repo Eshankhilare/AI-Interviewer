@@ -9,7 +9,7 @@ import { useAuth } from '../../context/AuthContext'
 import { BarRow, PageHead, ScoreRing, SkeletonBlock, formatDate, gradeClass, scoreColor } from '../ui'
 import AnswerInsights from '../../components/interview/AnswerInsights'
 import { analyzeAnswer } from '../../utils/answerInsights'
-import { addToPractice, loadSchedule, saveSchedule } from '../../utils/spacedRepetition'
+import { addToPractice, loadSchedule, saveSchedule, toServerPayload } from '../../utils/spacedRepetition'
 
 const PDFReportGenerator = lazy(() => import('../../components/report/PDFReportGenerator'))
 
@@ -76,6 +76,7 @@ export default function ReportStudio() {
       sourceTitle: interview?.title || 'Interview report',
     }
     saveSchedule(user, addToPractice(loadSchedule(user), entry))
+    api.put(`/practice/${entry.interviewId}/${entry.order}`, toServerPayload(entry)).catch(() => {})
     navigate('/practice')
   }
 
@@ -163,7 +164,7 @@ export default function ReportStudio() {
                     <PolarGrid stroke="rgba(255,255,255,.12)" />
                     <PolarAngleAxis dataKey="skill" tick={{ fill: '#a9adb8', fontSize: 11 }} />
                     <PolarRadiusAxis domain={[0, 100]} tick={false} axisLine={false} />
-                    <Radar dataKey="score" stroke="#a78bfa" fill="#7c6cf6" fillOpacity={0.32} strokeWidth={2} />
+                    <Radar dataKey="score" stroke="#fde68a" fill="#f59e0b" fillOpacity={0.32} strokeWidth={2} />
                   </RadarChart>
                 </ResponsiveContainer>
               </div>

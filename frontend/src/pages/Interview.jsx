@@ -304,7 +304,7 @@ const Interview = () => {
             </div>
             <div className="w-full h-2 rounded-full overflow-hidden" style={{ background: 'rgba(255,255,255,.05)' }}>
               <div className="h-2 rounded-full transition-all duration-500"
-                style={{ width: `${((interview.currentQuestionIndex + 1) / interview.totalQuestions) * 100}%`, background: '#6366f1' }} />
+                style={{ width: `${((interview.currentQuestionIndex + 1) / interview.totalQuestions) * 100}%`, background: '#f59e0b' }} />
             </div>
           </GlassCard>
 
@@ -322,12 +322,12 @@ const Interview = () => {
           <GlassCard className="mb-6 p-6">
             <div className="flex items-start space-x-3">
               <div className="flex-shrink-0">
-                <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: '#6366f1' }}>
+                <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: '#f59e0b' }}>
                   <MessageSquare className="h-5 w-5 text-white" />
                 </div>
               </div>
               <div className="flex-1">
-                <p className="text-sm font-semibold mb-1" style={{ color: '#818cf8' }}>AI Interviewer</p>
+                <p className="text-sm font-semibold mb-1" style={{ color: '#fbbf24' }}>AI Interviewer</p>
                 <p style={{ color: '#fff' }}>{currentQuestion.questionText}</p>
                 <div className="mt-2 flex space-x-2">
                   <GlassBadge variant="primary">{currentQuestion.questionType}</GlassBadge>
@@ -355,7 +355,7 @@ const Interview = () => {
                 ...(isCodingQuestion ? [{ mode: 'coding', icon: Code, label: 'Code' }] : []),
               ].map(({ mode, icon: Icon, label }) => (
                 <button key={mode} onClick={() => setInputMode(mode)} className="flex items-center px-4 py-2 rounded-xl text-sm font-medium transition-all"
-                  style={{ background: inputMode === mode ? '#6366f1' : 'rgba(255,255,255,.06)', color: inputMode === mode ? '#fff' : 'rgba(255,255,255,.5)', border: `1px solid ${inputMode === mode ? '#6366f1' : 'rgba(255,255,255,.08)'}` }}>
+                  style={{ background: inputMode === mode ? '#f59e0b' : 'rgba(255,255,255,.06)', color: inputMode === mode ? '#151515' : 'rgba(255,255,255,.68)', border: `1px solid ${inputMode === mode ? '#f59e0b' : 'rgba(255,255,255,.08)'}` }}>
                   <Icon className="w-4 h-4 mr-2" />{label}
                 </button>
               ))}
@@ -398,11 +398,11 @@ const Interview = () => {
                   <h3 className="text-sm font-bold mb-3" style={{ color: '#fff' }}>Feedback</h3>
                   <div className="space-y-3 mb-4">
                     <p className="text-sm leading-relaxed" style={{ color: 'rgba(255,255,255,.7)' }}>{feedback.feedback}</p>
-                    {feedback.strengths && <div><p className="text-xs font-semibold mb-1" style={{ color: '#4ade80' }}>Strengths</p><p className="text-sm" style={{ color: 'rgba(255,255,255,.5)' }}>{feedback.strengths}</p></div>}
-                    {feedback.weaknesses && <div><p className="text-xs font-semibold mb-1" style={{ color: '#fbbf24' }}>Areas to Improve</p><p className="text-sm" style={{ color: 'rgba(255,255,255,.5)' }}>{feedback.weaknesses}</p></div>}
+                    {feedback.strengths && <div><p className="text-xs font-semibold mb-1" style={{ color: '#4ade80' }}>Strengths</p><p className="text-sm" style={{ color: 'rgba(255,255,255,.65)' }}>{feedback.strengths}</p></div>}
+                    {feedback.weaknesses && <div><p className="text-xs font-semibold mb-1" style={{ color: '#fbbf24' }}>Areas to Improve</p><p className="text-sm" style={{ color: 'rgba(255,255,255,.65)' }}>{feedback.weaknesses}</p></div>}
                   </div>
                   {feedback.sampleResponse && (
-                    <details className="mb-4"><summary className="text-xs font-semibold cursor-pointer hover:opacity-80" style={{ color: '#818cf8' }}>Sample Response</summary>
+                    <details className="mb-4"><summary className="text-xs font-semibold cursor-pointer hover:opacity-80" style={{ color: '#fbbf24' }}>Sample Response</summary>
                       <p className="mt-2 text-sm leading-relaxed p-3 rounded-xl" style={{ color: 'rgba(255,255,255,.6)', background: 'rgba(255,255,255,.04)', border: '1px solid rgba(255,255,255,.06)' }}>{feedback.sampleResponse}</p>
                     </details>
                   )}
@@ -446,7 +446,7 @@ const Interview = () => {
                 { label: 'Proctoring', checked: showProctoring, onChange: setShowProctoring },
               ].map(({ label, checked, onChange }) => (
                 <label key={label} className="flex items-center space-x-2 cursor-pointer">
-                  <input type="checkbox" checked={checked} onChange={(e) => onChange(e.target.checked)} className="rounded" style={{ accentColor: '#6366f1' }} />
+                  <input type="checkbox" checked={checked} onChange={(e) => onChange(e.target.checked)} className="rounded" style={{ accentColor: '#f59e0b' }} />
                   <span className="text-sm" style={{ color: 'rgba(255,255,255,.6)' }}>{label}</span>
                 </label>
               ))}

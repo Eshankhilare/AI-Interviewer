@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
-import { CalendarClock, Download, RotateCcw, Trash2, Upload, Zap } from 'lucide-react'
+import { CalendarClock, CalendarPlus, Download, Mail, RotateCcw, Trash2, Upload, Zap } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
+import api from '../services/api'
 import { GlassCard, GlassBadge, WhiteButton } from '../components/ui/glass'
 import PracticeDrill from '../components/practice/PracticeDrill'
 import {
@@ -9,11 +10,15 @@ import {
   gradePracticeItem,
   importSchedule,
   loadSchedule,
+  mergeSchedules,
   removeFromPractice,
   saveSchedule,
+  serverItemsToSchedule,
   subscribeSchedule,
+  toServerPayload,
   upcomingItems,
 } from '../utils/spacedRepetition'
+import { buildPracticeCalendar, buildReminderEmail } from '../utils/reminders'
 
 const when = (iso) => {
   const diff = new Date(iso).getTime() - Date.now()
@@ -31,10 +36,30 @@ const Practice = () => {
   const fileRef = useRef(null)
 
   useEffect(() => {
-    const refresh = () => setSchedule(loadSchedule(user))
-    refresh()
+    let alive = true
+    const apply = (next) => { if (alive) setSchedule(next) }
+
+    const sync = async () => {
+      const local = loadSchedule(user)
+      try {
+        const { data } = await api.get('/practice')
+        const remote = serverItemsToSchedule(data)
+        const merged = mergeSchedules(local, remote)
+        const remoteKeys = new Set(Object.keys(remote.items))
+        await Promise.all(Object.values(merged.items)
+          .filter((item) => !remoteKeys.has(item.key))
+          .map((item) => api.put(`/practice/${item.interviewId}/${item.order}`, toServerPayload(item)).catch(() => {})))
+        saveSchedule(user, merged)
+        apply(merged)
+      } catch {
+        apply(local)
+      }
+    }
+
+    sync()
     setSelectedKey(null)
-    return subscribeSchedule(refresh)
+    const stop = subscribeSchedule(() => apply(loadSchedule(user)))
+    return () => { alive = false; stop() }
   }, [user])
 
   const persist = (next) => {
@@ -48,11 +73,17 @@ const Practice = () => {
 
   const grade = (id) => {
     if (!selectedKey) return
+    const item = schedule.items[selectedKey]
     persist(gradePracticeItem(schedule, selectedKey, id))
+    if (item) {
+      api.post(`/practice/${item.interviewId}/${item.order}/grade`, { grade: id }).catch(() => {})
+    }
   }
 
   const remove = (key) => {
+    const item = schedule.items[key]
     persist(removeFromPractice(schedule, key))
+    if (item) api.delete(`/practice/${item.interviewId}/${item.order}`).catch(() => {})
     if (selectedKey === key) setSelectedKey(null)
   }
 
@@ -78,6 +109,9 @@ const Practice = () => {
     }
     persist(imported)
     setSelectedKey(null)
+    Object.values(imported.items).forEach((item) => {
+      api.put(`/practice/${item.interviewId}/${item.order}`, toServerPayload(item)).catch(() => {})
+    })
     setNotice(`Imported ${Object.keys(imported.items).length} question(s).`)
   }
 
@@ -85,7 +119,26 @@ const Practice = () => {
     if (!window.confirm('Clear every scheduled question? This cannot be undone.')) return
     persist({ version: 1, items: {} })
     setSelectedKey(null)
+    api.delete('/practice').catch(() => {})
     setNotice('Queue cleared.')
+  }
+
+  const addToCalendar = () => {
+    const items = [...due, ...upcoming]
+    if (items.length === 0) return
+    const blob = new Blob([buildPracticeCalendar(items)], { type: 'text/calendar' })
+    const url = URL.createObjectURL(blob)
+    const link = document.createElement('a')
+    link.href = url
+    link.download = 'practice-reminders.ics'
+    link.click()
+    URL.revokeObjectURL(url)
+    setNotice('Calendar file downloaded.')
+  }
+
+  const emailPlan = () => {
+    const { subject, body } = buildReminderEmail([...due, ...upcoming], { appUrl: window.location.origin })
+    window.location.href = `mailto:${encodeURIComponent(user?.email || '')}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`
   }
 
   if (selected) {
@@ -144,6 +197,14 @@ const Practice = () => {
             <Upload className="h-3.5 w-3.5" /> Import
           </button>
           <input ref={fileRef} type="file" accept="application/json,.json" className="hidden" onChange={importFile} />
+          <button type="button" onClick={addToCalendar} disabled={due.length + upcoming.length === 0}
+            className="chip-btn inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs disabled:opacity-40">
+            <CalendarPlus className="h-3.5 w-3.5" /> Add to calendar
+          </button>
+          <button type="button" onClick={emailPlan} disabled={due.length + upcoming.length === 0}
+            className="chip-btn inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs disabled:opacity-40">
+            <Mail className="h-3.5 w-3.5" /> Email plan
+          </button>
           <button type="button" onClick={resetQueue} disabled={Object.keys(schedule.items).length === 0}
             className="chip-btn inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs disabled:opacity-40">
             <RotateCcw className="h-3.5 w-3.5" /> Reset

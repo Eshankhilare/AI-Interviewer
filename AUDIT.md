@@ -435,10 +435,10 @@ Everything below was run on `hackathon/polish` after the fixes.
 
 | Check | Command | Result |
 |---|---|---|
-| Backend unit + integration | `mvn test` | **11 passed** (2 rate-limit, 9 security/state/report/adaptive) |
+| Backend unit + integration | `mvn test` | **19 passed** (2 rate-limit, 9 security, 4 practice scheduler, 4 resume extractor) |
 | AI service | `python -m pytest` | **14 passed** (rubric arithmetic, grounding, injection, retries, router auth/limits, resume parser) |
-| Frontend unit | `npm test` | **15 passed**, 3 files |
-| Frontend lint | `npm run lint` | **0 errors**, 32 warnings (unused vars, hook deps) |
+| Frontend unit | `npm test` | **49 passed**, 10 files |
+| Frontend lint | `npm run lint` | **0 errors**, 34 warnings (unused vars, hook deps) |
 | Frontend build | `npm run build` | **PASS**, main chunk 955.96 kB (PDF chunk 1,223.76 kB, lazy-loaded) |
 | Benchmark self-check | `python bench/test_bench.py` | **PASS** |
 | Benchmark run | `python bench/run.py --mode local --repeats 2` | 12 answers scored by the **heuristic** fallback; no agreement metric claimed (no labels, no key) |
@@ -452,6 +452,9 @@ Everything below was run on `hackathon/polish` after the fixes.
 | Resume upload | `/api/resumes/upload` with a PDF | **409** with "Only text resumes can be parsed right now"; the picker now offers `.txt/.md` and says so instead of advertising PDF/DOCX |
 | Feature sweep | coding languages/problems, voice voices, resume parse-text, unauthenticated GET | 200 / 200 / 200 / 200 / **401** |
 | Browser walkthrough | Playwright over every route, desktop + mobile | **0 console errors**, 0 failed API calls; remaining request failure is the external CloudFront background video |
+| Practice sync | `PUT/GET /api/practice`, grade in the browser | **200**; a fresh browser profile saw the server item; grading through the drill persisted `reps=1`, `intervalDays=2` |
+| PDF resume | `POST /api/resumes/upload` with a real PDF | **200**, `PARSED`, non-empty `parsedData`; scanned PDFs rejected with "no text layer" |
+| WCAG automated | axe-core on dashboard, report, practice, wizard, profile, live interview | **0 violations** on all six (WCAG 2 A/AA rule set) |
 
 Live HTTP smoke test (backend on the `local` profile, port 8082, no AI service):
 
