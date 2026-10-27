@@ -93,7 +93,7 @@
   border-radius: 50%;
   display: grid;
   place-items: center;
-  color: var(--to-accent-2);
+  color: #fff8f0;
   background: rgba(16, 14, 12, .68);
   border: 2px solid var(--to-accent);
   box-shadow:

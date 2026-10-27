@@ -278,23 +278,23 @@ const Landing = () => {
           viewport={{ once: true }}
           className="text-center mb-16"
         >
-          <h2 className="text-3xl md:text-4xl font-bold mb-4">Everything You Need</h2>
-          <p className="text-white/50 max-w-lg mx-auto">
+          <h2 className="text-3xl md:text-4xl font-bold mb-4" style={{ textShadow: '0 2px 18px rgba(0,0,0,.9)' }}>Everything You Need</h2>
+          <p className="max-w-lg mx-auto" style={{ color: 'rgba(255,255,255,.72)', textShadow: '0 1px 12px rgba(0,0,0,.9)' }}>
             Built with AI to give you the most realistic interview experience.
           </p>
         </motion.div>
 
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
           {[
-            { icon: EvalIcon, title: 'AI-Powered Evaluation', desc: 'Multi-agent scoring: technical accuracy, communication clarity, and behavioral fit.' },
-            { icon: WaveIcon, title: 'Voice & Text Input', desc: 'Practice speaking your answers or typing — just like a real interview.' },
-            { icon: OrbIcon, title: 'Digital Avatar', desc: 'Interactive AI interviewer with animated responses and lip sync.' },
-            { icon: ShieldIcon, title: 'Interview Proctoring', desc: 'Face detection, gaze tracking, and integrity monitoring for realistic practice.' },
-            { icon: ReportIcon, title: 'Performance Reports', desc: 'Detailed analytics with radar charts, category scores, and improvement tips.' },
-            { icon: RoleIcon, title: '20+ Job Roles', desc: 'Pre-built question banks for Frontend, Backend, DevOps, Data Science, and more.' },
-            { icon: ResumeIcon, title: 'Resume Analysis', desc: 'Upload your resume for personalized questions based on your experience.' },
-            { icon: BoltIcon, title: 'Instant Feedback', desc: 'Get AI feedback on each answer before moving to the next question.' },
-            { icon: QuoteIcon, title: 'Sample Answers', desc: 'Learn from expert-crafted sample responses for every question.' },
+            { icon: EvalIcon, tint: '#fbbf24', title: 'AI-Powered Evaluation', desc: 'Multi-agent scoring: technical accuracy, communication clarity, and behavioral fit.' },
+            { icon: WaveIcon, tint: '#fb7185', title: 'Voice & Text Input', desc: 'Practice speaking your answers or typing — just like a real interview.' },
+            { icon: OrbIcon, tint: '#7dd3fc', title: 'Digital Avatar', desc: 'Interactive AI interviewer with animated responses and lip sync.' },
+            { icon: ShieldIcon, tint: '#5eead4', title: 'Interview Proctoring', desc: 'Face detection, gaze tracking, and integrity monitoring for realistic practice.' },
+            { icon: ReportIcon, tint: '#fda4af', title: 'Performance Reports', desc: 'Detailed analytics with radar charts, category scores, and improvement tips.' },
+            { icon: RoleIcon, tint: '#fdba74', title: '20+ Job Roles', desc: 'Pre-built question banks for Frontend, Backend, DevOps, Data Science, and more.' },
+            { icon: ResumeIcon, tint: '#fcd34d', title: 'Resume Analysis', desc: 'Upload your resume for personalized questions based on your experience.' },
+            { icon: BoltIcon, tint: '#f97316', title: 'Instant Feedback', desc: 'Get AI feedback on each answer before moving to the next question.' },
+            { icon: QuoteIcon, tint: '#e7c6a3', title: 'Sample Answers', desc: 'Learn from expert-crafted sample responses for every question.' },
           ].map((feature, i) => (
             <motion.div
               key={feature.title}
@@ -304,7 +304,9 @@ const Landing = () => {
               transition={{ duration: 0.5, delay: i * 0.08 }}
               className="p-5 bg-black/55 backdrop-blur-2xl border border-white/10 rounded-2xl hover:bg-black/50 transition-all"
             >
-              <feature.icon className="w-7 h-7 text-amber-400 mb-3" />
+              <div className="feature-icon" style={{ '--fi': feature.tint }}>
+                <feature.icon className="w-7 h-7" />
+              </div>
               <h3 className="text-base font-semibold mb-1.5">{feature.title}</h3>
               <p className="text-sm text-white/70 leading-relaxed">{feature.desc}</p>
             </motion.div>

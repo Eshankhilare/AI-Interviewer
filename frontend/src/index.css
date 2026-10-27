@@ -4,7 +4,27 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Tailwind preflight is not loaded: restore the few defaults the app relies on.
+/* Landing feature icon tiles: colour lives in the tile, glyph stays ivory. */
+.feature-icon {
+  width: 54px;
+  height: 54px;
+  border-radius: 15px;
+  display: grid;
+  place-items: center;
+  margin-bottom: 16px;
+  color: #fff8f0;
+  background:
+    linear-gradient(145deg,
+      color-mix(in srgb, var(--fi) 30%, rgba(12, 10, 9, .92)),
+      rgba(10, 9, 8, .88));
+  border: 1px solid color-mix(in srgb, var(--fi) 55%, transparent);
+  box-shadow:
+    0 10px 26px color-mix(in srgb, var(--fi) 20%, transparent),
+    inset 0 1px 0 rgba(255, 255, 255, .14);
+}
+.feature-icon svg { width: 26px; height: 26px; }
+
+/* Tailwind preflight is not loaded, so restore the few defaults the app relies on.
    Never zero backgrounds globally again - that hid every solid CTA. */
 a {
   text-decoration: none;
