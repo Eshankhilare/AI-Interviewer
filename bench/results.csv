@@ -1,0 +1,13 @@
+id,mean,repeats,spread,human,mode
+db-index-strong,80,80 80,0,,heuristic
+db-index-weak,73,73 73,0,,heuristic
+db-index-medium,73,73 73,0,,heuristic
+tx-strong,83,83 83,0,,heuristic
+tx-weak,53,53 53,0,,heuristic
+idem-strong,80,80 80,0,,heuristic
+idem-offtopic,70,70 70,0,,heuristic
+behavioral-strong,83,83 83,0,,heuristic
+behavioral-weak,50,50 50,0,,heuristic
+design-strong,80,80 80,0,,heuristic
+design-medium,70,70 70,0,,heuristic
+no-answer,50,50 50,0,,heuristic

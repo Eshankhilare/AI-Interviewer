@@ -114,6 +114,7 @@ Return ONLY a JSON object: {{"score": <0-100>, "feedback": "<1-2 sentences>"}}""
                 "confidence_level": self._assess_confidence(answer),
                 "communication_score": f"{comm_score}/100",
                 "technical_depth": f"{tech_score}/100",
+                "evaluation_mode": "naive",
             }
         except Exception as e:
             log.warning("multi-agent evaluation failed: %s", e)
@@ -134,6 +135,7 @@ Return ONLY a JSON object: {{"score": <0-100>, "feedback": "<1-2 sentences>"}}""
             "confidence_level": self._assess_confidence(answer),
             "communication_score": self._assess_communication(answer),
             "technical_depth": self._assess_technical_depth(answer),
+            "evaluation_mode": "heuristic",
         }
 
     def _calculate_score(self, question: str, answer: str, expected_answer: str) -> int:
