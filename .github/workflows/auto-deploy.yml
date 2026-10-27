@@ -8,8 +8,12 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: Deploy to Render
-        run: echo "Render auto-deploys from GitHub on push to main"
+      - name: Railway (backend + AI service)
+        run: echo "Railway redeploys both services from GitHub on push to main"
 
-      - name: Deploy to Vercel
-        run: echo "Vercel auto-deploys from GitHub on push to main"
+      - name: Cloudflare Pages (frontend)
+        run: echo "Cloudflare Pages rebuilds the frontend on push to main"
+
+      # Render + Vercel remain supported alternatives; see DEPLOY.md.
+      - name: Render / Vercel (alternative)
+        run: echo "Render and Vercel also auto-deploy from GitHub when configured"
