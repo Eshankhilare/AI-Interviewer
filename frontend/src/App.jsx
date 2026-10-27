@@ -84,7 +84,7 @@ function App() {
               position: 'absolute', inset: 0,
               width: '100%', height: '100%',
               objectFit: 'cover', objectPosition: 'center',
-              filter: 'blur(12px) brightness(0.6)',
+              filter: 'blur(10px) brightness(0.85)',
               transform: 'scale(1.05)',
               pointerEvents: 'none', userSelect: 'none',
             }}

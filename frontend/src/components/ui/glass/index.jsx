@@ -144,7 +144,7 @@ export const BackgroundVideo = () => (
         position: 'absolute', inset: 0,
         width: '100%', height: '100%',
         objectFit: 'cover', objectPosition: 'center',
-        filter: 'blur(20px) brightness(0.4)',
+        filter: 'blur(16px) brightness(0.62)',
         transform: 'scale(1.1)',
         pointerEvents: 'none', userSelect: 'none',
       }}

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 
-const KEY = 'ui-version'
+const KEY = 'ui-version-v2'
 const listeners = new Set()
 let current = null
 

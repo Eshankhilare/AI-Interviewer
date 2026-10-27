@@ -4,13 +4,13 @@
 .ui-studio {
   --st-bg: #08090c;
   --st-bg-2: #0b0d12;
-  --st-surface: rgba(22, 23, 28, .55);
-  --st-surface-2: rgba(30, 32, 40, .55);
+  --st-surface: rgba(22, 23, 28, .42);
+  --st-surface-2: rgba(30, 32, 40, .42);
   --st-line: rgba(255, 255, 255, .10);
   --st-line-strong: rgba(255, 255, 255, .17);
   --st-text: #f6f5f3;
-  --st-muted: #a9adb8;
-  --st-dim: #747986;
+  --st-muted: #b3b7c1;
+  --st-dim: #828794;
   --st-accent: #7c6cf6;
   --st-accent-2: #a78bfa;
   --st-accent-soft: rgba(124, 108, 246, .16);
@@ -20,7 +20,7 @@
   --st-radius: 14px;
   --st-radius-lg: 18px;
   --st-serif: "Fraunces", "Reference Display", Georgia, serif;
-  --st-panel: linear-gradient(145deg, rgba(32, 29, 27, .58), rgba(7, 14, 18, .70));
+  --st-panel: linear-gradient(145deg, rgba(36, 32, 30, .40), rgba(9, 15, 21, .52));
   min-height: 100vh;
   background: transparent;
   color: var(--st-text);
@@ -40,7 +40,7 @@
     radial-gradient(58% 46% at 12% -4%, rgba(99, 102, 241, .22), transparent 62%),
     radial-gradient(48% 40% at 88% 4%, rgba(251, 146, 60, .10), transparent 60%),
     radial-gradient(50% 52% at 60% 100%, rgba(139, 92, 246, .12), transparent 65%),
-    linear-gradient(180deg, rgba(4, 5, 8, .42), rgba(4, 5, 8, .80));
+    linear-gradient(180deg, rgba(4, 5, 8, .16), rgba(4, 5, 8, .52));
 }
 
 /* ---------- shell ---------- */
@@ -93,7 +93,7 @@
   display: flex; align-items: center; justify-content: space-between; gap: 16px;
   height: 64px; padding: 0 28px;
   border-bottom: 1px solid rgba(255, 255, 255, .07);
-  background: rgba(8, 9, 12, .55);
+  background: rgba(8, 9, 12, .34);
   backdrop-filter: blur(18px) saturate(120%);
 }
 .st-crumb { display: flex; align-items: center; gap: 8px; color: var(--st-dim); font-size: 13px; }
@@ -110,7 +110,7 @@
 }
 .st-flux-bg::after {
   content: ""; position: absolute; inset: 0;
-  background: linear-gradient(180deg, rgba(5, 6, 10, .52), rgba(5, 6, 10, .78) 60%, rgba(5, 6, 10, .88));
+  background: linear-gradient(180deg, rgba(5, 6, 10, .18), rgba(5, 6, 10, .38) 60%, rgba(5, 6, 10, .50));
 }
 .st-flux-bg > .flux-lines-container { position: absolute; inset: 0; }
 

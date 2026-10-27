@@ -67,8 +67,9 @@ const Layout = () => {
                   </div>
                   <span className="text-sm font-medium" style={{ color: 'rgba(255,255,255,.7)' }}>{user?.fullName}</span>
                 </div>
-                <button onClick={() => setUIVersion('studio')} aria-label="Switch to the new studio UI" title="Try the new Studio UI" className="inline-flex items-center px-3 py-2 text-sm font-medium rounded-xl transition-all duration-200" style={{ color: 'rgba(255,255,255,.4)' }}>
+                <button onClick={() => setUIVersion('studio')} aria-label="Switch to the new studio UI" title="Open the new Studio UI" className="inline-flex items-center gap-2 px-3 py-2 text-xs font-semibold rounded-xl transition-all duration-200" style={{ color: '#d8d2ff', background: 'rgba(124,108,246,.16)', border: '1px solid rgba(139,92,246,.35)' }}>
                   <ArrowLeftRight className="h-4 w-4" aria-hidden="true" />
+                  <span className="hidden sm:inline">Studio</span>
                 </button>
                 <button onClick={handleLogout} aria-label="Log out" title="Log out" className="inline-flex items-center px-3 py-2 text-sm font-medium rounded-xl transition-all duration-200" style={{ color: 'rgba(255,255,255,.4)' }}>
                   <LogOut className="h-4 w-4" aria-hidden="true" />
