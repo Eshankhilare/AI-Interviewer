@@ -155,20 +155,17 @@ considered public.
 
 ## Deployment
 
-### Render (Backend + AI Service)
-1. Connect GitHub repo to Render
-2. Use `render.yaml` Blueprint
-3. Add environment variables in Render dashboard
+The recommended stack for a fast, always-on public deploy is **Cloudflare Pages
++ Railway (Singapore) + TiDB Cloud Starter**. Full steps, variables and the
+Fly.io alternative are in [DEPLOY.md](DEPLOY.md).
 
-### Vercel (Frontend)
-1. Import GitHub repo to Vercel
-2. Set Root Directory to `frontend`
-3. Add `VITE_API_URL` environment variable
-
-### TiDB Cloud (Database)
-1. Create free Starter instance
-2. Get connection details
-3. Update backend environment variables
+- **Frontend:** Cloudflare Pages, root `frontend`, `npm ci && npm run build`,
+  output `dist`, `VITE_API_URL=https://api.example.com`.
+- **Backend + AI service:** two Railway services from this repo, root
+  directories `backend` and `ai-service`; both have `railway.toml`.
+- **Database:** TiDB Cloud Starter (MySQL compatible, free tier).
+- **Alternative:** `render.yaml` still works for Render, but the free plan
+  sleeps after 15 minutes; use a paid instance for a live demo.
 
 ## Default Credentials
 
@@ -184,6 +181,7 @@ version whose password is unknown; do not assume it works.
 | [AUDIT.md](AUDIT.md) | Findings from the audit, with status and evidence |
 | [bench/RESULTS.md](bench/RESULTS.md) | Evaluator benchmark and its limits |
 | [DEMO.md](DEMO.md) | Two-minute walkthrough for a demo or judging session |
+| [DEPLOY.md](DEPLOY.md) | Cloudflare Pages + Railway + TiDB, Fly.io alternative, env reference |
 
 ## API Documentation
 

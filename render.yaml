@@ -1,3 +1,5 @@
+# Alternative to the Railway path in DEPLOY.md. Render's free plan sleeps after
+# 15 minutes (30-60 s cold start); use a paid instance for a live demo.
 services:
   - type: web
     name: ai-interviewer-backend
