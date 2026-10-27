@@ -331,16 +331,13 @@ const BodyLanguageAnalyzer = ({ onAnalysisUpdate, enabled = true }) => {
     setIsActive(false)
   }, [resetState])
 
-  useEffect(() => {
-    if (enabled && !isActive) {
-      startAnalysis()
-    }
-    return () => {
-      if (cameraRef.current) cameraRef.current.stop()
-      if (poseRef.current) poseRef.current.close()
-      prevLandmarksRef.current = null
-    }
-  }, [enabled])
+  // Do not open the camera on mount: the panel has an explicit Start button, and
+  // an unprompted permission denial renders as a red error the user cannot clear.
+  useEffect(() => () => {
+    if (cameraRef.current) cameraRef.current.stop()
+    if (poseRef.current) poseRef.current.close()
+    prevLandmarksRef.current = null
+  }, [])
 
   const getPostureColor = (posture) => {
     switch (posture) {
@@ -378,7 +375,7 @@ const BodyLanguageAnalyzer = ({ onAnalysisUpdate, enabled = true }) => {
   if (!enabled) return null
 
   return (
-    <div className="bg-white rounded-2xl shadow-card border border-ink-100 overflow-hidden">
+    <div className="glass rounded-2xl overflow-hidden">
       <div className="p-4 border-b border-ink-100 bg-gradient-brand-soft">
         <div className="flex items-center justify-between">
           <h3 className="font-semibold text-ink-900 flex items-center">
@@ -387,11 +384,7 @@ const BodyLanguageAnalyzer = ({ onAnalysisUpdate, enabled = true }) => {
           </h3>
           <button
             onClick={isActive ? stopAnalysis : startAnalysis}
-            className={`flex items-center px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
-              isActive
-                ? 'bg-red-100 text-red-700 hover:bg-red-200'
-                : 'bg-primary-100 text-primary-700 hover:bg-primary-200'
-            }`}
+            className={`chip-btn flex items-center px-3 py-1.5 rounded-lg text-xs font-medium transition-colors`}
           >
             {isActive ? <CameraOff className="w-3.5 h-3.5 mr-1" /> : <Camera className="w-3.5 h-3.5 mr-1" />}
             {isActive ? 'Stop' : 'Start'}
@@ -405,7 +398,7 @@ const BodyLanguageAnalyzer = ({ onAnalysisUpdate, enabled = true }) => {
         </div>
       )}
 
-      <div className="relative bg-ink-900 overflow-hidden">
+      <div className="relative video-well overflow-hidden">
         <video ref={videoRef} className="w-full h-44 object-cover" playsInline muted />
         <canvas ref={canvasRef} className="absolute inset-0 w-full h-44 object-cover" />
         {!isActive && (
