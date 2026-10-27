@@ -3,6 +3,7 @@ import { motion } from 'framer-motion'
 import { ContainerScroll } from '../components/ui/container-scroll-animation'
 import ScrollExpand from '../components/ui/ScrollExpand'
 import TractionOrbit from '../components/ui/TractionOrbit'
+import LandingProductDemo from '../components/ui/LandingProductDemo'
 import {
   MarkIcon, ArrowIcon, PlayIcon, RoleIcon, WaveIcon, OrbIcon,
   EvalIcon, ShieldIcon, ReportIcon, ResumeIcon, BoltIcon, QuoteIcon,
@@ -179,12 +180,7 @@ const Landing = () => {
             </div>
           }
         >
-          <img
-            src="/studio-report.png"
-            alt="AI Interviewer assessment report with rubric radar and evidence"
-            className="mx-auto h-full w-full object-cover object-top rounded-xl"
-            draggable={false}
-          />
+          <LandingProductDemo />
         </ContainerScroll>
       </section>
 
@@ -447,7 +443,7 @@ const Landing = () => {
           {[
             { name: 'Eshan Khilare', role: 'Co-Founder & AI Engineer', image: '/team/eshan-khilare.jpg', focus: 'center 18%' },
             { name: 'Abhijit Kapure', role: 'Co-Founder & Full-Stack Engineer', image: '/team/abhijit-kapure.jpg', focus: 'center 18%' },
-            { name: 'Vishwesh Penkar', role: 'Co-Founder & Product Designer', image: '/team/vishwesh-penkar.png', focus: 'center 16%' },
+            { name: 'Vishwesh Penkar', role: 'Co-Founder & Product Designer', image: '/team/vishwesh-penkar.jpg', focus: 'center 22%' },
           ].map((member, i) => (
             <motion.article
               key={member.name}
