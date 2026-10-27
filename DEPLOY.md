@@ -1,20 +1,72 @@
 # Deploy
 
-The fast, low-ops path is **Cloudflare Pages + Railway (Singapore) + TiDB
-Cloud Starter**. Fly.io and Render are kept as alternatives.
+The two **zero-cost** paths are:
 
-| Piece | Recommended | Why |
+1. **Oracle Cloud Always Free** — 2 OCPU / 12 GB ARM, Mumbai or Hyderabad,
+   always on. Best free performance and latency; one VM, no cold starts. The
+   repo ships a one-command stack: `docker-compose.free.yml`.
+2. **Northflank Sandbox** — 2 services + 1 MySQL, always on, no card, up to
+   $20/month of resources. Zero server maintenance; higher latency and a tight
+   resource cap.
+
+Both use **Cloudflare Pages** for the frontend. If you can spend ~$5–10/month,
+the managed **Cloudflare Pages + Railway + TiDB** path is the least maintenance;
+Fly.io and Render remain alternatives.
+
+| Piece (paid managed path) | Where | Why |
 |---|---|---|
 | Frontend | Cloudflare Pages | Static Vite build, unlimited static bandwidth, global edge, free |
 | Backend | Railway, Singapore | Docker, always-on, no cold starts, close to India |
 | AI service | Railway, same project, Singapore | Private network to the backend, 512 MB is enough |
 | Database | TiDB Cloud Starter | MySQL-compatible, 5 GiB + 50M RU free per instance |
 
-Estimated cost: **$0–10/month** (Pages and TiDB free; Railway Hobby starts at $5).
+Estimated managed cost: **$5–10/month**. Free paths: **$0**.
 
 > Do not use Render's free plan for a demo: it sleeps after 15 minutes and the
 > first request takes 30–60 s. `render.yaml` is still valid if you prefer Render,
 > but run it on a paid instance.
+
+---
+
+## Free-only (zero cost)
+
+| Option | What you get | Catch |
+|---|---|---|
+| **Oracle Cloud Always Free** (best performance) | 2 OCPU / 12 GB ARM, 200 GB, Mumbai or Hyderabad, always on | Card for verification; ARM capacity often exhausted; you run the server |
+| **Northflank Sandbox** (easiest) | 2 services + 1 MySQL + 2 cron jobs, always on, no card, up to $20/mo resources | Not for production; $20 cap is tight for two JVMs; no India region |
+| **Cloudflare Pages** | Frontend hosting, unlimited static bandwidth | None for this app |
+| **Gemini API free tier** | Flash-Lite evaluation with the heuristic fallback | Per-model daily limits; check AI Studio |
+
+### Oracle VM (lowest latency, truly free)
+
+The repo includes a complete one-command stack:
+
+```bash
+cp deploy/free.env.example .env    # fill the secrets and APP_DOMAIN
+docker compose -f docker-compose.free.yml up -d --build
+```
+
+Caddy serves the React build and proxies `/api` to Spring Boot on the same
+origin, so there is no CORS. MySQL, the backend and the AI service run as
+containers on the VM. Full steps, capacity workarounds, backups and updates:
+[`deploy/oracle/README.md`](deploy/oracle/README.md).
+
+### Northflank Sandbox (zero-ops)
+
+Two services from this repo (`backend`, `ai-service`) plus a managed MySQL,
+always on, no card. Full steps and sizing:
+[`deploy/northflank/README.md`](deploy/northflank/README.md).
+
+**Verdict:** take Oracle if you can get A1 capacity (best latency and no resource
+cap); take Northflank if you want no server maintenance and accept higher
+latency and the $20 cap. Both use Cloudflare Pages for the frontend.
+
+> **Gemini free tier:** our run hit the 20 requests/day cap on
+> `gemini-2.5-flash`, then worked on `gemini-3.5-flash-lite`. Google no longer
+> publishes a single per-model RPD table; check
+> <https://aistudio.google.com/rate-limit> for the current allowance. When it
+> runs out the evaluator falls back to the heuristic and the request still
+> succeeds.
 
 ---
 
@@ -35,7 +87,7 @@ through the backend proxy with `AI_SERVICE_TOKEN`.
 
 ---
 
-## Option A — Cloudflare Pages + Railway + TiDB (recommended)
+## Option A — Cloudflare Pages + Railway + TiDB (paid, managed)
 
 ### 1. Database (TiDB Cloud Starter)
 
@@ -169,7 +221,8 @@ hundred ms of extra CPU time under load.
 A single **DigitalOcean Bangalore (BLR1)** or **AWS ap-south-1** box with
 Docker Compose and Coolify/Caddy runs all three services plus MySQL. Expect
 10–30 ms from India instead of 50–80 ms via Singapore, at $12–24/month, but you
-own backups, updates and TLS. Not scripted in this repo.
+own backups, updates and TLS. The repo includes this stack as
+`docker-compose.free.yml`; the Oracle guide runs it on a free VM.
 
 ---
 
@@ -198,9 +251,12 @@ Never commit `.env`. The files in `deploy/` are placeholders.
 
 ## Operational notes
 
-- **Gemini free tier is 20 requests/day/model.** One three-question interview
-  spends about nine. For a public URL, use a paid key or Vertex AI; otherwise
-  most visitors silently get the keyword fallback.
+- **Gemini free tier is limited.** Our run hit 20 requests/day on
+  `gemini-2.5-flash`; `gemini-3.5-flash-lite` worked afterwards. Google no
+  longer publishes one per-model RPD table — check AI Studio. One
+  three-question interview spends about nine requests. For a public URL, use a
+  paid key or Vertex AI, or accept the heuristic fallback when the free quota
+  runs out.
 - **Uploads are ephemeral.** Parsed resume text is stored in the database, but
   the original file is lost on redeploy. Add object storage (R2/S3) if download
   links matter.
@@ -218,6 +274,8 @@ Never commit `.env`. The files in `deploy/` are placeholders.
 
 | Setup | Monthly |
 |---|---|
+| Oracle Always Free (2 OCPU / 12 GB, Mumbai/Hyderabad) + Pages | **$0** |
+| Northflank Sandbox (2 services + MySQL, always on) + Pages | **$0** within the $20 cap |
 | Cloudflare Pages + Railway Hobby + TiDB Starter | ~$5–10 |
 | Fly.io (1 GB + 512 MB, Singapore) + TiDB | ~$13 |
 | Render paid (two services) + TiDB | ~$14+ |

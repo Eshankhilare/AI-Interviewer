@@ -155,9 +155,13 @@ considered public.
 
 ## Deployment
 
-The recommended stack for a fast, always-on public deploy is **Cloudflare Pages
-+ Railway (Singapore) + TiDB Cloud Starter**. Full steps, variables and the
-Fly.io alternative are in [DEPLOY.md](DEPLOY.md).
+**Zero-cost:** Oracle Cloud Always Free (one VM, `docker-compose.free.yml`) or
+Northflank Sandbox (2 services + MySQL, always on). Both use Cloudflare Pages
+for the frontend. See [DEPLOY.md](DEPLOY.md) and
+[`deploy/oracle/README.md`](deploy/oracle/README.md).
+
+**Managed (~$5–10/month):** Cloudflare Pages + Railway (Singapore) + TiDB Cloud
+Starter. Full steps and variables are in [DEPLOY.md](DEPLOY.md).
 
 - **Frontend:** Cloudflare Pages, root `frontend`, `npm ci && npm run build`,
   output `dist`, `VITE_API_URL=https://api.example.com`.
