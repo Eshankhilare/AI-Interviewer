@@ -1,3 +1,4 @@
+import { lazy } from 'react'
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
 import { AuthProvider, useAuth } from './context/AuthContext'
 import Landing from './pages/Landing'
@@ -11,8 +12,16 @@ import JobDescriptions from './pages/JobDescriptions'
 import Resumes from './pages/Resumes'
 import ProtectedRoute from './components/common/ProtectedRoute'
 import Profile from './pages/Profile'
-import Layout from './components/common/Layout'
 import ErrorBoundary from './components/common/ErrorBoundary'
+import { UIChrome, UIPage } from './v2/UISwitch'
+
+const StudioHome = lazy(() => import('./v2/pages/Home'))
+const StudioBrief = lazy(() => import('./v2/pages/Brief'))
+const StudioLive = lazy(() => import('./v2/pages/StudioLive'))
+const StudioReport = lazy(() => import('./v2/pages/ReportStudio'))
+const StudioLibrary = lazy(() => import('./v2/pages/Library'))
+const StudioSettings = lazy(() => import('./v2/pages/Settings'))
+const StudioAuth = lazy(() => import('./v2/pages/Auth'))
 
 function AppRoutes() {
   const { user, loading } = useAuth()
@@ -27,14 +36,18 @@ function AppRoutes() {
 
   return (
     <Routes>
-      <Route path="/login" element={user ? <Navigate to="/" replace /> : <Login />} />
-      <Route path="/register" element={user ? <Navigate to="/" replace /> : <Register />} />
+      <Route path="/login" element={user ? <Navigate to="/" replace /> : (
+        <UIPage classic={<Login />} studio={<StudioAuth mode="login" />} />
+      )} />
+      <Route path="/register" element={user ? <Navigate to="/" replace /> : (
+        <UIPage classic={<Register />} studio={<StudioAuth mode="register" />} />
+      )} />
       <Route
         path="/"
         element={
           user ? (
             <ProtectedRoute>
-              <Layout />
+              <UIChrome />
             </ProtectedRoute>
           ) : (
             <Landing />
@@ -43,13 +56,13 @@ function AppRoutes() {
       >
         {user && (
           <>
-            <Route index element={<Dashboard />} />
-            <Route path="interview/new" element={<NewInterview />} />
-            <Route path="interview/:id" element={<Interview />} />
-            <Route path="report/:id" element={<Report />} />
-            <Route path="job-descriptions" element={<JobDescriptions />} />
-            <Route path="resumes" element={<Resumes />} />
-            <Route path="profile" element={<Profile />} />
+            <Route index element={<UIPage classic={<Dashboard />} studio={<StudioHome />} />} />
+            <Route path="interview/new" element={<UIPage classic={<NewInterview />} studio={<StudioBrief />} />} />
+            <Route path="interview/:id" element={<UIPage classic={<Interview />} studio={<StudioLive />} />} />
+            <Route path="report/:id" element={<UIPage classic={<Report />} studio={<StudioReport />} />} />
+            <Route path="job-descriptions" element={<UIPage classic={<JobDescriptions />} studio={<StudioLibrary initialTab="jobs" />} />} />
+            <Route path="resumes" element={<UIPage classic={<Resumes />} studio={<StudioLibrary initialTab="resumes" />} />} />
+            <Route path="profile" element={<UIPage classic={<Profile />} studio={<StudioSettings />} />} />
           </>
         )}
       </Route>

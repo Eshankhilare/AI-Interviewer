@@ -1,8 +1,9 @@
 import { Outlet, Link, useNavigate, useLocation } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
-import { LogOut, Home, Briefcase, FileText, Menu, X, User } from 'lucide-react'
+import { LogOut, Home, Briefcase, FileText, Menu, X, User, ArrowLeftRight } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useState } from 'react'
+import { setUIVersion } from '../../v2/store'
 
 const Layout = () => {
   const { user, logout } = useAuth()
@@ -66,6 +67,9 @@ const Layout = () => {
                   </div>
                   <span className="text-sm font-medium" style={{ color: 'rgba(255,255,255,.7)' }}>{user?.fullName}</span>
                 </div>
+                <button onClick={() => setUIVersion('studio')} aria-label="Switch to the new studio UI" title="Try the new Studio UI" className="inline-flex items-center px-3 py-2 text-sm font-medium rounded-xl transition-all duration-200" style={{ color: 'rgba(255,255,255,.4)' }}>
+                  <ArrowLeftRight className="h-4 w-4" aria-hidden="true" />
+                </button>
                 <button onClick={handleLogout} aria-label="Log out" title="Log out" className="inline-flex items-center px-3 py-2 text-sm font-medium rounded-xl transition-all duration-200" style={{ color: 'rgba(255,255,255,.4)' }}>
                   <LogOut className="h-4 w-4" aria-hidden="true" />
                 </button>
