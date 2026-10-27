@@ -70,6 +70,32 @@ latency and the $20 cap. Both use Cloudflare Pages for the frontend.
 
 ---
 
+## Vercel Services (frontend + backend + AI service)
+
+The root `vercel.json` runs three services: the Vite frontend, the Spring
+backend (container), and the FastAPI AI service. `/api/*` is routed to the
+backend on the same origin, so the frontend needs no `VITE_API_URL` in Vercel.
+
+The backend image now defaults to the `local` profile (in-memory H2, platform
+`PORT`), so a fresh deploy starts without a database. **Data resets when the
+container restarts.** For persistent data set these in the Vercel project:
+
+| Variable | Value |
+|---|---|
+| `SPRING_PROFILES_ACTIVE` | `production` |
+| `SPRING_DATASOURCE_URL`, `SPRING_DATASOURCE_USERNAME`, `SPRING_DATASOURCE_PASSWORD` | TiDB/MySQL |
+| `JWT_SECRET` | 32+ random bytes |
+| `AI_SERVICE_TOKEN` | same value on the backend and AI service |
+| `APP_CORS_ALLOWED_ORIGINS` | your Vercel URL |
+
+AI service: `LLM_API_KEY` (without it scoring falls back to the heuristic),
+optional `UPSTASH_REDIS_REST_URL/TOKEN`. The backend receives `AI_SERVICE_URL`
+automatically through the `bindings` entry.
+
+After redeploying, check `https://<deployment>/api/health`; it must return
+`{"status":"UP","database":"UP",...}`. A 500 here means the backend container
+is not answering — check the backend service logs, not the frontend.
+
 ## Architecture
 
 ```
