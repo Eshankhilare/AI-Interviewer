@@ -314,6 +314,88 @@ const Landing = () => {
         </div>
       </div>
 
+      {/* Values */}
+      <div className="relative z-10 max-w-7xl mx-auto px-8 py-20">
+        <motion.div
+          initial={{ opacity: 0, y: 26 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          className="text-center mb-12"
+        >
+          <h2 className="text-3xl md:text-4xl font-bold mb-4" style={{ textShadow: '0 2px 18px rgba(0,0,0,.9)' }}>What we hold ourselves to</h2>
+          <p className="max-w-lg mx-auto" style={{ color: 'rgba(255,255,255,.72)', textShadow: '0 1px 12px rgba(0,0,0,.9)' }}>
+            Five principles behind every question, score and report.
+          </p>
+        </motion.div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-5">
+          {[
+            { icon: CheckIcon, title: 'Trust', desc: 'Every score comes from the rubric and is checked against your own words. A quote that is not in your answer is flagged, never invented.' },
+            { icon: ChatIcon, title: 'Simplicity', desc: 'One clear score, five criteria and the exact quote behind each. Nothing to decode before you can improve.' },
+            { icon: ShieldIcon, title: 'Privacy', desc: 'Camera checks are optional and run in your browser. Nothing is uploaded, and proctoring stays off until you opt in.' },
+            { icon: EvalIcon, title: 'Fairness', desc: 'The same rubric for every answer and every session, so progress reflects your work, not the mood of the room.' },
+            { icon: OrbIcon, title: 'Innovation', desc: 'Adaptive follow-ups, coding rounds and voice answers in one studio. Practise the interview you will actually get.' },
+          ].map((value, i) => (
+            <motion.div
+              key={value.title}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.45, delay: i * 0.07 }}
+              className="value-card"
+            >
+              <span className="value-medallion"><value.icon className="w-6 h-6" /></span>
+              <h3 className="text-base font-semibold mb-2">{value.title}</h3>
+              <p className="text-sm leading-relaxed" style={{ color: 'rgba(255,255,255,.68)' }}>{value.desc}</p>
+            </motion.div>
+          ))}
+        </div>
+      </div>
+
+      {/* Problem */}
+      <div className="relative z-10 max-w-5xl mx-auto px-8 py-20">
+        <motion.div
+          initial={{ opacity: 0, y: 26 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          className="text-center problem-intro"
+        >
+          <h2 className="text-3xl md:text-4xl font-bold mb-4" style={{ textShadow: '0 2px 18px rgba(0,0,0,.9)' }}>The Problem We Solve</h2>
+          <p className="max-w-2xl mx-auto text-sm md:text-base leading-relaxed" style={{ color: 'rgba(255,255,255,.72)', textShadow: '0 1px 12px rgba(0,0,0,.9)' }}>
+            Most preparation gives you more questions, not better feedback. You rehearse alone, get a vague
+            “good answer”, and only discover the weak criterion in the real round. AI Interviewer turns rehearsal
+            into evidence: what was asked, what you said, how it scored, and what to fix next.
+          </p>
+        </motion.div>
+
+        <div className="grid sm:grid-cols-2 gap-4 mt-10">
+          {[
+            { icon: RoleIcon, title: 'Forty applications, one story', desc: 'The same rehearsed answer stops working when the role changes.' },
+            { icon: ClockIcon, title: 'A timed screen at 11pm', desc: 'No one to check your structure, edge cases or trade-offs.' },
+            { icon: ChatIcon, title: 'A behavioural round alone', desc: 'You cannot tell whether the story actually landed.' },
+            { icon: ReportIcon, title: '“Be more specific”', desc: 'Feedback with no quote, no criterion and no next step.' },
+          ].map((item) => (
+            <div key={item.title} className="problem-card">
+              <span className="problem-icon"><item.icon className="w-5 h-5" /></span>
+              <div>
+                <h3 className="text-sm font-semibold mb-1">{item.title}</h3>
+                <p className="text-xs leading-relaxed" style={{ color: 'rgba(255,255,255,.6)' }}>{item.desc}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <div className="problem-callout">
+          <p className="text-sm font-semibold flex items-center justify-center gap-2" style={{ color: '#fde68a' }}>
+            <ShieldIcon className="w-4 h-4" /> That is the gap AI Interviewer fills.
+          </p>
+          <p className="text-xs md:text-sm leading-relaxed mt-2" style={{ color: 'rgba(255,255,255,.7)' }}>
+            A studio that asks role-specific questions, scores the five criteria, quotes your own words and hands you
+            the next drill — so the real interview is the second time you have done it.
+          </p>
+        </div>
+      </div>
+
       {/* Job Roles */}
       <div id="roles" className="relative z-10 max-w-7xl mx-auto px-8 py-24">
         <motion.div
