@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { ArrowRight, Briefcase, Sparkles } from 'lucide-react'
 import api, { errorMessage } from '../../services/api'
-import { Empty, PageHead, SkeletonBlock } from '../ui'
+import { Empty, PageHead, Reveal, SkeletonBlock } from '../ui'
 
 const TIER = { JUNIOR: 0, MID: 1, SENIOR: 2, LEAD: 2, ARCHITECT: 2 }
 const TIERS = ['BASIC', 'ADVANCED', 'EXPERT']
@@ -131,6 +131,7 @@ export default function Brief() {
         <span className="st-flow-step"><b>3</b> Report</span>
       </div>
 
+      <Reveal>
       <div className="st-grid-2" style={{ gridTemplateColumns: 'minmax(0, 1.6fr) minmax(280px, .9fr)', alignItems: 'start' }}>
         <div className="st-stack" style={{ gap: 18 }}>
           <section className="st-card">
@@ -287,6 +288,7 @@ export default function Brief() {
           </p>
         </aside>
       </div>
+      </Reveal>
     </div>
   )
 }

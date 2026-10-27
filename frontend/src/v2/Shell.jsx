@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom'
+import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
 import { Home, Plus, FolderOpen, Settings, ArrowLeftRight, Waves } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
 import { setUIVersion, useBackground } from './store'
@@ -23,6 +24,7 @@ export default function StudioShell() {
   const navigate = useNavigate()
   const { background, setBackground } = useBackground()
   const [showIntro, setShowIntro] = useState(needsOnboarding)
+  const reduce = useReducedMotion()
   const isLive = /^\/interview\//.test(location.pathname) && location.pathname !== '/interview/new'
 
   const items = [
@@ -94,7 +96,17 @@ export default function StudioShell() {
       </header>
 
       <main id="main-content" tabIndex={-1}>
-        <Outlet />
+        <AnimatePresence mode="wait" initial={false}>
+          <motion.div
+            key={location.pathname}
+            initial={reduce ? false : { opacity: 0, y: 18 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={reduce ? undefined : { opacity: 0, y: -10 }}
+            transition={{ duration: 0.32, ease: [0.16, 1, 0.3, 1] }}
+          >
+            <Outlet />
+          </motion.div>
+        </AnimatePresence>
       </main>
 
       {showIntro && <Onboarding onDone={() => setShowIntro(false)} />}
