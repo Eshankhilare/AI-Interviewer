@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect, useCallback } from 'react'
 import { Mic, MicOff, Square } from 'lucide-react'
+import { API_BASE } from '../../services/api'
 
 const VoiceRecorder = ({ onTranscript, onRecordingChange, disabled = false }) => {
   const [isRecording, setIsRecording] = useState(false)
@@ -187,8 +188,7 @@ const VoiceRecorder = ({ onTranscript, onRecordingChange, disabled = false }) =>
       const formData = new FormData()
       formData.append('audio', audioBlob, 'recording.webm')
 
-      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8080'
-      const response = await fetch(`${apiUrl}/api/voice/transcribe`, {
+      const response = await fetch(`${API_BASE}/voice/transcribe`, {
         method: 'POST',
         headers: {
           Authorization: `Bearer ${localStorage.getItem('token')}`,

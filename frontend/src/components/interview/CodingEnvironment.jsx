@@ -1,6 +1,7 @@
 import { useState, useRef, useCallback } from 'react'
 import Editor from '@monaco-editor/react'
 import { Play, RotateCcw, CheckCircle, XCircle, Loader2, Terminal, Clock } from 'lucide-react'
+import { API_BASE } from '../../services/api'
 
 const LANGUAGES = [
   { id: 'python', name: 'Python', judge0Id: 71, monacoId: 'python' },
@@ -218,8 +219,7 @@ const CodingEnvironment = ({ problem, onSubmit, timeLimit = 30 }) => {
     try {
       const selectedLang = LANGUAGES.find((l) => l.id === language)
 
-      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8080'
-      const response = await fetch(`${apiUrl}/api/coding/execute`, {
+      const response = await fetch(`${API_BASE}/coding/execute`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -253,8 +253,7 @@ const CodingEnvironment = ({ problem, onSubmit, timeLimit = 30 }) => {
     try {
       const selectedLang = LANGUAGES.find((l) => l.id === language)
 
-      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8080'
-      const response = await fetch(`${apiUrl}/api/coding/submit`, {
+      const response = await fetch(`${API_BASE}/coding/submit`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

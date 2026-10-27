@@ -1,6 +1,10 @@
 import axios from 'axios'
 
-export const API_BASE = (import.meta.env.VITE_API_URL || 'http://localhost:8080') + '/api'
+// Vercel Services routes /api/* to the Spring backend on the same domain, so an
+// unset VITE_API_URL means same-origin. Local development keeps the full URL in
+// frontend/.env.local.
+const apiRoot = (import.meta.env.VITE_API_URL || '').trim().replace(/\/+$/, '')
+export const API_BASE = apiRoot ? `${apiRoot}/api` : '/api'
 
 const api = axios.create({
   baseURL: API_BASE,
