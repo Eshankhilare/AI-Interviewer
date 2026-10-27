@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
+import { motion, useReducedMotion } from 'framer-motion'
 import {
   ArrowRight, Camera, CheckCircle2, Clock, Code, MessageSquare, Mic, Send, Shield, Square,
 } from 'lucide-react'
@@ -9,6 +10,7 @@ import CodingEnvironment from '../../components/interview/CodingEnvironment'
 import BodyLanguageAnalyzer from '../../components/interview/BodyLanguageAnalyzer'
 import ProctoringMonitor from '../../components/interview/ProctoringMonitor'
 import AnswerInsights from '../../components/interview/AnswerInsights'
+import LiveAnswerHints from '../../components/interview/LiveAnswerHints'
 import { analyzeAnswer } from '../../utils/answerInsights'
 import { ScoreRing, SkeletonBlock } from '../ui'
 
@@ -33,6 +35,7 @@ export default function StudioLive() {
   const [remaining, setRemaining] = useState(null)
   const [deadline, setDeadline] = useState(null)
   const audioRef = useRef(null)
+  const reduce = useReducedMotion()
 
   useEffect(() => {
     let alive = true
@@ -252,7 +255,14 @@ export default function StudioLive() {
         </aside>
 
         <section>
-          <div className="st-card" style={{ overflow: 'hidden' }}>
+          <motion.div
+            key={question.id}
+            className="st-card"
+            style={{ overflow: 'hidden' }}
+            initial={reduce ? false : { opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+          >
             <div className="st-stage">
               <div className="st-orb st-orb-sm" aria-hidden="true" />
               <div>
@@ -279,9 +289,15 @@ export default function StudioLive() {
             {question.aiFollowUp && (
               <div className="st-quote" style={{ marginTop: 14 }}>{question.aiFollowUp}</div>
             )}
-          </div>
+          </motion.div>
 
-          <div className="st-card" style={{ marginTop: 14 }}>
+          <motion.div
+            className="st-card"
+            style={{ marginTop: 14 }}
+            initial={reduce ? false : { opacity: 0, y: 14 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4, delay: 0.06, ease: [0.16, 1, 0.3, 1] }}
+          >
             {feedback ? (
               <>
                 <div className="st-row" style={{ alignItems: 'flex-start', gap: 16 }}>
@@ -370,9 +386,13 @@ export default function StudioLive() {
                   )}
                 </div>
 
+                {!feedback && (
+                  <LiveAnswerHints text={answer} behavioral={question?.questionType === 'BEHAVIORAL'} />
+                )}
+
                 <div className="st-between" style={{ marginTop: 14 }}>
                   <span className="st-dim" style={{ fontSize: 11.5 }}>
-                    {answer.trim() ? `${answer.trim().split(/\s+/).length} words` : 'Ctrl/⌘ + Enter to submit'}
+                    Ctrl/⌘ + Enter to submit
                   </span>
                   <button
                     type="button"
@@ -385,7 +405,7 @@ export default function StudioLive() {
                 </div>
               </>
             )}
-          </div>
+          </motion.div>
         </section>
 
         <aside className="st-stack" style={{ gap: 14 }}>

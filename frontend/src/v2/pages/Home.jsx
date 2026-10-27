@@ -4,7 +4,7 @@ import { motion } from 'framer-motion'
 import { ArrowRight, Clock, Play, Sparkles, Target, TrendingUp, BarChart3, Award, Brain } from 'lucide-react'
 import api from '../../services/api'
 import { useAuth } from '../../context/AuthContext'
-import { dueItems, loadSchedule } from '../../utils/spacedRepetition'
+import { dueItems, loadSchedule, subscribeSchedule } from '../../utils/spacedRepetition'
 import { BarRow, Empty, PageHead, ScoreRing, SkeletonBlock, formatDate } from '../ui'
 
 const byNewest = (a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0)
@@ -20,6 +20,13 @@ export default function Home() {
   const navigate = useNavigate()
   const [interviews, setInterviews] = useState(null)
   const [report, setReport] = useState(null)
+  const [dueCount, setDueCount] = useState(0)
+
+  useEffect(() => {
+    const refresh = () => setDueCount(dueItems(loadSchedule(user)).length)
+    refresh()
+    return subscribeSchedule(refresh)
+  }, [user])
 
   useEffect(() => {
     let alive = true
@@ -61,7 +68,6 @@ export default function Home() {
   const active = (interviews || []).find((i) => i.status === 'IN_PROGRESS')
   const scheduled = (interviews || []).find((i) => i.status === 'SCHEDULED')
   const resume = active || scheduled
-  const dueCount = dueItems(loadSchedule(user)).length
 
   const skills = Array.isArray(report?.skillRadarData) ? report.skillRadarData : []
   const weakest = [...skills].sort((a, b) => a.score - b.score).slice(0, 3)

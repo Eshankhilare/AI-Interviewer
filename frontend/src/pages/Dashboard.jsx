@@ -5,14 +5,21 @@ import { Plus, Clock, CheckCircle, XCircle, TrendingUp, BarChart3, Brain } from 
 import { motion } from 'framer-motion'
 import { GlassCard, WhiteButton, GlassBadge, BackgroundVideo } from '../components/ui/glass'
 import { useAuth } from '../context/AuthContext'
-import { dueItems, loadSchedule } from '../utils/spacedRepetition'
+import { dueItems, loadSchedule, subscribeSchedule } from '../utils/spacedRepetition'
 
 const Dashboard = () => {
   const { user } = useAuth()
   const [interviews, setInterviews] = useState([])
   const [loading, setLoading] = useState(true)
+  const [dueCount, setDueCount] = useState(0)
 
   useEffect(() => { fetchInterviews() }, [])
+
+  useEffect(() => {
+    const refresh = () => setDueCount(dueItems(loadSchedule(user)).length)
+    refresh()
+    return subscribeSchedule(refresh)
+  }, [user])
 
   const fetchInterviews = async () => {
     try { const r = await api.get('/interviews'); setInterviews(r.data) }
@@ -42,8 +49,6 @@ const Dashboard = () => {
     if (s === 'CANCELLED') return 'danger'
     return 'default'
   }
-
-  const dueCount = dueItems(loadSchedule(user)).length
 
   if (loading) {
     return (
@@ -146,9 +151,9 @@ const Dashboard = () => {
                       </span>
                     </div>
                     {interview.totalQuestions > 0 && (
-                      <div className="mt-3 h-1 rounded-full overflow-hidden" style={{ background: 'rgba(255,255,255,.05)' }}>
+                      <div className="mt-3 h-1 rounded-full overflow-hidden" style={{ background: 'rgba(255,255,255,.09)' }}>
                         <div className="h-full rounded-full transition-all duration-500"
-                          style={{ width: `${(interview.currentQuestionIndex / interview.totalQuestions) * 100}%`, background: interview.status === 'COMPLETED' ? '#4ade80' : '#6366f1' }} />
+                          style={{ width: `${(interview.currentQuestionIndex / interview.totalQuestions) * 100}%`, background: interview.status === 'COMPLETED' ? '#34d399' : '#6366f1' }} />
                       </div>
                     )}
                     <p className="mt-3 text-xs" style={{ color: 'rgba(255,255,255,.25)' }}>

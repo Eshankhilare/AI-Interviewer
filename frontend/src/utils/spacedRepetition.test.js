@@ -9,6 +9,7 @@ import {
   removeFromPractice,
   saveSchedule,
   scheduleKey,
+  subscribeSchedule,
   upcomingItems,
 } from './spacedRepetition'
 
@@ -107,5 +108,20 @@ describe('spaced repetition', () => {
     expect(intervalLabel(item, 'hard')).toBe('in 1 day')
     expect(intervalLabel(item, 'good')).toBe('in 2 days')
     expect(intervalLabel(item, 'easy')).toMatch(/in \d+ days/)
+  })
+
+  it('notifies on focus and on a schedule change in another tab', () => {
+    const spy = vi.fn()
+    const stop = subscribeSchedule(spy)
+
+    window.dispatchEvent(new Event('focus'))
+    expect(spy).toHaveBeenCalledTimes(1)
+
+    window.dispatchEvent(new StorageEvent('storage', { key: scheduleKey(user) }))
+    expect(spy).toHaveBeenCalledTimes(2)
+
+    stop()
+    window.dispatchEvent(new Event('focus'))
+    expect(spy).toHaveBeenCalledTimes(2)
   })
 })

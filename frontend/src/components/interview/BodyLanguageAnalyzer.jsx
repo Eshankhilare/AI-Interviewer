@@ -362,10 +362,10 @@ const BodyLanguageAnalyzer = ({ onAnalysisUpdate, enabled = true }) => {
           <span className="text-ink-500">{label}</span>
           <span className="font-medium text-ink-700">{value}%</span>
         </div>
-        <div className="h-2 bg-ink-100 rounded-full overflow-hidden">
+        <div className="h-2 rounded-full overflow-hidden" style={{ background: 'rgba(255,255,255,.08)' }}>
           <div
             className="h-full rounded-full transition-all duration-500"
-            style={{ width: `${displayValue}%`, background: getScoreColor(displayValue) }}
+            style={{ width: `${value}%`, background: getScoreColor(displayValue) }}
           />
         </div>
       </div>

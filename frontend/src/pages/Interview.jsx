@@ -11,6 +11,7 @@ import SpeechEmotionAnalyzer from '../components/interview/SpeechEmotionAnalyzer
 import InterviewerOrb from '../components/interview/InterviewerOrb'
 import ErrorBoundary from '../components/common/ErrorBoundary'
 import AnswerInsights from '../components/interview/AnswerInsights'
+import LiveAnswerHints from '../components/interview/LiveAnswerHints'
 import { analyzeAnswer } from '../utils/answerInsights'
 import { motion } from 'framer-motion'
 import { GlassCard, WhiteButton, GlassBadge, GlassInput, BackgroundVideo } from '../components/ui/glass'
@@ -342,6 +343,10 @@ const Interview = () => {
                   <label className="block text-sm font-medium mb-2" style={{ color: 'rgba(255,255,255,.6)' }}>Your Answer</label>
                   <GlassInput as="textarea" rows={6} value={answer} onChange={(e) => setAnswer(e.target.value)} placeholder="Type your answer here..." style={{ resize: 'none' }} />
                 </>
+              )}
+
+              {!feedback && (
+                <LiveAnswerHints text={answer} behavioral={currentQuestion.questionType === 'BEHAVIORAL'} />
               )}
 
               {feedback ? (

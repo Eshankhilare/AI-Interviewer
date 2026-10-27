@@ -9,6 +9,7 @@ import {
   loadSchedule,
   removeFromPractice,
   saveSchedule,
+  subscribeSchedule,
   upcomingItems,
 } from '../utils/spacedRepetition'
 
@@ -26,8 +27,10 @@ const Practice = () => {
   const [selectedKey, setSelectedKey] = useState(null)
 
   useEffect(() => {
-    setSchedule(loadSchedule(user))
+    const refresh = () => setSchedule(loadSchedule(user))
+    refresh()
     setSelectedKey(null)
+    return subscribeSchedule(refresh)
   }, [user])
 
   const persist = (next) => {

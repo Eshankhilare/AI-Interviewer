@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { ArrowLeft, CheckCircle2, RotateCcw } from 'lucide-react'
 import { GlassCard, GlassBadge, WhiteButton, GlassInput } from '../ui/glass'
 import AnswerInsights from '../interview/AnswerInsights'
+import LiveAnswerHints from '../interview/LiveAnswerHints'
 import { analyzeAnswer } from '../../utils/answerInsights'
 import { intervalLabel } from '../../utils/spacedRepetition'
 
@@ -66,6 +67,7 @@ const PracticeDrill = ({ item, onGrade, onBack }) => {
         placeholder="Say it out loud, then type the version you would give in the interview..."
         style={{ resize: 'vertical' }}
       />
+      <LiveAnswerHints text={answer} behavioral={item.questionType === 'BEHAVIORAL'} />
 
       {!revealed ? (
         <div className="mt-4 flex justify-end">

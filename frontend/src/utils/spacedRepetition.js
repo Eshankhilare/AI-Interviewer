@@ -112,3 +112,19 @@ export const gradePracticeItem = (schedule, key, grade, now = Date.now()) => {
   if (!item) return schedule
   return { ...schedule, items: { ...schedule.items, [key]: nextState(item, grade, now) } }
 }
+
+// Keeps the due counts in sync while the app is open: another tab changing the
+// schedule fires `storage`, and returning to this tab fires `focus`.
+export const subscribeSchedule = (callback) => {
+  if (typeof window === 'undefined') return () => {}
+  const onStorage = (event) => {
+    if (!event.key || event.key.startsWith(KEY_PREFIX)) callback()
+  }
+  const onFocus = () => callback()
+  window.addEventListener('storage', onStorage)
+  window.addEventListener('focus', onFocus)
+  return () => {
+    window.removeEventListener('storage', onStorage)
+    window.removeEventListener('focus', onFocus)
+  }
+}
