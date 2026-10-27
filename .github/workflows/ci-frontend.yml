@@ -27,5 +27,5 @@ jobs:
       - name: Build
         run: npm run build
 
-      - name: Lint (if configured)
-        run: npm run lint --if-present
+      - name: Lint
+        run: npm run lint

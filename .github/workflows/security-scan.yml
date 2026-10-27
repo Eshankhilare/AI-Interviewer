@@ -1,5 +1,9 @@
 name: Security Scan
 
+# Advisory dependency report on every PR. These jobs do not gate the merge:
+# the known npm advisories are in the Vite/Vitest build tooling, and the backend
+# dependency check needs an NVD API key in CI. The output is there to be read;
+# `AUDIT.md` tracks the findings and their status.
 on:
   pull_request:
     branches: [main]
@@ -18,7 +22,8 @@ jobs:
           cache: 'npm'
           cache-dependency-path: frontend/package-lock.json
       - run: npm install
-      - run: npm audit --audit-level=high || true
+      - name: npm audit (advisory)
+        run: npm audit --audit-level=high || true
 
   backend-audit:
     runs-on: ubuntu-latest
@@ -32,7 +37,8 @@ jobs:
           java-version: '21'
           distribution: 'temurin'
           cache: 'maven'
-      - run: mvn dependency-check:check -q || true
+      - name: OWASP dependency check (advisory)
+        run: mvn dependency-check:check -q || true
 
   ai-service-audit:
     runs-on: ubuntu-latest
@@ -47,4 +53,5 @@ jobs:
           cache: 'pip'
           cache-dependency-path: ai-service/requirements.txt
       - run: pip install safety pip-audit
-      - run: pip-audit -r requirements.txt || true
+      - name: pip-audit (advisory)
+        run: pip-audit -r requirements.txt || true
