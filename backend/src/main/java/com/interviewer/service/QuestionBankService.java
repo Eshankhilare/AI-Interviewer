@@ -52,6 +52,21 @@ public class QuestionBankService {
         return shuffled.subList(0, Math.min(count, shuffled.size()));
     }
 
+    /**
+     * Picks an unused question of the requested difficulty for the same role.
+     * Empty when the bank has nothing suitable, so the caller keeps the original question.
+     */
+    public Optional<Map<String, String>> pickQuestion(String roleTitle, String difficulty, Set<String> excludeTexts) {
+        String fileName = ROLE_FILE_MAP.getOrDefault(roleTitle, slugify(roleTitle));
+        List<Map<String, String>> candidates = new ArrayList<>(loadQuestions(fileName));
+        Collections.shuffle(candidates);
+
+        return candidates.stream()
+                .filter(q -> difficulty.equalsIgnoreCase(q.getOrDefault("difficulty", "MEDIUM")))
+                .filter(q -> q.get("text") != null && !excludeTexts.contains(q.get("text")))
+                .findFirst();
+    }
+
     private List<Map<String, String>> loadQuestions(String fileName) {
         return cache.computeIfAbsent(fileName, key -> {
             try {

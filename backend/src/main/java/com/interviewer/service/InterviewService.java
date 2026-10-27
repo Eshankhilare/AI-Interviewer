@@ -1,5 +1,6 @@
 package com.interviewer.service;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.interviewer.dto.*;
 import com.interviewer.entity.*;
@@ -14,7 +15,9 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -116,14 +119,7 @@ public class InterviewService {
         if (!bankQuestions.isEmpty() && bankQuestions.size() >= count) {
             List<Question> questions = new ArrayList<>();
             for (Map<String, String> bq : bankQuestions) {
-                Question q = Question.builder()
-                        .text(bq.get("text"))
-                        .type(Question.Type.valueOf(bq.getOrDefault("type", "TECHNICAL")))
-                        .difficulty(Question.Difficulty.valueOf(bq.getOrDefault("difficulty", "MEDIUM")))
-                        .expectedAnswer(bq.get("expected_answer"))
-                        .active(true)
-                        .build();
-                questions.add(q);
+                questions.add(questionFromBank(bq, null));
             }
             return questionRepository.saveAll(questions);
         }
@@ -221,10 +217,77 @@ public class InterviewService {
 
         evaluateSession(session, interview);
 
+        if (session.getEvaluation() != null) {
+            adaptNextQuestion(interview, session);
+        }
+
         interview.setCurrentQuestionIndex(session.getQuestionOrder());
         interviewRepository.save(interview);
 
         return mapToSessionResponse(session, false);
+    }
+
+    /**
+     * Keeps the pre-planned next session but swaps its question when the last answer
+     * was clearly strong or weak, so the rest of the interview follows the candidate.
+     * A missing bank entry simply leaves the original question in place.
+     */
+    private void adaptNextQuestion(Interview interview, InterviewSession answered) {
+        int nextOrder = answered.getQuestionOrder() + 1;
+        if (nextOrder > interview.getTotalQuestions()) {
+            return;
+        }
+        InterviewSession next = sessionRepository
+                .findByInterviewIdAndQuestionOrder(interview.getId(), nextOrder)
+                .orElse(null);
+        if (next == null) {
+            return;
+        }
+
+        int score = answered.getEvaluation().getScore();
+        String target = score >= 80 ? "HARD" : score <= 50 ? "EASY" : null;
+        if (target == null || next.getQuestion().getDifficulty().name().equals(target)) {
+            return;
+        }
+
+        String roleTitle = interview.getJobDescription() != null
+                ? interview.getJobDescription().getTitle() : null;
+        if (roleTitle == null || roleTitle.isBlank()) {
+            return;
+        }
+
+        Set<String> usedTexts = interview.getSessions().stream()
+                .map(s -> s.getQuestion().getText())
+                .collect(Collectors.toSet());
+
+        questionBankService.pickQuestion(roleTitle, target, usedTexts).ifPresent(bank -> {
+            Question replacement = questionRepository.save(questionFromBank(bank, target));
+            next.setQuestion(replacement);
+            sessionRepository.save(next);
+        });
+    }
+
+    /** Tolerates bad bank data (unknown type/difficulty) instead of failing the whole interview. */
+    private Question questionFromBank(Map<String, String> bank, String forcedDifficulty) {
+        String difficulty = forcedDifficulty != null ? forcedDifficulty : bank.get("difficulty");
+        return Question.builder()
+                .text(bank.get("text"))
+                .type(parseEnum(Question.Type.class, bank.get("type"), Question.Type.TECHNICAL))
+                .difficulty(parseEnum(Question.Difficulty.class, difficulty, Question.Difficulty.MEDIUM))
+                .expectedAnswer(bank.get("expected_answer"))
+                .active(true)
+                .build();
+    }
+
+    private static <E extends Enum<E>> E parseEnum(Class<E> type, String value, E fallback) {
+        if (value == null || value.isBlank()) {
+            return fallback;
+        }
+        try {
+            return Enum.valueOf(type, value.trim().toUpperCase(Locale.ROOT));
+        } catch (IllegalArgumentException e) {
+            return fallback;
+        }
     }
 
     /** Best-effort evaluation. Failure leaves the answer saved (status ANSWERED) so a retry can evaluate it. */
@@ -307,8 +370,9 @@ public class InterviewService {
         }
 
         String recommendations = "Review the per-question feedback for concrete next steps.";
-        String skillRadar = "[]";
-        String categoryScores = "[]";
+        // Derived from real per-answer criterion scores, never from the model's prose.
+        String skillRadar = toJson(buildSkillRadar(evaluated));
+        String categoryScores = toJson(buildCategoryScores(evaluated));
         String strengths = "[]";
         String weaknesses = "[]";
         String breakdown = toJson(buildQuestionBreakdown(interview));
@@ -321,15 +385,9 @@ public class InterviewService {
         }
 
         if (reportData != null && !reportData.isEmpty()) {
-            // Text fields may come from the model; the numeric score stays computed from real evaluations.
+            // Only prose may come from the model; every number is computed from real evaluations.
             if (reportData.get("summary") != null) {
                 summary = (String) reportData.get("summary");
-            }
-            if (reportData.get("skill_radar_data") != null) {
-                skillRadar = toJson(reportData.get("skill_radar_data"));
-            }
-            if (reportData.get("category_scores") != null) {
-                categoryScores = toJson(reportData.get("category_scores"));
             }
             if (reportData.get("strengths") != null) {
                 strengths = toJson(reportData.get("strengths"));
@@ -359,8 +417,61 @@ public class InterviewService {
         return reportRepository.save(report);
     }
 
-    private List<Map<String, Object>> buildQuestionBreakdown(Interview interview) {
-        List<Map<String, Object>> breakdown = new ArrayList<>();
+    private static final Map<String, String> SKILL_LABELS = Map.of(
+            "relevance", "Relevance",
+            "technicalDepth", "Technical Depth",
+            "correctness", "Correctness",
+            "clarity", "Clarity",
+            "evidence", "Evidence");
+
+    /** Averages each rubric criterion across evaluated answers. Empty when no criterion scores exist. */
+    private List<Map<String, Object>> buildSkillRadar(List<InterviewSession> evaluated) {
+        Map<String, List<Integer>> bySkill = new LinkedHashMap<>();
+        for (InterviewSession session : evaluated) {
+            String raw = session.getEvaluation().getSkillScores();
+            if (raw == null || raw.isBlank()) {
+                continue;
+            }
+            try {
+                JsonNode node = objectMapper.readTree(raw);
+                node.fields().forEachRemaining(field -> {
+                    if (field.getValue().isNumber()) {
+                        bySkill.computeIfAbsent(field.getKey(), key -> new ArrayList<>())
+                                .add(field.getValue().asInt());
+                    }
+                });
+            } catch (Exception ignored) {
+                // A legacy or malformed evaluation simply does not contribute to the radar.
+            }
+        }
+
+        List<Map<String, Object>> radar = new ArrayList<>();
+        bySkill.forEach((skill, scores) -> radar.add(Map.of(
+                "skill", SKILL_LABELS.getOrDefault(skill, skill),
+                "score", (int) Math.round(scores.stream().mapToInt(Integer::intValue).average().orElse(0)))));
+        return radar;
+    }
+
+    private List<Map<String, Object>> buildCategoryScores(List<InterviewSession> evaluated) {
+        Map<String, List<Integer>> byType = new LinkedHashMap<>();
+        for (InterviewSession session : evaluated) {
+            byType.computeIfAbsent(prettyType(session.getQuestion().getType().name()), key -> new ArrayList<>())
+                    .add(session.getEvaluation().getScore());
+        }
+
+        List<Map<String, Object>> categories = new ArrayList<>();
+        byType.forEach((category, scores) -> categories.add(Map.of(
+                "category", category,
+                "score", (int) Math.round(scores.stream().mapToInt(Integer::intValue).average().orElse(0)))));
+        return categories;
+    }
+
+    private String prettyType(String name) {
+        String lower = name.toLowerCase().replace('_', ' ');
+        return Character.toUpperCase(lower.charAt(0)) + lower.substring(1);
+    }
+
+    private List<Map<String, Object>> buildQuestionBreakdown(Interview interview) {        List<Map<String, Object>> breakdown = new ArrayList<>();
         for (InterviewSession session : interview.getSessions()) {
             Map<String, Object> item = new LinkedHashMap<>();
             item.put("question", session.getQuestion().getText());

@@ -71,13 +71,18 @@ class InterviewSecurityTest {
         @Override
         public Map<String, Object> evaluateAnswer(String question, String answer, String expectedAnswer,
                                                   String questionType, String difficulty, String jobContext) {
-            return Map.of(
-                    "score", 80,
-                    "grade", "A",
-                    "feedback", "Clear and correct.",
-                    "strengths", "Explains trade-offs",
-                    "weaknesses", "Could add an example",
-                    "sample_response", "A stronger answer...");
+            Map<String, Object> result = new java.util.HashMap<>();
+            result.put("score", 80);
+            result.put("grade", "A");
+            result.put("feedback", "Clear and correct.");
+            result.put("strengths", "Explains trade-offs");
+            result.put("weaknesses", "Could add an example");
+            result.put("sample_response", "A stronger answer...");
+            result.put("improvement_suggestions", "Mention the failure mode");
+            result.put("skill_scores", Map.of(
+                    "relevance", 80, "technicalDepth", 70,
+                    "correctness", 90, "clarity", 75, "evidence", 60));
+            return result;
         }
 
         @Override
@@ -258,6 +263,72 @@ class InterviewSecurityTest {
                 .andExpect(status().isConflict());
         mvc.perform(get("/api/reports/{id}", interviewId).header("Authorization", bearer(owner)))
                 .andExpect(status().isOk());
+    }
+
+    @Test
+    void reportIsComputedFromRealEvaluations() throws Exception {
+        String owner = register("report-math");
+        long jdId = createJobDescription(owner);
+        long interviewId = startInterview(owner, jdId, 2).get("id").asLong();
+        mvc.perform(post("/api/interviews/{id}/begin", interviewId).header("Authorization", bearer(owner)))
+                .andExpect(status().isOk());
+
+        long sessionId = nextQuestion(owner, interviewId).get("id").asLong();
+        mvc.perform(post("/api/interviews/{id}/answer", interviewId)
+                        .header("Authorization", bearer(owner))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json(Map.of("sessionId", sessionId, "answer", "A detailed answer."))))
+                .andExpect(status().isOk());
+        mvc.perform(post("/api/interviews/{id}/end", interviewId).header("Authorization", bearer(owner)))
+                .andExpect(status().isOk());
+
+        mvc.perform(get("/api/reports/{id}", interviewId).header("Authorization", bearer(owner)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.overallScore").value(80))
+                .andExpect(jsonPath("$.overallGrade").value("A"))
+                .andExpect(jsonPath("$.recommendationLevel").value("RECOMMENDED"))
+                .andExpect(jsonPath("$.skillRadarData", org.hamcrest.Matchers.hasSize(5)))
+                .andExpect(jsonPath("$.skillRadarData[*].skill", org.hamcrest.Matchers.hasItem("Relevance")))
+                .andExpect(jsonPath("$.categoryScores[0].score").value(80))
+                .andExpect(jsonPath("$.questionBreakdown", org.hamcrest.Matchers.hasSize(2)));
+    }
+
+    @Test
+    void reportWithoutEvaluationsSaysSoInsteadOfInventingAScore() throws Exception {
+        String owner = register("report-empty");
+        long jdId = createJobDescription(owner);
+        long interviewId = startInterview(owner, jdId, 2).get("id").asLong();
+        mvc.perform(post("/api/interviews/{id}/begin", interviewId).header("Authorization", bearer(owner)))
+                .andExpect(status().isOk());
+        mvc.perform(post("/api/interviews/{id}/end", interviewId).header("Authorization", bearer(owner)))
+                .andExpect(status().isOk());
+
+        mvc.perform(get("/api/reports/{id}", interviewId).header("Authorization", bearer(owner)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.overallScore").value(0))
+                .andExpect(jsonPath("$.overallGrade").value("N/A"))
+                .andExpect(jsonPath("$.recommendationLevel").value("INSUFFICIENT_DATA"))
+                .andExpect(jsonPath("$.skillRadarData", org.hamcrest.Matchers.hasSize(0)));
+    }
+
+    @Test
+    void strongAnswerAdaptsTheNextQuestionToHard() throws Exception {
+        String owner = register("adaptive");
+        long jdId = createJobDescription(owner);
+        long interviewId = startInterview(owner, jdId, 2).get("id").asLong();
+        mvc.perform(post("/api/interviews/{id}/begin", interviewId).header("Authorization", bearer(owner)))
+                .andExpect(status().isOk());
+
+        long sessionId = nextQuestion(owner, interviewId).get("id").asLong();
+        mvc.perform(post("/api/interviews/{id}/answer", interviewId)
+                        .header("Authorization", bearer(owner))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json(Map.of("sessionId", sessionId, "answer", "A strong answer."))))
+                .andExpect(status().isOk());
+
+        JsonNode next = nextQuestion(owner, interviewId);
+        assertThat(next.get("difficulty").asText()).isEqualTo("HARD");
+        assertThat(next.get("id").asLong()).isNotEqualTo(sessionId);
     }
 
     @Test
