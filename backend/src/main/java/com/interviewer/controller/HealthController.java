@@ -39,6 +39,9 @@ public class HealthController {
         body.put("database", database ? "UP" : "DOWN");
         // The app stays usable when the AI service is down (question bank + honest fallbacks).
         body.put("aiService", aiService ? "UP" : "DOWN");
+        if (!aiService) {
+            body.put("aiServiceError", aiServiceClient.healthError());
+        }
 
         return ResponseEntity.status(database ? HttpStatus.OK : HttpStatus.SERVICE_UNAVAILABLE).body(body);
     }

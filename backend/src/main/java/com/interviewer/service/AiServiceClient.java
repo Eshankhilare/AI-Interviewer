@@ -38,13 +38,27 @@ public class AiServiceClient {
         this.healthRestTemplate = new RestTemplate(fastFactory);
     }
 
+    private volatile String healthError;
+
     public boolean isHealthy() {
         try {
-            return healthRestTemplate.getForEntity(aiServiceUrl + "/health", String.class)
+            boolean healthy = healthRestTemplate.getForEntity(aiServiceUrl + "/health", String.class)
                     .getStatusCode().is2xxSuccessful();
+            healthError = healthy ? null : "AI service answered without a 2xx status";
+            return healthy;
         } catch (Exception e) {
+            healthError = e.getClass().getSimpleName() + ": " + e.getMessage();
             return false;
         }
+    }
+
+    /** Last health-check failure, so /api/health can say why the AI service is down. */
+    public String healthError() {
+        String error = healthError;
+        if (error == null) {
+            return null;
+        }
+        return error.length() > 300 ? error.substring(0, 300) : error;
     }
 
     private HttpEntity<Map<String, Object>> entity(Map<String, Object> request) {
