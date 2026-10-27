@@ -1,0 +1,98 @@
+# Dependencies
+node_modules/
+__pycache__/
+*.pyc
+venv/
+.venv/
+
+# Build
+target/
+dist/
+build/
+*.class
+*.jar
+.vite/
+frontend/.vite/
+
+# Environment
+.env
+.env.local
+.env.production
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+ai-service.log
+backend.log
+frontend.log
+
+# Uploads
+uploads/
+
+# Database
+*.db
+
+# Debug files
+debug-tts.js
+debug-tts.cjs
+
+# Migration guides (local only)
+CODERABBIT_BACKUP.md
+
+# PID files
+*.pid
+
+# Local scripts (not needed in repo)
+setup.sh
+start.sh
+stop.sh
+use-skill.sh
+
+# Workflow notes
+.github/WORKFLOW_NOTE.md
+
+# Python
+*.egg-info/
+.pytest_cache/
+
+# Maven
+.mvn/
+
+# Downloaded skill repos (use separately)
+Anthropic-Cybersecurity-Skills/
+Graft/
+OpenMontage/
+OpenViking/
+agency-agents/
+agentmemory/
+anthropic-skills/
+awesome-design-md/
+awesome-harness-engineering/
+awesome-mcp-servers/
+browser-use/
+codebase-memory-mcp/
+diagram-design/
+openai-plugins/
+playwright-cli/
+role-specific-plugins/
+scientific-agent-skills/
+taste-skill/
+vercel-agent-skills/
+vercel-skills-cli/
+web-interface-guidelines/
+.skills-registry/
+codeaudit/
+libcst/
+medusa/
+VulnHunter/
+nuclei/
+strix/

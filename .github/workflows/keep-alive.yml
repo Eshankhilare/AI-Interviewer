@@ -1,0 +1,30 @@
+name: Keep Alive (Prevent Render Spin-Down)
+
+on:
+  schedule:
+    - cron: '*/14 * * * *'
+  workflow_dispatch:
+
+jobs:
+  keep-alive:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Wake up Backend
+        run: |
+          echo "Waking up backend..."
+          for i in 1 2 3; do
+            curl -s -o /dev/null -w "Backend attempt $i: HTTP %{http_code} (%{time_total}s)\n" \
+              https://ai-interviewer-backend-y6ks.onrender.com/api/health \
+              --max-time 60 || true
+            sleep 5
+          done
+
+      - name: Wake up AI Service
+        run: |
+          echo "Waking up AI service..."
+          for i in 1 2 3; do
+            curl -s -o /dev/null -w "AI Service attempt $i: HTTP %{http_code} (%{time_total}s)\n" \
+              https://ai-interviewer-ai-service-qpxr.onrender.com/health \
+              --max-time 60 || true
+            sleep 5
+          done
