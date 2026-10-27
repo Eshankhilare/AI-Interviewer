@@ -422,6 +422,8 @@ Everything below was run on `hackathon/polish` after the fixes.
 | Benchmark run | `python bench/run.py --mode local --repeats 2` | 12 answers scored by the **heuristic** fallback; no agreement metric claimed (no labels, no key) |
 | TTS proxy | `POST /api/voice/synthesize` with a token | **200**, `audio/mpeg`, 14,544 bytes with an MP3 frame header (`FF F3`); no token → **401** |
 | TTS proxy with `AI_SERVICE_TOKEN` set on both services | same call | **200**, `audio/mpeg`, 20,448 bytes; direct AI-service call without or with a wrong token → **401**, with the right one → **200** |
+| Rubric path, real Gemini key | interview answered through the backend | matching strong answer → **91/100 A+**, all five evidence quotes grounded, radar from the rubric; off-topic answers → 16–58 with the evaluator naming the mismatch |
+| Quota exhaustion | after the free-tier limit | two retries, then the heuristic fallback; the request still returns 200 and the score is not invented |
 
 Live HTTP smoke test (backend on the `local` profile, port 8082, no AI service):
 

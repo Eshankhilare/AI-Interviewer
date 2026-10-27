@@ -127,7 +127,7 @@ variable with a safe default.
 | File | Copy to | Notes |
 |---|---|---|
 | `backend/.env.example` | `backend/.env` or your shell | `JWT_SECRET` is required in production (32+ bytes). Empty locally means a random key per boot. |
-| `ai-service/.env.example` | `ai-service/.env` | `LLM_API_KEY` (or `GEMINI_API_KEY`) enables the rubric evaluator; without it the heuristic fallback runs. `AI_SERVICE_TOKEN` must match the backend. |
+| `ai-service/.env.example` | `ai-service/.env` | `LLM_API_KEY` (or `GEMINI_API_KEY`) enables the rubric evaluator; without it the heuristic fallback runs. The free tier allows about 20 requests per model per day, which is roughly two three-question interviews. `AI_SERVICE_TOKEN` must match the backend. |
 | `frontend/.env.example` | `frontend/.env.local` | `VITE_API_URL` only; the browser never talks to the AI service directly. |
 
 Nothing in the repository contains a real credential. If you deployed from an
@@ -194,6 +194,8 @@ mvn spring-boot:run
 # 3. Frontend (port 5173)
 cd frontend
 npm install
+# the local profile runs on 8082, so point the frontend at it once:
+echo "VITE_API_URL=http://localhost:8082" > .env.local
 npm run dev
 ```
 

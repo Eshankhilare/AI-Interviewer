@@ -19,9 +19,21 @@ cd frontend && npm run dev
 Open `http://localhost:5173`, register an account (the `local` profile drops its
 database on restart, so register again after each restart).
 
+> The `local` profile runs on **8082**, so `frontend/.env.local` must contain
+> `VITE_API_URL=http://localhost:8082`. Without it the frontend calls 8080 and
+> every request fails. This file is gitignored; create it once.
+
 Optional but recommended: put a Gemini key in `ai-service/.env` as `LLM_API_KEY`.
 Without it the app still runs end to end, but every answer is scored by the
 keyword heuristic, which is exactly what `bench/RESULTS.md` warns about.
+
+**Gemini free tier: 20 requests per day per model.** One three-question interview
+spends about six — a follow-up and an evaluation per answer — plus one to three
+on the report, so the free tier covers roughly two demo interviews per model per
+day. When it runs out, the evaluator retries twice, then falls back to the
+heuristic and the request still succeeds; the score just gets lenient. Use a
+paid key for a longer session, or point `LLM_MODEL` at another model, since each
+model has its own daily allowance.
 
 First request after a cold start is slow on a free tier. The backend reports the
 AI service state at `GET /api/health`, so you can check readiness before
@@ -59,6 +71,9 @@ curl http://localhost:8082/api/health
 - **The score is not the model's opinion.** The model returns five 0-10 criteria
   and a quote per criterion; the 0-100 number, grade and radar are computed from
   those. A quote that does not appear in the answer is capped and flagged.
+- **Scoring takes 20-30 seconds per answer** with Gemini 2.5 Flash: the model
+  writes five rationales and a paragraph of feedback. The submit button shows a
+  spinner; the request timeout is 120 s.
 - **When nothing was evaluated, the report says `N/A` / `INSUFFICIENT_DATA`.**
   No invented 75/B.
 - **The answer key is not sent to the browser** until the interview is completed.

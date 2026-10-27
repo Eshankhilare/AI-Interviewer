@@ -80,7 +80,7 @@ Return ONLY a JSON object: {{"score": <0-100>, "feedback": "<1-2 sentences>"}}""
 
             # Run all three agents in parallel
             import asyncio
-            llm = ChatGoogleGenerativeAI(model="gemini-3.5-flash-lite", google_api_key=self.api_key, temperature=0.3)
+            llm = ChatGoogleGenerativeAI(model=os.getenv("LLM_MODEL", "gemini-3.5-flash-lite"), google_api_key=self.api_key, temperature=0.3)
             
             tech_result, comm_result, behav_result = await asyncio.gather(
                 llm.ainvoke([HumanMessage(content=tech_prompt)]),
