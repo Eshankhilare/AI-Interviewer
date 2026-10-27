@@ -47,6 +47,7 @@ const Landing = () => {
           <a href="#features" className="text-sm text-white/70 hover:text-white transition-colors">Features</a>
           <a href="#how-it-works" className="text-sm text-white/70 hover:text-white transition-colors">How it Works</a>
           <a href="#roles" className="text-sm text-white/70 hover:text-white transition-colors">Job Roles</a>
+          <a href="#team" className="text-sm text-white/70 hover:text-white transition-colors">Team</a>
         </nav>
 
         <div className="flex items-center gap-4">
@@ -428,6 +429,61 @@ const Landing = () => {
         </div>
       </div>
 
+      {/* Team */}
+      <div id="team" className="relative z-10 max-w-6xl mx-auto px-8 py-24">
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          className="text-center mb-14"
+        >
+          <p className="text-xs font-semibold uppercase tracking-[.2em] mb-4" style={{ color: '#fbbf24' }}>The team</p>
+          <h2 className="text-3xl md:text-4xl font-bold mb-4">Three builders. One honest score.</h2>
+          <p className="text-white/60 max-w-xl mx-auto">
+            We built the interviewer we wished we had — evidence, not vibes.
+          </p>
+        </motion.div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-7 max-w-5xl mx-auto">
+          {[
+            { name: 'Eshan Khilare', role: 'Co-Founder & AI Engineer', image: '/team/eshan-khilare.jpg', focus: 'center 18%' },
+            { name: 'Abhijit Kapure', role: 'Co-Founder & Full-Stack Engineer', image: '/team/abhijit-kapure.jpg', focus: 'center 18%' },
+            { name: 'Vishwesh Penkar', role: 'Co-Founder & Product Designer', image: '/team/vishwesh-penkar.png', focus: 'center 16%' },
+          ].map((member, i) => (
+            <motion.article
+              key={member.name}
+              initial={{ opacity: 0, y: 24 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: i * 0.1 }}
+              className="group rounded-2xl overflow-hidden"
+              style={{
+                background: '#f5f1e8',
+                border: '1px solid rgba(255,255,255,.2)',
+                boxShadow: '0 24px 50px rgba(0,0,0,.38)',
+              }}
+            >
+              <div className="pt-5 flex justify-center">
+                <span className="block w-10 h-1 rounded-full" style={{ background: 'rgba(20,20,20,.16)' }} />
+              </div>
+              <div className="p-4">
+                <div className="aspect-[4/5] overflow-hidden rounded-xl" style={{ background: '#e7e1d5' }}>
+                  <img
+                    src={member.image}
+                    alt={`${member.name}, ${member.role}`}
+                    loading="lazy"
+                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-[1.03]"
+                    style={{ objectPosition: member.focus }}
+                  />
+                </div>
+                <h3 className="mt-5 text-sm font-bold uppercase tracking-[.14em]" style={{ color: '#151515' }}>{member.name}</h3>
+                <p className="mt-1.5 text-xs" style={{ color: '#7a6f60' }}>{member.role}</p>
+              </div>
+            </motion.article>
+          ))}
+        </div>
+      </div>
+
       {/* CTA */}
       <div className="relative z-10 max-w-7xl mx-auto px-8 py-24">
         <motion.div
@@ -462,8 +518,9 @@ const Landing = () => {
         <div className="max-w-7xl mx-auto px-8 flex justify-between items-center">
           <p className="text-sm text-white/40">2026 AI Interviewer. All rights reserved.</p>
           <div className="flex gap-6">
-            <a href="#" className="text-sm text-white/40 hover:text-white/70">Privacy</a>
-            <a href="#" className="text-sm text-white/40 hover:text-white/70">Terms</a>
+            <Link to="/privacy" className="text-sm text-white/40 hover:text-white/70">Privacy</Link>
+            <Link to="/terms" className="text-sm text-white/40 hover:text-white/70">Terms</Link>
+            <Link to="/cookies" className="text-sm text-white/40 hover:text-white/70">Cookies</Link>
           </div>
         </div>
       </footer>
