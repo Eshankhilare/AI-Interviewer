@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect, useCallback } from 'react'
 import { Volume2, VolumeX, Play, Pause, Loader2 } from 'lucide-react'
+import api from '../../services/api'
 
 const VoicePlayer = ({ text, voice = 'en-US-AndrewNeural', rate = 0.9, autoPlay = false, onSpeakingChange }) => {
   const [isPlaying, setIsPlaying] = useState(false)
@@ -123,44 +124,29 @@ const VoicePlayer = ({ text, voice = 'en-US-AndrewNeural', rate = 0.9, autoPlay 
     stopAll()
     setIsLoading(true)
 
-    // Try server TTS first - call ai-service directly (backend proxy returns empty bytes)
+    // Server TTS through the backend proxy, so the AI service URL and its token
+    // stay server-side. An empty blob (mock TTS provider) falls through to the browser.
     try {
-      const aiServiceUrl = import.meta.env.VITE_AI_SERVICE_URL || 'https://ai-interviewer-ai-service-qpxr.onrender.com'
-      console.log('[VoicePlayer] Trying ai-service TTS:', aiServiceUrl)
       if (text) {
-        const response = await fetch(`${aiServiceUrl}/ai/synthesize`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ text, voice, rate }),
-        })
+        const response = await api.post('/voice/synthesize', { text, voice, rate }, { responseType: 'blob' })
+        const audioBlob = response.data
+        if (audioBlob.size > 100) {
+          const AudioContextClass = window.AudioContext || window.webkitAudioContext
+          const audioCtx = new AudioContextClass()
+          if (audioCtx.state === 'suspended') await audioCtx.resume()
 
-        console.log('[VoicePlayer] Server response:', response.status, response.headers.get('content-type'))
+          const arrayBuffer = await audioBlob.arrayBuffer()
+          const audioBuffer = await audioCtx.decodeAudioData(arrayBuffer)
 
-        if (response.ok) {
-          const audioBlob = await response.blob()
-          console.log('[VoicePlayer] Audio blob size:', audioBlob.size)
-          if (audioBlob.size > 100) {
-            const AudioContextClass = window.AudioContext || window.webkitAudioContext
-            const audioCtx = new AudioContextClass()
-            if (audioCtx.state === 'suspended') await audioCtx.resume()
-
-            const arrayBuffer = await audioBlob.arrayBuffer()
-            const audioBuffer = await audioCtx.decodeAudioData(arrayBuffer)
-            console.log('[VoicePlayer] Playing SERVER audio, duration:', audioBuffer.duration, 'sec')
-
-            setAudioSource('server')
-            playFromBuffer(audioCtx, audioBuffer, 0)
-            return
-          }
+          setAudioSource('server')
+          playFromBuffer(audioCtx, audioBuffer, 0)
+          return
         }
       }
     } catch (err) {
       console.warn('[VoicePlayer] Server TTS failed, falling back to browser speech:', err.message)
     }
 
-    console.log('[VoicePlayer] Using BROWSER speechSynthesis fallback')
     setAudioSource('browser')
     speakWithBrowser()
   }, [text, voice, rate, stopAll, playFromBuffer, speakWithBrowser])
