@@ -35,18 +35,18 @@ export default function StudioShell() {
   ]
 
   return (
-    <div className="ui-studio">
+    <div className="ui-studio" data-bg={background}>
       {background === 'flux' ? (
         <div className="st-flux-bg" aria-hidden="true">
           <FluxLines
             colors={['#ffffff', '#e7e1ff', '#ffffff']}
-            speed={0.35}
+            speed={0.55}
             scale={1.7}
-            glow={2.2}
-            rimWidth={0.18}
-            lineWidth={1}
+            glow={3.2}
+            rimWidth={0.2}
+            lineWidth={1.2}
             flowDirection="down"
-            opacity={0.8}
+            opacity={1}
           />
         </div>
       ) : (
