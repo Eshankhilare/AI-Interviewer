@@ -19,7 +19,20 @@ public class VoiceService {
     @Value("${deepgram.api.key:}")
     private String deepgramApiKey;
 
+    @Value("${ai.service.token:}")
+    private String aiServiceToken;
+
     private final RestTemplate restTemplate = new RestTemplate();
+
+    /** Same optional shared secret the AI service enforces when AI_SERVICE_TOKEN is set. */
+    private HttpHeaders aiHeaders(MediaType contentType) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(contentType);
+        if (aiServiceToken != null && !aiServiceToken.isBlank()) {
+            headers.set("X-AI-Service-Token", aiServiceToken);
+        }
+        return headers;
+    }
 
     public String transcribeAudio(MultipartFile audioFile) {
         try {
@@ -27,10 +40,8 @@ public class VoiceService {
             MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
             body.add("audio", audioFile.getResource());
 
-            HttpHeaders headers = new HttpHeaders();
-            headers.setContentType(MediaType.MULTIPART_FORM_DATA);
-
-            HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(body, headers);
+            HttpEntity<MultiValueMap<String, Object>> requestEntity =
+                new HttpEntity<>(body, aiHeaders(MediaType.MULTIPART_FORM_DATA));
 
             ResponseEntity<Map> response = restTemplate.exchange(
                 aiServiceUrl + "/ai/transcribe",
@@ -55,8 +66,7 @@ public class VoiceService {
             request.put("voice", voice);
             request.put("rate", rate);
 
-            HttpHeaders headers = new HttpHeaders();
-            headers.setContentType(MediaType.APPLICATION_JSON);
+            HttpHeaders headers = aiHeaders(MediaType.APPLICATION_JSON);
 
             HttpEntity<Map<String, Object>> entity = new HttpEntity<>(request, headers);
 

@@ -421,6 +421,7 @@ Everything below was run on `hackathon/polish` after the fixes.
 | Benchmark self-check | `python bench/test_bench.py` | **PASS** |
 | Benchmark run | `python bench/run.py --mode local --repeats 2` | 12 answers scored by the **heuristic** fallback; no agreement metric claimed (no labels, no key) |
 | TTS proxy | `POST /api/voice/synthesize` with a token | **200**, `audio/mpeg`, 14,544 bytes with an MP3 frame header (`FF F3`); no token → **401** |
+| TTS proxy with `AI_SERVICE_TOKEN` set on both services | same call | **200**, `audio/mpeg`, 20,448 bytes; direct AI-service call without or with a wrong token → **401**, with the right one → **200** |
 
 Live HTTP smoke test (backend on the `local` profile, port 8082, no AI service):
 
