@@ -37,3 +37,9 @@ def test_shared_secret_is_required_when_configured(monkeypatch):
     assert client.post(
         "/ai/evaluate-answer", json=body,
         headers={"X-AI-Service-Token": "s3cret"}).status_code == 200
+
+
+def test_health_reports_cache_backend():
+    response = client.get("/health")
+    assert response.status_code == 200
+    assert response.json()["cache"] in {"memory", "upstash", "off"}

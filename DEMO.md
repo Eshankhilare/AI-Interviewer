@@ -35,6 +35,13 @@ heuristic and the request still succeeds; the score just gets lenient. Use a
 paid key for a longer session, or point `LLM_MODEL` at another model, since each
 model has its own daily allowance.
 
+**Repeated answers are cached.** The AI service caches identical rubric
+evaluations for 7 days and follow-ups for 24 hours. Locally the cache is
+process memory; to share it across restarts or demo instances, add
+`UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN` from the Upstash REST
+API. This makes a repeated demo answer instant but does not make a new answer
+faster, and it does not affect first page load.
+
 First request after a cold start is slow on a free tier. The backend reports the
 AI service state at `GET /api/health`, so you can check readiness before
 presenting:

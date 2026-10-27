@@ -130,6 +130,24 @@ variable with a safe default.
 | `ai-service/.env.example` | `ai-service/.env` | `LLM_API_KEY` (or `GEMINI_API_KEY`) enables the rubric evaluator; without it the heuristic fallback runs. The free tier allows about 20 requests per model per day, which is roughly two three-question interviews. `AI_SERVICE_TOKEN` must match the backend. |
 | `frontend/.env.example` | `frontend/.env.local` | `VITE_API_URL` only; the browser never talks to the AI service directly. `VITE_CONTACT_EMAIL` and `VITE_CONTACT_PHONE` fill the contact box on the legal pages (the phone is hidden when empty). |
 
+### Optional Upstash Redis cache
+
+The AI service caches **identical** rubric evaluations (7 days) and follow-up
+questions (24 hours). Without Redis it keeps that cache in process memory; add
+the two REST values to share it across restarts and instances:
+
+```sh
+# ai-service/.env
+UPSTASH_REDIS_REST_URL=https://your-db.upstash.io
+UPSTASH_REDIS_REST_TOKEN=your-rest-token
+```
+
+Copy them from the Upstash console → your Redis database → **REST API**, not the
+Redis protocol URL. The cache fails open: if Upstash is unreachable the service
+continues normally. It only speeds up repeated identical requests; a new answer
+still takes the full evaluation time, and first page load is frontend assets,
+not Redis. Cached values are derived evaluation text, never raw resumes.
+
 Nothing in the repository contains a real credential. If you deployed from an
 earlier commit, rotate the TiDB password, the local MySQL password, the JWT
 secret and the admin keep-alive password — they were committed and must be

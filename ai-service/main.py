@@ -2,6 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.routers import ai_router
 from app.services.llm_service import LLMService
+from app.services.cache import cache
 import os
 from dotenv import load_dotenv
 
@@ -31,7 +32,7 @@ async def root():
 
 @app.get("/health")
 async def health_check():
-    return {"status": "healthy", "service": "ai-interviewer"}
+    return {"status": "healthy", "service": "ai-interviewer", "cache": cache.backend}
 
 if __name__ == "__main__":
     import uvicorn

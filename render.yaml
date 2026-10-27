@@ -62,3 +62,9 @@ services:
         sync: false
       - key: ALLOWED_ORIGINS
         sync: false
+      # Optional Upstash Redis REST cache for rubric results and follow-ups.
+      # Without these the service falls back to a process-local TTL cache.
+      - key: UPSTASH_REDIS_REST_URL
+        sync: false
+      - key: UPSTASH_REDIS_REST_TOKEN
+        sync: false

@@ -3,6 +3,7 @@ import os
 from typing import Dict, Optional
 
 from app.services.rubric_evaluator import RubricEvaluator
+from app.services.cache import cache
 
 log = logging.getLogger(__name__)
 
@@ -22,8 +23,15 @@ class EvaluationService:
         expected_answer: Optional[str] = ""
     ) -> Dict:
         if self.mode == "rubric" and self.api_key:
+            cache_key = cache.key(
+                "rubric", question, answer, expected_answer or "", self.rubric.model)
+            cached = await cache.get(cache_key)
+            if cached:
+                return {**cached, "cached": True}
+
             result = await self.rubric.evaluate(question, answer, expected_answer)
             if result:
+                await cache.set(cache_key, result)
                 return result
             log.warning("rubric evaluator unavailable; falling back to heuristic")
 

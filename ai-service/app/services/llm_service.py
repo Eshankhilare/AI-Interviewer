@@ -2,6 +2,7 @@ import os
 import json
 from typing import List, Dict, Optional
 from dotenv import load_dotenv
+from app.services.cache import cache
 
 load_dotenv()
 
@@ -50,6 +51,11 @@ Generate questions that are:
         if self.provider == "mock":
             return "Can you elaborate on that approach and explain the trade-offs?"
 
+        cache_key = cache.key("followup", question, answer, self.model, self.provider)
+        cached = await cache.get(cache_key)
+        if cached:
+            return cached
+
         prompt = f"""Based on this interview question and candidate's answer,
 generate a thoughtful follow-up question that digs deeper into their understanding.
 
@@ -59,7 +65,10 @@ Answer: {answer}
 Return only the follow-up question text."""
 
         try:
-            return await self._call_llm(prompt)
+            result = await self._call_llm(prompt)
+            if result:
+                await cache.set(cache_key, result, ttl=24 * 60 * 60)
+            return result
         except Exception:
             return "Can you elaborate on that approach and explain the trade-offs?"
 
