@@ -36,9 +36,8 @@ const Landing = () => {
         className="relative z-10 flex items-center justify-between px-8 py-5 max-w-7xl mx-auto"
       >
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl flex items-center justify-center"
-            style={{ background: 'rgba(245,158,11,.12)', border: '1px solid rgba(245,158,11,.4)', color: '#fbbf24' }}>
-            <MarkIcon className="w-5 h-5" />
+          <div className="w-10 h-10 rounded-xl overflow-hidden flex-shrink-0" style={{ border: '1px solid rgba(245,158,11,.4)' }}>
+            <img src="/logo.jpeg" alt="AI Interviewer" className="w-full h-full object-cover" />
           </div>
           <span className="text-lg font-semibold tracking-tight">AI Interviewer</span>
         </div>
@@ -192,8 +191,8 @@ const Landing = () => {
       {/* Full-bleed scroll expand */}
       <section className="relative z-10">
         <ScrollExpand
-          src="https://images.unsplash.com/photo-1521737604893-d14cc237f11d?auto=format&fit=crop&w=2400&q=80"
-          alt="Team working together in a studio"
+          src="https://images.unsplash.com/photo-1521791136064-7986c2920216?auto=format&fit=crop&w=2400&q=80"
+          alt="HR interviewer shaking hands with a candidate"
           title="Every session, scored."
           scrollHint="Scroll to open the studio"
           useWindowScroll
