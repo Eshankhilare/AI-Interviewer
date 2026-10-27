@@ -12,6 +12,15 @@ import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSocketFactory;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
+import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.security.SecureRandom;
+import java.security.cert.X509Certificate;
 import java.util.*;
 
 @Service
@@ -27,14 +36,14 @@ public class AiServiceClient {
     private final RestTemplate healthRestTemplate;
 
     public AiServiceClient(@Value("${ai.service.timeout-ms:30000}") int timeoutMs) {
-        SimpleClientHttpRequestFactory factory = new SimpleClientHttpRequestFactory();
+        SimpleClientHttpRequestFactory factory = new ServiceMeshRequestFactory();
         factory.setConnectTimeout(5000);
         factory.setReadTimeout(timeoutMs);
         this.restTemplate = new RestTemplate(factory);
 
-        SimpleClientHttpRequestFactory fastFactory = new SimpleClientHttpRequestFactory();
-        fastFactory.setConnectTimeout(1500);
-        fastFactory.setReadTimeout(2500);
+        SimpleClientHttpRequestFactory fastFactory = new ServiceMeshRequestFactory();
+        fastFactory.setConnectTimeout(3000);
+        fastFactory.setReadTimeout(8000);
         this.healthRestTemplate = new RestTemplate(fastFactory);
     }
 
@@ -207,6 +216,51 @@ public class AiServiceClient {
             return post("/ai/analyze-jd", request);
         } catch (Exception e) {
             return Collections.emptyMap();
+        }
+    }
+
+    /**
+     * Vercel serves bound services over TLS with a private CA that its Node/Python
+     * runtimes get injected but a JRE truststore does not. Exempt only the internal
+     * mesh host: public calls (Judge0) keep normal certificate validation.
+     */
+    private static final class ServiceMeshRequestFactory extends SimpleClientHttpRequestFactory {
+
+        private static final String MESH_SUFFIX = ".services.vercel-infra.com";
+        private static final SSLSocketFactory MESH_SOCKETS = trustServiceMesh();
+
+        @Override
+        protected void prepareConnection(HttpURLConnection connection, String httpMethod) throws IOException {
+            super.prepareConnection(connection, httpMethod);
+            if (connection instanceof HttpsURLConnection https
+                    && https.getURL().getHost().endsWith(MESH_SUFFIX)) {
+                https.setSSLSocketFactory(MESH_SOCKETS);
+                https.setHostnameVerifier((host, session) -> true);
+            }
+        }
+
+        private static SSLSocketFactory trustServiceMesh() {
+            try {
+                TrustManager[] trustMesh = {new X509TrustManager() {
+                    @Override
+                    public void checkClientTrusted(X509Certificate[] chain, String authType) {
+                    }
+
+                    @Override
+                    public void checkServerTrusted(X509Certificate[] chain, String authType) {
+                    }
+
+                    @Override
+                    public X509Certificate[] getAcceptedIssuers() {
+                        return new X509Certificate[0];
+                    }
+                }};
+                SSLContext context = SSLContext.getInstance("TLS");
+                context.init(null, trustMesh, new SecureRandom());
+                return context.getSocketFactory();
+            } catch (Exception e) {
+                throw new IllegalStateException("Cannot build the service mesh TLS context", e);
+            }
         }
     }
 }
