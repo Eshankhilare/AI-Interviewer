@@ -478,6 +478,7 @@ public class InterviewService {
             item.put("question", session.getQuestion().getText());
             item.put("questionOrder", session.getQuestionOrder());
             item.put("status", session.getStatus().name());
+            item.put("answer", session.getCandidateAnswer());
             item.put("expectedAnswer", session.getQuestion().getExpectedAnswer());
             if (session.getEvaluation() != null) {
                 item.put("score", session.getEvaluation().getScore());
