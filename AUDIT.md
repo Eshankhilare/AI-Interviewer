@@ -335,6 +335,28 @@ These are real issues but exceed the Phase 1–3 time box or need a decision abo
 
 ---
 
+## 8.2 Parked ideas (recorded, deliberately not built)
+
+### Candidate difficulty tiers: BASIC / ADVANCED / EXPERT
+
+A strong senior and a junior currently get near-identical questions, so the
+interview does not separate them. The plan is a third tier above the existing
+`experienceLevel` (JUNIOR/MID/SENIOR), chosen per interview:
+
+| Tier | Intended candidate | Question shape |
+|---|---|---|
+| BASIC | 0–2 years | Definitions, one-hop reasoning, guided "what happens if…" |
+| ADVANCED | 3–6 years | Trade-offs, failure modes, "why not the obvious design" |
+| EXPERT | 7+ years | Ambiguous constraints, incident forensics, scale/cost judgement |
+
+Where it would reach: `Question.difficulty` and the planner prompt already carry
+a difficulty axis, so this is primarily a curated bank split plus a tier-aware
+prompt and a label on `NewInterview`; scoring weights and the rubric stay as-is.
+Blocked on: content for three banks and a decision on how the tier is chosen
+(self-declared vs derived from the resume). No code written.
+
+---
+
 ## 9. Phase plan derived from this audit
 
 | Phase | Work | Findings |
