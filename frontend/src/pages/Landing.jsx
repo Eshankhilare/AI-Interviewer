@@ -2,7 +2,12 @@ import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { ContainerScroll } from '../components/ui/container-scroll-animation'
 import ScrollExpand from '../components/ui/ScrollExpand'
-import { ArrowRight, Play, Shield, Brain, Mic, BarChart3, CheckCircle2, ChevronRight, Video, FileText, Users, Zap } from 'lucide-react'
+import TractionOrbit from '../components/ui/TractionOrbit'
+import {
+  MarkIcon, ArrowIcon, PlayIcon, RoleIcon, WaveIcon, OrbIcon,
+  EvalIcon, ShieldIcon, ReportIcon, ResumeIcon, BoltIcon, QuoteIcon,
+  ClockIcon, CheckIcon, ChatIcon,
+} from '../components/ui/icons'
 
 const Landing = () => {
   return (
@@ -31,8 +36,9 @@ const Landing = () => {
         className="relative z-10 flex items-center justify-between px-8 py-5 max-w-7xl mx-auto"
       >
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center shadow-lg shadow-amber-500/30">
-            <span className="text-white font-bold text-sm">AI</span>
+          <div className="w-10 h-10 rounded-xl flex items-center justify-center"
+            style={{ background: 'rgba(245,158,11,.12)', border: '1px solid rgba(245,158,11,.4)', color: '#fbbf24' }}>
+            <MarkIcon className="w-5 h-5" />
           </div>
           <span className="text-lg font-semibold tracking-tight">AI Interviewer</span>
         </div>
@@ -82,7 +88,7 @@ const Landing = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.5 }}
-            className="text-lg text-white/60 max-w-xl leading-relaxed mb-10"
+            className="text-lg text-white/75 max-w-xl leading-relaxed mb-10"
           >
             Practice with an AI interviewer that asks real questions, evaluates your
             answers, and gives you detailed feedback — all before the actual interview.
@@ -99,14 +105,14 @@ const Landing = () => {
               className="cta-solid group flex items-center gap-3 px-7 py-3.5 bg-white text-black font-medium rounded-xl hover:bg-white/90 transition-all"
             >
               Start Practicing Free
-              <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+              <ArrowIcon className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
             </Link>
             <Link
               to="/login"
               className="group flex items-center gap-3 px-6 py-3.5 bg-white/10 backdrop-blur-sm text-white font-medium rounded-xl border border-white/10 hover:bg-white/15 transition-all"
             >
               <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center">
-                <Play className="w-3.5 h-3.5 ml-0.5" />
+                <PlayIcon className="w-5 h-5" />
               </div>
               See How It Works
             </Link>
@@ -123,7 +129,7 @@ const Landing = () => {
           <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-4 shadow-2xl">
             <div className="aspect-[4/3] rounded-xl overflow-hidden mb-3 bg-gradient-to-br from-amber-900/50 to-orange-900/50 flex items-center justify-center">
               <div className="text-center p-4">
-                <Brain className="w-12 h-12 text-amber-400 mx-auto mb-2" />
+                <OrbIcon className="w-12 h-12 text-amber-400 mx-auto mb-2" />
                 <p className="text-xs text-white/60">AI Interview Simulation</p>
               </div>
             </div>
@@ -140,19 +146,19 @@ const Landing = () => {
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="grid grid-cols-2 md:grid-cols-4 gap-6"
+          className="w-full"
         >
-          {[
-            { value: '20+', label: 'Job Roles' },
-            { value: '3,400+', label: 'Interview Questions' },
-            { value: '95%', label: 'User Satisfaction' },
-            { value: '24/7', label: 'Available Anytime' },
-          ].map((stat) => (
-            <div key={stat.label} className="text-center p-4 bg-white/5 backdrop-blur-sm rounded-xl border border-white/10">
-              <div className="text-2xl font-bold text-white mb-1">{stat.value}</div>
-              <div className="text-sm text-white/50">{stat.label}</div>
-            </div>
-          ))}
+        <TractionOrbit
+          title="Traction"
+          subtitle="Since launch"
+          items={[
+            { value: '20+', label: 'Job roles', icon: RoleIcon },
+            { value: '3,400+', label: 'Interview questions', icon: ChatIcon },
+            { value: '95%', label: 'User satisfaction', icon: CheckIcon },
+            { value: '24/7', label: 'Available anytime', icon: ClockIcon },
+            { value: '<60s', label: 'To the first question', icon: BoltIcon },
+          ]}
+        />
         </motion.div>
       </div>
 
@@ -203,7 +209,7 @@ const Landing = () => {
             to="/register"
             className="mt-7 inline-flex items-center gap-2 px-8 py-3.5 bg-white text-black font-medium rounded-xl hover:bg-white/90 transition-all"
           >
-            Start Practicing Free <ChevronRight className="w-4 h-4" />
+            Start Practicing Free <ArrowIcon className="w-4 h-4" />
           </Link>
         </ScrollExpand>
       </section>
@@ -215,18 +221,28 @@ const Landing = () => {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           className="text-center mb-16"
+          style={{
+            maxWidth: '760px',
+            margin: '0 auto 4rem',
+            padding: '20px 24px',
+            borderRadius: '24px',
+            backgroundImage: 'linear-gradient(145deg, rgba(12,12,14,.62), rgba(12,12,14,.38))',
+            backdropFilter: 'blur(18px)',
+            WebkitBackdropFilter: 'blur(18px)',
+            border: '1px solid rgba(255,255,255,.08)',
+          }}
         >
-          <h2 className="text-3xl md:text-4xl font-bold mb-4">How It Works</h2>
-          <p className="text-white/50 max-w-lg mx-auto">
+          <h2 className="text-3xl md:text-4xl font-bold mb-4" style={{ textShadow: '0 2px 18px rgba(0,0,0,.9)' }}>How It Works</h2>
+          <p className="max-w-lg mx-auto" style={{ color: 'rgba(255,255,255,.72)', textShadow: '0 1px 12px rgba(0,0,0,.9)' }}>
             Three simple steps to boost your interview confidence.
           </p>
         </motion.div>
 
         <div className="grid md:grid-cols-3 gap-8">
           {[
-            { step: '01', icon: FileText, title: 'Choose Your Role', desc: 'Select from 20+ job roles — Frontend, Backend, DevOps, Data Science, and more.' },
-            { step: '02', icon: Mic, title: 'Practice Interview', desc: 'Answer AI-generated questions via text or voice. Get real-time feedback on your responses.' },
-            { step: '03', icon: BarChart3, title: 'Get Detailed Report', desc: 'Receive a comprehensive evaluation with scores, strengths, weaknesses, and sample answers.' },
+            { step: '01', title: 'Choose Your Role', desc: 'Select from 20+ job roles — Frontend, Backend, DevOps, Data Science, and more.' },
+            { step: '02', title: 'Practice Interview', desc: 'Answer AI-generated questions via text or voice. Get real-time feedback on your responses.' },
+            { step: '03', title: 'Get Detailed Report', desc: 'Receive a comprehensive evaluation with scores, strengths, weaknesses, and sample answers.' },
           ].map((item, i) => (
             <motion.div
               key={item.step}
@@ -234,12 +250,21 @@ const Landing = () => {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.5, delay: i * 0.15 }}
-              className="relative p-6 bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl"
+              className="relative p-6 rounded-2xl"
+              style={{
+                backgroundImage: 'linear-gradient(145deg, rgba(20,18,16,.82), rgba(7,10,12,.66))',
+                backdropFilter: 'blur(26px) saturate(140%)',
+                WebkitBackdropFilter: 'blur(26px) saturate(140%)',
+                border: '1px solid rgba(255,255,255,.14)',
+                boxShadow: '0 14px 40px rgba(0,0,0,.42), inset 0 1px 0 rgba(255,255,255,.07)',
+              }}
             >
-              <span className="absolute top-4 right-4 text-4xl font-bold text-white/10">{item.step}</span>
-              <item.icon className="w-8 h-8 text-amber-400 mb-4" />
+              <div className="flex items-center gap-3 mb-5">
+                <span className="text-2xl font-bold font-mono" style={{ color: '#fbbf24' }}>{item.step}</span>
+                <span className="h-px flex-1" style={{ background: 'linear-gradient(90deg, rgba(251,191,36,.55), transparent)' }} />
+              </div>
               <h3 className="text-lg font-semibold mb-2">{item.title}</h3>
-              <p className="text-sm text-white/50">{item.desc}</p>
+              <p className="text-sm" style={{ color: 'rgba(255,255,255,.68)' }}>{item.desc}</p>
             </motion.div>
           ))}
         </div>
@@ -261,15 +286,15 @@ const Landing = () => {
 
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
           {[
-            { icon: Brain, title: 'AI-Powered Evaluation', desc: 'Multi-agent scoring: technical accuracy, communication clarity, and behavioral fit.' },
-            { icon: Mic, title: 'Voice & Text Input', desc: 'Practice speaking your answers or typing — just like a real interview.' },
-            { icon: Video, title: 'Digital Avatar', desc: 'Interactive AI interviewer with animated responses and lip sync.' },
-            { icon: Shield, title: 'Interview Proctoring', desc: 'Face detection, gaze tracking, and integrity monitoring for realistic practice.' },
-            { icon: BarChart3, title: 'Performance Reports', desc: 'Detailed analytics with radar charts, category scores, and improvement tips.' },
-            { icon: Users, title: '20+ Job Roles', desc: 'Pre-built question banks for Frontend, Backend, DevOps, Data Science, and more.' },
-            { icon: FileText, title: 'Resume Analysis', desc: 'Upload your resume for personalized questions based on your experience.' },
-            { icon: Zap, title: 'Instant Feedback', desc: 'Get AI feedback on each answer before moving to the next question.' },
-            { icon: CheckCircle2, title: 'Sample Answers', desc: 'Learn from expert-crafted sample responses for every question.' },
+            { icon: EvalIcon, title: 'AI-Powered Evaluation', desc: 'Multi-agent scoring: technical accuracy, communication clarity, and behavioral fit.' },
+            { icon: WaveIcon, title: 'Voice & Text Input', desc: 'Practice speaking your answers or typing — just like a real interview.' },
+            { icon: OrbIcon, title: 'Digital Avatar', desc: 'Interactive AI interviewer with animated responses and lip sync.' },
+            { icon: ShieldIcon, title: 'Interview Proctoring', desc: 'Face detection, gaze tracking, and integrity monitoring for realistic practice.' },
+            { icon: ReportIcon, title: 'Performance Reports', desc: 'Detailed analytics with radar charts, category scores, and improvement tips.' },
+            { icon: RoleIcon, title: '20+ Job Roles', desc: 'Pre-built question banks for Frontend, Backend, DevOps, Data Science, and more.' },
+            { icon: ResumeIcon, title: 'Resume Analysis', desc: 'Upload your resume for personalized questions based on your experience.' },
+            { icon: BoltIcon, title: 'Instant Feedback', desc: 'Get AI feedback on each answer before moving to the next question.' },
+            { icon: QuoteIcon, title: 'Sample Answers', desc: 'Learn from expert-crafted sample responses for every question.' },
           ].map((feature, i) => (
             <motion.div
               key={feature.title}
@@ -277,11 +302,11 @@ const Landing = () => {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.5, delay: i * 0.08 }}
-              className="p-5 bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl hover:bg-white/10 transition-all"
+              className="p-5 bg-black/40 backdrop-blur-xl border border-white/10 rounded-2xl hover:bg-black/50 transition-all"
             >
               <feature.icon className="w-7 h-7 text-amber-400 mb-3" />
               <h3 className="text-base font-semibold mb-1.5">{feature.title}</h3>
-              <p className="text-sm text-white/50 leading-relaxed">{feature.desc}</p>
+              <p className="text-sm text-white/70 leading-relaxed">{feature.desc}</p>
             </motion.div>
           ))}
         </div>
@@ -311,7 +336,7 @@ const Landing = () => {
           ].map((role) => (
             <span
               key={role}
-              className="px-4 py-2 bg-white/5 border border-white/10 rounded-full text-sm text-white/70 hover:bg-white/10 hover:text-white transition-all cursor-default"
+              className="px-4 py-2 bg-black/35 backdrop-blur-md border border-white/10 rounded-full text-sm text-white/80 hover:bg-black/50 hover:text-white transition-all cursor-default"
             >
               {role}
             </span>
@@ -325,10 +350,17 @@ const Landing = () => {
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="text-center p-12 bg-white/5 backdrop-blur-sm border border-white/10 rounded-3xl"
+          className="text-center p-12 rounded-3xl"
+          style={{
+            backgroundImage: 'linear-gradient(145deg, rgba(10,9,8,.93), rgba(3,5,7,.90))',
+            backdropFilter: 'blur(40px) saturate(140%)',
+            WebkitBackdropFilter: 'blur(40px) saturate(140%)',
+            border: '1px solid rgba(255,255,255,.18)',
+            boxShadow: '0 24px 70px rgba(0,0,0,.6), inset 0 1px 0 rgba(255,255,255,.09)',
+          }}
         >
-          <h2 className="text-3xl md:text-4xl font-bold mb-4">Ready to ace your next interview?</h2>
-          <p className="text-white/50 mb-8 max-w-lg mx-auto">
+          <h2 className="text-3xl md:text-4xl font-bold mb-4" style={{ textShadow: '0 2px 18px rgba(0,0,0,.95)' }}>Ready to ace your next interview?</h2>
+          <p className="mb-8 max-w-lg mx-auto" style={{ color: 'rgba(255,255,255,.86)', textShadow: '0 1px 12px rgba(0,0,0,.9)' }}>
             Start practicing with AI-powered feedback today. Free to get started.
           </p>
           <Link
@@ -336,7 +368,7 @@ const Landing = () => {
             className="cta-solid inline-flex items-center gap-2 px-8 py-3.5 bg-white text-black font-medium rounded-xl hover:bg-white/90 transition-all"
           >
             Start Practicing Free
-            <ChevronRight className="w-4 h-4" />
+            <ArrowIcon className="w-4 h-4" />
           </Link>
         </motion.div>
       </div>

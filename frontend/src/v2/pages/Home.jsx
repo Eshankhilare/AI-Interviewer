@@ -6,6 +6,8 @@ import api from '../../services/api'
 import { useAuth } from '../../context/AuthContext'
 import { dueItems, loadSchedule, mergeSchedules, saveSchedule, serverItemsToSchedule, subscribeSchedule } from '../../utils/spacedRepetition'
 import { BarRow, Empty, PageHead, ScoreRing, SkeletonBlock, formatDate } from '../ui'
+import TractionOrbit from '../../components/ui/TractionOrbit'
+import { ChatIcon, ReportIcon, EvalIcon, ClockIcon, BoltIcon } from '../../components/ui/icons'
 
 const byNewest = (a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0)
 
@@ -193,11 +195,18 @@ export default function Home() {
         </motion.section>
       )}
 
-      <motion.div className="st-stat-grid" style={{ marginTop: 18 }} {...rise(.08)}>
-        <div className="st-stat"><strong>{interviews.length}</strong><span>Sessions</span></div>
-        <div className="st-stat"><strong>{scored.length}</strong><span>Reports</span></div>
-        <div className="st-stat"><strong>{best ? `${best.overallScore} · ${best.overallGrade}` : '—'}</strong><span>Best result</span></div>
-        <div className="st-stat"><strong>{active ? '1' : '0'}</strong><span>In progress</span></div>
+      <motion.div style={{ marginTop: 18 }} {...rise(.08)}>
+        <TractionOrbit
+          title="Traction"
+          subtitle={readiness == null ? 'Your first run' : `${readiness}/100 readiness`}
+          items={[
+            { value: interviews.length, label: 'Sessions', icon: ChatIcon },
+            { value: scored.length, label: 'Reports', icon: ReportIcon },
+            { value: best ? best.overallScore : '—', label: 'Best result', icon: EvalIcon, hint: best?.overallGrade },
+            { value: active ? '1' : '0', label: 'In progress', icon: ClockIcon },
+            { value: dueCount, label: 'Drills due', icon: BoltIcon },
+          ]}
+        />
       </motion.div>
 
       <motion.div className="st-grid-2" style={{ marginTop: 18 }} {...rise(.14)}>
