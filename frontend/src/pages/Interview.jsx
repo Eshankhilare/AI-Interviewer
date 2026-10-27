@@ -311,8 +311,8 @@ const Interview = () => {
 
           {/* Answer Input */}
           {inputMode === 'coding' && isCodingQuestion ? (
-            <GlassCard className="mb-6 p-0 overflow-hidden h-96">
-              <CodingEnvironment problem={{ id: currentQuestion.id, title: currentQuestion.questionText, description: currentQuestion.questionText }} onSubmit={handleCodingSubmit} />
+            <GlassCard className="mb-6 p-0 overflow-hidden h-[720px]">
+              <CodingEnvironment problem={{ id: currentQuestion.id, title: 'Coding challenge', description: currentQuestion.questionText }} onSubmit={handleCodingSubmit} />
             </GlassCard>
           ) : (
             <GlassCard className="mb-6 p-6">

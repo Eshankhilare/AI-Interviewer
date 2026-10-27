@@ -403,7 +403,7 @@ const CodingEnvironment = ({ problem, onSubmit, timeLimit = 30 }) => {
       )}
 
       {/* Editor */}
-      <div className="flex-1 min-h-0">
+      <div className="flex-1 min-h-[240px]">
         <Editor
           height="100%"
           language={LANGUAGES.find((l) => l.id === language)?.monacoId || 'python'}
