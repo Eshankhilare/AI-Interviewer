@@ -211,6 +211,10 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+.contact-input::placeholder {
+  color: rgba(255, 255, 255, .35);
+}
+
 /* Keep raw controls (inputs, selects) from falling back to native light chrome.
    Class utilities still win because this rule is not !important. */
 *, *::before, *::after {

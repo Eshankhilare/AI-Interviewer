@@ -115,7 +115,7 @@ export default function Onboarding({ onDone }) {
 
         <div className="st-between" style={{ position: 'relative' }}>
           <div className="st-row" style={{ gap: 8 }}>
-            <span className="st-rail-logo" style={{ width: 30, height: 30, borderRadius: 9, fontSize: 10, marginBottom: 0 }}>AI</span>
+            <img src="/logo.jpeg" alt="" className="st-rail-logo" style={{ width: 30, height: 30, borderRadius: 9, marginBottom: 0, objectFit: 'cover' }} />
             <span className="st-eyebrow">A 60-second intro</span>
           </div>
           <button type="button" className="st-btn st-btn-ghost st-btn-sm" onClick={() => persist(true)} disabled={saving}>

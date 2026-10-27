@@ -22,7 +22,7 @@ const PracticePlan = ({ radar, breakdown }) => {
         {steps.map((step, index) => (
           <li key={step.title} className="flex gap-3">
             <span className="flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold"
-              style={{ background: 'rgba(99,102,241,.18)', color: '#a5b4fc' }}>{index + 1}</span>
+              style={{ background: 'rgba(245,158,11,.18)', color: '#a5b4fc' }}>{index + 1}</span>
             <div>
               <p className="text-sm font-semibold" style={{ color: 'rgba(255,255,255,.85)' }}>{step.title}</p>
               <p className="text-sm" style={{ color: 'rgba(255,255,255,.5)' }}>{step.detail}</p>

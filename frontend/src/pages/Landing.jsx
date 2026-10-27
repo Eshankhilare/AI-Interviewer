@@ -10,6 +10,19 @@ import {
   ClockIcon, CheckIcon, ChatIcon,
 } from '../components/ui/icons'
 
+const CONTACT_EMAIL = import.meta.env.VITE_CONTACT_EMAIL || 'vishwesh.penkar25@aiml.sce.edu.in'
+const PROJECT_URL = 'https://github.com/vishweshpenkar06/AI-Interviewer'
+const contactInput = {
+  width: '100%',
+  padding: '12px 14px',
+  borderRadius: '10px',
+  border: '1px solid rgba(255,255,255,.14)',
+  background: 'rgba(255,255,255,.05)',
+  color: '#fff',
+  fontSize: '14px',
+  outline: 'none',
+}
+
 const Landing = () => {
   return (
     <div className="min-h-screen bg-black text-white" style={{ overflowX: 'clip' }}>
@@ -48,6 +61,7 @@ const Landing = () => {
           <a href="#how-it-works" className="text-sm text-white/70 hover:text-white transition-colors">How it Works</a>
           <a href="#roles" className="text-sm text-white/70 hover:text-white transition-colors">Job Roles</a>
           <a href="#team" className="text-sm text-white/70 hover:text-white transition-colors">Team</a>
+          <a href="#contact" className="text-sm text-white/70 hover:text-white transition-colors">Contact</a>
         </nav>
 
         <div className="flex items-center gap-4">
@@ -168,14 +182,14 @@ const Landing = () => {
         <ContainerScroll
           titleComponent={
             <div className="max-w-4xl mx-auto text-center">
-              <p className="text-xs font-semibold uppercase tracking-[.18em] text-white/40 mb-4">The interview studio</p>
-              <h2 className="text-4xl md:text-6xl font-semibold text-white leading-[1.05]">
-                Meet your AI interviewer.
+              <p className="text-xs font-semibold uppercase tracking-[.18em] text-white/40 mb-4">The scoring engine</p>
+              <h2 className="text-4xl md:text-6xl font-semibold text-white leading-[1.05]" style={{ textShadow: '0 2px 24px rgba(0,0,0,.9)' }}>
+                See exactly how an answer is scored.
                 <br />
                 <span className="text-white/45">Evidence, not vibes.</span>
               </h2>
-              <p className="mt-5 text-white/50 max-w-xl mx-auto">
-                Every score comes from a five-criterion rubric and quotes from your own answer.
+              <p className="mt-5 max-w-xl mx-auto" style={{ color: 'rgba(255,255,255,.7)', textShadow: '0 1px 14px rgba(0,0,0,.9)' }}>
+                Five criteria, weights computed in code, and quotes verified against your own words.
               </p>
             </div>
           }
@@ -187,13 +201,13 @@ const Landing = () => {
       {/* Full-bleed scroll expand */}
       <section className="relative z-10">
         <ScrollExpand
-          src="https://images.unsplash.com/photo-1521791136064-7986c2920216?auto=format&fit=crop&w=2400&q=80"
-          alt="HR interviewer shaking hands with a candidate"
+          src="/robot-human-handshake.png"
+          alt="A human and a robot shaking hands"
           title="Every session, scored."
           scrollHint="Scroll to open the studio"
           useWindowScroll
-          mediaZoom={1.15}
-          overlayScrim={0.55}
+          mediaZoom={1.05}
+          overlayScrim={0.5}
         >
           <h2 className="text-3xl md:text-5xl font-semibold text-white mb-4">
             A studio, not a form.
@@ -453,16 +467,18 @@ const Landing = () => {
               transition={{ duration: 0.5, delay: i * 0.1 }}
               className="group rounded-2xl overflow-hidden"
               style={{
-                background: '#f5f1e8',
-                border: '1px solid rgba(255,255,255,.2)',
-                boxShadow: '0 24px 50px rgba(0,0,0,.38)',
+                background: 'linear-gradient(145deg, rgba(24,22,20,.62), rgba(5,12,14,.72))',
+                border: '1px solid rgba(255,255,255,.14)',
+                backdropFilter: 'blur(18px) saturate(130%)',
+                WebkitBackdropFilter: 'blur(18px) saturate(130%)',
+                boxShadow: '0 24px 50px rgba(0,0,0,.38), inset 0 1px 0 rgba(255,255,255,.08)',
               }}
             >
               <div className="pt-5 flex justify-center">
-                <span className="block w-10 h-1 rounded-full" style={{ background: 'rgba(20,20,20,.16)' }} />
+                <span className="block w-10 h-1 rounded-full" style={{ background: 'rgba(255,255,255,.22)' }} />
               </div>
               <div className="p-4">
-                <div className="aspect-[4/5] overflow-hidden rounded-xl" style={{ background: '#e7e1d5' }}>
+                <div className="aspect-[4/5] overflow-hidden rounded-xl" style={{ background: 'rgba(0,0,0,.25)' }}>
                   <img
                     src={member.image}
                     alt={`${member.name}, ${member.role}`}
@@ -471,11 +487,98 @@ const Landing = () => {
                     style={{ objectPosition: member.focus }}
                   />
                 </div>
-                <h3 className="mt-5 text-sm font-bold uppercase tracking-[.14em]" style={{ color: '#151515' }}>{member.name}</h3>
-                <p className="mt-1.5 text-xs" style={{ color: '#7a6f60' }}>{member.role}</p>
+                <h3 className="mt-5 text-sm font-bold uppercase tracking-[.14em]" style={{ color: '#fff' }}>{member.name}</h3>
+                <p className="mt-1.5 text-xs" style={{ color: 'rgba(255,255,255,.55)' }}>{member.role}</p>
+                <a
+                  href={`mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(`Regarding ${member.name}`)}`}
+                  className="mt-3 inline-flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-[.14em]"
+                  style={{ color: '#fbbf24' }}
+                >
+                  <ChatIcon className="w-3.5 h-3.5" /> Contact
+                </a>
               </div>
             </motion.article>
           ))}
+        </div>
+      </div>
+
+      {/* Contact */}
+      <div id="contact" className="relative z-10 max-w-6xl mx-auto px-8 py-24">
+        <div
+          className="grid lg:grid-cols-[1.15fr_.85fr] rounded-3xl overflow-hidden"
+          style={{
+            background: 'linear-gradient(145deg, rgba(24,22,20,.80), rgba(5,12,14,.86))',
+            border: '1px solid rgba(255,255,255,.14)',
+            backdropFilter: 'blur(18px) saturate(130%)',
+            WebkitBackdropFilter: 'blur(18px) saturate(130%)',
+            boxShadow: '0 24px 60px rgba(0,0,0,.38), inset 0 1px 0 rgba(255,255,255,.08)',
+          }}
+        >
+          <form
+            className="p-8 md:p-10"
+            onSubmit={(event) => {
+              event.preventDefault()
+              const data = new FormData(event.currentTarget)
+              const subject = `Project enquiry from ${data.get('name')}`
+              const body = `Name: ${data.get('name')}\nEmail: ${data.get('email')}\nPhone: ${data.get('phone') || '-'}\n\n${data.get('message')}`
+              window.location.href = `mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`
+            }}
+          >
+            <p className="text-xs font-semibold uppercase tracking-[.18em]" style={{ color: '#fbbf24' }}>Contact us</p>
+            <h2 className="mt-3 text-3xl md:text-4xl font-bold" style={{ color: '#fff' }}>Tell us what you need.</h2>
+            <p className="mt-3 text-sm max-w-md" style={{ color: 'rgba(255,255,255,.6)' }}>
+              Product questions, feedback or a collaboration idea. Send a note and the team will get back to you.
+            </p>
+
+            <div className="mt-7 grid sm:grid-cols-2 gap-3">
+              <input name="name" required placeholder="Name" className="contact-input" style={contactInput} />
+              <input name="email" type="email" required placeholder="Email" className="contact-input" style={contactInput} />
+            </div>
+            <input name="phone" placeholder="Phone (optional)" className="contact-input mt-3" style={contactInput} />
+            <textarea
+              name="message"
+              required
+              rows={5}
+              placeholder="Share your question, feedback or suggestion..."
+              className="contact-input mt-3 resize-y"
+              style={contactInput}
+            />
+            <button
+              type="submit"
+              className="mt-5 inline-flex items-center gap-2 rounded-lg px-5 py-3 text-sm font-semibold transition-opacity hover:opacity-90"
+              style={{ background: '#fff', color: '#111' }}
+            >
+              Send message <ArrowIcon className="w-4 h-4" />
+            </button>
+            <p className="mt-3 text-xs" style={{ color: 'rgba(255,255,255,.4)' }}>
+              This opens your email app with the message ready to send.
+            </p>
+          </form>
+
+          <aside className="p-8 md:p-10" style={{ background: 'rgba(255,255,255,.025)', borderLeft: '1px solid rgba(255,255,255,.08)' }}>
+            <h3 className="text-xs font-semibold uppercase tracking-[.18em]" style={{ color: '#fbbf24' }}>Contact info</h3>
+            <div className="mt-5 space-y-4 text-sm" style={{ color: 'rgba(255,255,255,.6)' }}>
+              <div>
+                <p className="text-[11px] uppercase tracking-wider" style={{ color: 'rgba(255,255,255,.4)' }}>Email</p>
+                <a href={`mailto:${CONTACT_EMAIL}`} className="font-medium hover:underline" style={{ color: '#fff' }}>
+                  {CONTACT_EMAIL}
+                </a>
+              </div>
+              <div>
+                <p className="text-[11px] uppercase tracking-wider" style={{ color: 'rgba(255,255,255,.4)' }}>Project</p>
+                <a href={PROJECT_URL} target="_blank" rel="noreferrer" className="font-medium hover:underline" style={{ color: '#fff' }}>
+                  GitHub repository
+                </a>
+              </div>
+              <div>
+                <p className="text-[11px] uppercase tracking-wider" style={{ color: 'rgba(255,255,255,.4)' }}>Response time</p>
+                <p>1-2 business days</p>
+              </div>
+              <p className="pt-4 text-xs leading-relaxed" style={{ borderTop: '1px solid rgba(255,255,255,.08)', color: 'rgba(255,255,255,.4)' }}>
+                Reporting a scoring problem? Include the interview ID from your report so we can inspect the stored evaluation.
+              </p>
+            </div>
+          </aside>
         </div>
       </div>
 

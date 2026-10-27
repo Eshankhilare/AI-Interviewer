@@ -55,7 +55,7 @@ export default function StudioShell() {
 
       <header className="st-topbar st-topbar-v2">
         <Link to="/" className="st-brand" aria-label="AI Interviewer home">
-          <span className="st-rail-logo" style={{ marginBottom: 0 }}>AI</span>
+          <img src="/logo.jpeg" alt="" className="st-rail-logo" style={{ marginBottom: 0, objectFit: 'cover' }} />
           <span className="st-brand-name">AI Interviewer</span>
         </Link>
 

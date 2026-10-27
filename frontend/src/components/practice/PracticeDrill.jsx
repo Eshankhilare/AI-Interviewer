@@ -10,7 +10,7 @@ const GRADES = [
   { id: 'again', label: 'Again', color: '#f87171' },
   { id: 'hard', label: 'Hard', color: '#fbbf24' },
   { id: 'good', label: 'Good', color: '#4ade80' },
-  { id: 'easy', label: 'Easy', color: '#818cf8' },
+  { id: 'easy', label: 'Easy', color: '#fbbf24' },
 ]
 
 const PracticeDrill = ({ item, onGrade, onBack }) => {
@@ -101,7 +101,7 @@ const PracticeDrill = ({ item, onGrade, onBack }) => {
 
           {item.sampleResponse && (
             <details className="mt-3">
-              <summary className="text-xs font-semibold cursor-pointer" style={{ color: '#818cf8' }}>Stronger sample answer</summary>
+              <summary className="text-xs font-semibold cursor-pointer" style={{ color: '#fbbf24' }}>Stronger sample answer</summary>
               <p className="mt-2 text-sm p-3 rounded-xl" style={{ color: 'rgba(255,255,255,.65)', background: 'rgba(255,255,255,.04)' }}>{item.sampleResponse}</p>
             </details>
           )}
