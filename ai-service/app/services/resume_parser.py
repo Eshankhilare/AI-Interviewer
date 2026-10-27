@@ -56,8 +56,9 @@ class ResumeParser:
 
     def _extract_experience(self, text: str) -> List[Dict]:
         experience_patterns = [
-            r"(\d+)\+?\s*years?\s*(?:of\s*)?experience",
+            r"(\d+)\+?\s*years?\s*(?:of\s*)?(?:professional\s*)?experience",
             r"experience[:\s]*(\d+)\+?\s*years?",
+            r"(\d+)\+?\s*years?",
         ]
 
         years = 0
