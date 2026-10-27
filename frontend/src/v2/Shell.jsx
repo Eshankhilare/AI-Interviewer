@@ -1,9 +1,10 @@
 import { useState } from 'react'
 import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom'
-import { Home, Plus, FolderOpen, Settings, ArrowLeftRight } from 'lucide-react'
+import { Home, Plus, FolderOpen, Settings, ArrowLeftRight, Waves } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
-import { setUIVersion } from './store'
+import { setUIVersion, useBackground } from './store'
 import { LiquidNavbar } from '../components/ui/liquid-glass-navbar'
+import FluxLines from '../components/ui/FluxLines'
 import Onboarding, { needsOnboarding } from './Onboarding'
 import './ui.css'
 
@@ -20,6 +21,7 @@ export default function StudioShell() {
   const { user } = useAuth()
   const location = useLocation()
   const navigate = useNavigate()
+  const { background, setBackground } = useBackground()
   const [showIntro, setShowIntro] = useState(needsOnboarding)
   const isLive = /^\/interview\//.test(location.pathname) && location.pathname !== '/interview/new'
 
@@ -32,7 +34,22 @@ export default function StudioShell() {
 
   return (
     <div className="ui-studio">
-      <div className="st-ambient" aria-hidden="true" />
+      {background === 'flux' ? (
+        <div className="st-flux-bg" aria-hidden="true">
+          <FluxLines
+            colors={['#ffffff', '#e7e1ff', '#ffffff']}
+            speed={0.35}
+            scale={1.7}
+            glow={2.2}
+            rimWidth={0.18}
+            lineWidth={1}
+            flowDirection="down"
+            opacity={0.8}
+          />
+        </div>
+      ) : (
+        <div className="st-ambient" aria-hidden="true" />
+      )}
 
       <header className="st-topbar st-topbar-v2">
         <Link to="/" className="st-brand" aria-label="AI Interviewer home">
@@ -51,6 +68,18 @@ export default function StudioShell() {
         </div>
 
         <div className="st-topbar-actions">
+          {!isLive && (
+            <button
+              type="button"
+              className="st-btn st-btn-ghost st-btn-sm"
+              onClick={() => setBackground(background === 'flux' ? 'video' : 'flux')}
+              title={`Background: ${background === 'flux' ? 'flux lines' : 'original video'}`}
+              aria-label="Switch background"
+              aria-pressed={background === 'flux'}
+            >
+              <Waves size={14} /> <span>{background === 'flux' ? 'Flux' : 'Video'}</span>
+            </button>
+          )}
           {!isLive && (
             <button
               type="button"

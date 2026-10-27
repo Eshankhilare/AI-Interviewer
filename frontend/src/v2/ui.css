@@ -104,6 +104,16 @@
 .st-content.st-narrow { max-width: 1060px; }
 
 /* floating liquid nav */
+.st-flux-bg {
+  position: fixed; inset: 0; z-index: -1; pointer-events: none;
+  background: radial-gradient(55% 45% at 30% 8%, rgba(99, 102, 241, .14), transparent 60%), #08090c;
+}
+.st-flux-bg::after {
+  content: ""; position: absolute; inset: 0;
+  background: linear-gradient(180deg, rgba(5, 6, 10, .52), rgba(5, 6, 10, .78) 60%, rgba(5, 6, 10, .88));
+}
+.st-flux-bg > .flux-lines-container { position: absolute; inset: 0; }
+
 .st-topbar-v2 { height: 78px; padding: 0 22px; gap: 14px; }
 .st-brand { display: flex; align-items: center; gap: 10px; text-decoration: none; color: var(--st-text); font-weight: 600; font-size: 13px; letter-spacing: -.01em; white-space: nowrap; }
 .st-brand .st-rail-logo { width: 34px; height: 34px; border-radius: 10px; font-size: 11px; }

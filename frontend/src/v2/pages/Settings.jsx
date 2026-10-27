@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { ArrowLeftRight, LogOut, Save, ShieldCheck } from 'lucide-react'
+import { ArrowLeftRight, LogOut, Save, ShieldCheck, Waves, MonitorPlay } from 'lucide-react'
 import api, { errorMessage } from '../../services/api'
 import { useAuth } from '../../context/AuthContext'
-import { setUIVersion } from '../store'
+import { setUIVersion, useBackground } from '../store'
 import { PageHead, SkeletonBlock } from '../ui'
 
 const PREF_KEY = 'studio-preferences'
@@ -16,6 +16,7 @@ const readPrefs = () => {
 export default function Settings() {
   const { user, logout } = useAuth()
   const navigate = useNavigate()
+  const { background, setBackground } = useBackground()
   const [form, setForm] = useState(null)
   const [prefs, setPrefs] = useState(readPrefs)
   const [saving, setSaving] = useState(false)
@@ -160,6 +161,34 @@ export default function Settings() {
               <div className="st-banner" style={{ marginTop: 16, fontSize: 12 }}>
                 Switching updates every page immediately. Your choice is remembered in this browser.
               </div>
+
+              <div style={{ height: 1, background: 'var(--st-line)', margin: '18px 0' }} />
+              <h3 className="st-h3">Background</h3>
+              <div className="st-stack" style={{ marginTop: 10, gap: 8 }}>
+                <button
+                  type="button"
+                  className="st-btn"
+                  style={{ justifyContent: 'space-between' }}
+                  onClick={() => setBackground('video')}
+                  aria-pressed={background === 'video'}
+                >
+                  <span className="st-row"><MonitorPlay size={14} /> Original video</span>
+                  {background === 'video' ? <span className="st-chip st-chip-accent">Current</span> : null}
+                </button>
+                <button
+                  type="button"
+                  className="st-btn"
+                  style={{ justifyContent: 'space-between' }}
+                  onClick={() => setBackground('flux')}
+                  aria-pressed={background === 'flux'}
+                >
+                  <span className="st-row"><Waves size={14} /> Flux lines</span>
+                  {background === 'flux' ? <span className="st-chip st-chip-accent">Current</span> : null}
+                </button>
+              </div>
+              <p className="st-dim" style={{ fontSize: 11.5, marginBottom: 0 }}>
+                Flux lines are a live WebGL background; the original video stays available.
+              </p>
             </section>
           </div>
 

@@ -33,3 +33,37 @@ export const useUIVersion = () => {
   }, [])
   return { version: getUIVersion(), setVersion: setUIVersion }
 }
+
+const BG_KEY = 'studio-background'
+const bgListeners = new Set()
+let bgCurrent = null
+
+const readBackground = () => {
+  const forced = new URLSearchParams(window.location.search).get('bg')
+  if (forced === 'flux' || forced === 'video') {
+    localStorage.setItem(BG_KEY, forced)
+    return forced
+  }
+  return localStorage.getItem(BG_KEY) || 'video'
+}
+
+export const getBackground = () => {
+  if (bgCurrent === null) bgCurrent = readBackground()
+  return bgCurrent
+}
+
+export const setBackground = (value) => {
+  bgCurrent = value
+  localStorage.setItem(BG_KEY, value)
+  bgListeners.forEach((listener) => listener())
+}
+
+export const useBackground = () => {
+  const [, bump] = useState(0)
+  useEffect(() => {
+    const listener = () => bump((n) => n + 1)
+    bgListeners.add(listener)
+    return () => bgListeners.delete(listener)
+  }, [])
+  return { background: getBackground(), setBackground }
+}
