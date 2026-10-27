@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 @Service
@@ -292,53 +293,66 @@ public class InterviewService {
 
     /** Best-effort evaluation. Failure leaves the answer saved (status ANSWERED) so a retry can evaluate it. */
     private void evaluateSession(InterviewSession session, Interview interview) {
-        try {
-            String followUp = aiServiceClient.generateFollowUp(
-                    session.getQuestion().getText(),
-                    session.getCandidateAnswer()
-            );
-            if (followUp != null) {
-                session.setAiFollowUp(followUp);
+        String questionText = session.getQuestion().getText();
+        String candidateAnswer = session.getCandidateAnswer();
+        String expectedAnswer = session.getQuestion().getExpectedAnswer();
+        String jobContext = interview.getJobDescription() != null
+                ? interview.getJobDescription().getTitle() : "";
+
+        // The follow-up and the rubric score are independent model calls. Running
+        // them together halves the time the candidate waits after submitting.
+        CompletableFuture<String> followUpFuture = CompletableFuture.supplyAsync(() -> {
+            try {
+                return aiServiceClient.generateFollowUp(questionText, candidateAnswer);
+            } catch (Exception e) {
+                return null;
             }
-        } catch (Exception e) {
-            // No follow-up if the AI service fails.
+        });
+        CompletableFuture<Map<String, Object>> evalFuture = CompletableFuture.supplyAsync(() -> {
+            try {
+                return aiServiceClient.evaluateAnswer(
+                        questionText,
+                        candidateAnswer,
+                        expectedAnswer,
+                        session.getQuestion().getType().name(),
+                        session.getQuestion().getDifficulty().name(),
+                        jobContext
+                );
+            } catch (Exception e) {
+                return null;
+            }
+        });
+
+        String followUp = followUpFuture.join();
+        if (followUp != null) {
+            session.setAiFollowUp(followUp);
         }
 
-        try {
-            String jobContext = interview.getJobDescription() != null
-                    ? interview.getJobDescription().getTitle() : "";
-            Map<String, Object> evalResult = aiServiceClient.evaluateAnswer(
-                    session.getQuestion().getText(),
-                    session.getCandidateAnswer(),
-                    session.getQuestion().getExpectedAnswer(),
-                    session.getQuestion().getType().name(),
-                    session.getQuestion().getDifficulty().name(),
-                    jobContext
-            );
+        applyEvaluation(session, evalFuture.join());
+    }
 
-            if (evalResult != null && !evalResult.isEmpty() && evalResult.get("score") != null) {
-                Evaluation evaluation = Evaluation.builder()
-                        .session(session)
-                        .score(((Number) evalResult.get("score")).intValue())
-                        .grade((String) evalResult.getOrDefault("grade", "F"))
-                        .feedback((String) evalResult.getOrDefault("feedback", ""))
-                        .skillScores(evalResult.get("skill_scores") != null ? toJson(evalResult.get("skill_scores")) : null)
-                        .strengths(evalResult.get("strengths") != null ? toJson(evalResult.get("strengths")) : null)
-                        .weaknesses(evalResult.get("weaknesses") != null ? toJson(evalResult.get("weaknesses")) : null)
-                        .improvementSuggestions((String) evalResult.get("improvement_suggestions"))
-                        .sampleResponse((String) evalResult.getOrDefault("sample_response", ""))
-                        .confidenceLevel((String) evalResult.get("confidence_level"))
-                        .communicationScore((String) evalResult.get("communication_score"))
-                        .technicalDepth((String) evalResult.get("technical_depth"))
-                        .build();
-                evaluation = evaluationRepository.save(evaluation);
-                session.setEvaluation(evaluation);
-                session.setStatus(InterviewSession.Status.EVALUATED);
-                sessionRepository.save(session);
-            }
-        } catch (Exception e) {
-            // Answer is preserved; a later retry will try the evaluation again.
+    private void applyEvaluation(InterviewSession session, Map<String, Object> evalResult) {
+        if (evalResult == null || evalResult.isEmpty() || evalResult.get("score") == null) {
+            return;
         }
+        Evaluation evaluation = Evaluation.builder()
+                .session(session)
+                .score(((Number) evalResult.get("score")).intValue())
+                .grade((String) evalResult.getOrDefault("grade", "F"))
+                .feedback((String) evalResult.getOrDefault("feedback", ""))
+                .skillScores(evalResult.get("skill_scores") != null ? toJson(evalResult.get("skill_scores")) : null)
+                .strengths(evalResult.get("strengths") != null ? toJson(evalResult.get("strengths")) : null)
+                .weaknesses(evalResult.get("weaknesses") != null ? toJson(evalResult.get("weaknesses")) : null)
+                .improvementSuggestions((String) evalResult.get("improvement_suggestions"))
+                .sampleResponse((String) evalResult.getOrDefault("sample_response", ""))
+                .confidenceLevel((String) evalResult.get("confidence_level"))
+                .communicationScore((String) evalResult.get("communication_score"))
+                .technicalDepth((String) evalResult.get("technical_depth"))
+                .build();
+        evaluation = evaluationRepository.save(evaluation);
+        session.setEvaluation(evaluation);
+        session.setStatus(InterviewSession.Status.EVALUATED);
+        sessionRepository.save(session);
     }
 
     @Transactional

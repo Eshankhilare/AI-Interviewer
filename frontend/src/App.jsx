@@ -1,22 +1,26 @@
-import { lazy } from 'react'
+import { lazy, Suspense } from 'react'
 import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom'
 import { AuthProvider, useAuth } from './context/AuthContext'
-import Landing from './pages/Landing'
-import Login from './pages/Login'
-import Register from './pages/Register'
-import Dashboard from './pages/Dashboard'
-import NewInterview from './pages/NewInterview'
-import Interview from './pages/Interview'
-import Report from './pages/Report'
-import JobDescriptions from './pages/JobDescriptions'
-import Resumes from './pages/Resumes'
-import Practice from './pages/Practice'
 import ProtectedRoute from './components/common/ProtectedRoute'
-import Profile from './pages/Profile'
-import AuthCallback from './pages/AuthCallback'
-import { Privacy, Terms, Cookies } from './pages/Legal'
 import ErrorBoundary from './components/common/ErrorBoundary'
 import { UIChrome, UIPage } from './v2/UISwitch'
+
+const Landing = lazy(() => import('./pages/Landing'))
+const Login = lazy(() => import('./pages/Login'))
+const Register = lazy(() => import('./pages/Register'))
+const Dashboard = lazy(() => import('./pages/Dashboard'))
+const NewInterview = lazy(() => import('./pages/NewInterview'))
+const Interview = lazy(() => import('./pages/Interview'))
+const Report = lazy(() => import('./pages/Report'))
+const JobDescriptions = lazy(() => import('./pages/JobDescriptions'))
+const Resumes = lazy(() => import('./pages/Resumes'))
+const Practice = lazy(() => import('./pages/Practice'))
+const Profile = lazy(() => import('./pages/Profile'))
+const AuthCallback = lazy(() => import('./pages/AuthCallback'))
+const LegalPages = import('./pages/Legal')
+const Privacy = lazy(() => LegalPages.then((m) => ({ default: m.Privacy })))
+const Terms = lazy(() => LegalPages.then((m) => ({ default: m.Terms })))
+const Cookies = lazy(() => LegalPages.then((m) => ({ default: m.Cookies })))
 
 const StudioHome = lazy(() => import('./v2/pages/Home'))
 const StudioBrief = lazy(() => import('./v2/pages/Brief'))
@@ -38,6 +42,7 @@ function AppRoutes() {
   }
 
   return (
+    <Suspense fallback={<div className="min-h-screen bg-black flex items-center justify-center"><div className="animate-spin rounded-full h-8 w-8 border-2 border-white/20 border-t-white" /></div>}>
     <Routes>
       <Route path="/login" element={user ? <Navigate to="/" replace /> : (
         <UIPage classic={<Login />} studio={<StudioAuth mode="login" />} />
@@ -76,6 +81,7 @@ function AppRoutes() {
       </Route>
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
+    </Suspense>
   )
 }
 

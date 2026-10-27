@@ -49,9 +49,9 @@ describe('App profile route', () => {
     window.history.replaceState({}, '', '/')
   })
 
-  it('renders the profile page at the protected /profile path', () => {
+  it('renders the profile page at the protected /profile path', async () => {
     render(<App />)
 
-    expect(screen.getByRole('heading', { name: 'Profile route content' })).toBeInTheDocument()
+    expect(await screen.findByRole('heading', { name: 'Profile route content' })).toBeInTheDocument()
   })
 })
