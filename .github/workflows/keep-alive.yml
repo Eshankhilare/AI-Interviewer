@@ -2,13 +2,24 @@ name: Keep Alive (Prevent Render Spin-Down)
 
 on:
   schedule:
-    - cron: '*/14 * * * *'
+    - cron: '*/5 * * * *'
   workflow_dispatch:
 
 jobs:
   keep-alive:
     runs-on: ubuntu-latest
     steps:
+      # Vercel runs the backend as a container on in-memory H2. A warm container
+      # keeps that data and skips the ~30 s cold start; a recycled one starts empty.
+      - name: Wake up Vercel deployment
+        run: |
+          for i in 1 2 3; do
+            curl -s -o /dev/null -w "Vercel attempt $i: HTTP %{http_code} (%{time_total}s)\n" \
+              https://ai-interviewer-jrqp.vercel.app/api/health \
+              --max-time 90 || true
+            sleep 10
+          done
+
       - name: Wake up Backend
         run: |
           echo "Waking up backend..."
