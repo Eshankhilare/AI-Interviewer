@@ -3,6 +3,8 @@ package com.interviewer.service;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.interviewer.dto.*;
 import com.interviewer.entity.*;
+import com.interviewer.exception.ConflictException;
+import com.interviewer.exception.ResourceNotFoundException;
 import com.interviewer.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -10,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -38,18 +41,35 @@ public class InterviewService {
         }
     }
 
+    /** Loads an interview only when it belongs to the caller; otherwise behaves as if it does not exist. */
+    private Interview requireOwnedInterview(Long interviewId, Long userId) {
+        Interview interview = interviewRepository.findById(interviewId)
+                .orElseThrow(() -> new ResourceNotFoundException("Interview not found"));
+        if (userId == null || interview.getCandidate() == null
+                || !interview.getCandidate().getId().equals(userId)) {
+            throw new ResourceNotFoundException("Interview not found");
+        }
+        return interview;
+    }
+
     @Transactional
     public InterviewResponse startInterview(Long userId, InterviewStartRequest request) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
         JobDescription jd = jobDescriptionRepository.findById(request.getJobDescriptionId())
-                .orElseThrow(() -> new RuntimeException("Job description not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Job description not found"));
+        if (jd.getCreatedBy() == null || !jd.getCreatedBy().getId().equals(userId)) {
+            throw new ResourceNotFoundException("Job description not found");
+        }
 
         Resume resume = null;
         if (request.getResumeId() != null) {
             resume = resumeRepository.findById(request.getResumeId())
-                    .orElseThrow(() -> new RuntimeException("Resume not found"));
+                    .orElseThrow(() -> new ResourceNotFoundException("Resume not found"));
+            if (!resume.getUser().getId().equals(userId)) {
+                throw new ResourceNotFoundException("Resume not found");
+            }
         }
 
         Interview interview = Interview.builder()
@@ -81,6 +101,9 @@ public class InterviewService {
 
         sessionRepository.saveAll(sessions);
         interview.setSessions(sessions);
+        // Sessions are the source of truth; keep the advertised count in sync with what exists.
+        interview.setTotalQuestions(sessions.size());
+        interviewRepository.save(interview);
 
         return mapToInterviewResponse(interview);
     }
@@ -125,9 +148,15 @@ public class InterviewService {
     }
 
     @Transactional
-    public InterviewResponse startInterviewSession(Long interviewId) {
-        Interview interview = interviewRepository.findById(interviewId)
-                .orElseThrow(() -> new RuntimeException("Interview not found"));
+    public InterviewResponse startInterviewSession(Long interviewId, Long userId) {
+        Interview interview = requireOwnedInterview(interviewId, userId);
+
+        if (interview.getStatus() == Interview.Status.IN_PROGRESS) {
+            return mapToInterviewResponse(interview);
+        }
+        if (interview.getStatus() != Interview.Status.SCHEDULED) {
+            throw new ConflictException("Interview cannot be started in status " + interview.getStatus());
+        }
 
         interview.setStatus(Interview.Status.IN_PROGRESS);
         interview.setStartedAt(LocalDateTime.now());
@@ -136,54 +165,98 @@ public class InterviewService {
         return mapToInterviewResponse(interview);
     }
 
-    public SessionResponse getNextQuestion(Long interviewId) {
-        Interview interview = interviewRepository.findById(interviewId)
-                .orElseThrow(() -> new RuntimeException("Interview not found"));
+    @Transactional(readOnly = true)
+    public SessionResponse getNextQuestion(Long interviewId, Long userId) {
+        Interview interview = requireOwnedInterview(interviewId, userId);
+
+        if (interview.getStatus() != Interview.Status.IN_PROGRESS) {
+            throw new ConflictException("Interview is not in progress");
+        }
 
         int nextOrder = interview.getCurrentQuestionIndex() + 1;
+        if (nextOrder > interview.getTotalQuestions()) {
+            throw new ConflictException("No more questions");
+        }
+
         InterviewSession session = sessionRepository
                 .findByInterviewIdAndQuestionOrder(interviewId, nextOrder)
-                .orElseThrow(() -> new RuntimeException("No more questions"));
+                .orElseThrow(() -> new ConflictException("No more questions"));
 
-        return mapToSessionResponse(session);
+        return mapToSessionResponse(session, false);
     }
 
     @Transactional
-    public SessionResponse submitAnswer(Long interviewId, AnswerSubmitRequest request) {
-        Interview interview = interviewRepository.findById(interviewId)
-                .orElseThrow(() -> new RuntimeException("Interview not found"));
+    public SessionResponse submitAnswer(Long interviewId, Long userId, AnswerSubmitRequest request) {
+        Interview interview = requireOwnedInterview(interviewId, userId);
+
+        if (interview.getStatus() != Interview.Status.IN_PROGRESS) {
+            throw new ConflictException("Interview is not in progress");
+        }
 
         InterviewSession session = sessionRepository.findById(request.getSessionId())
-                .orElseThrow(() -> new RuntimeException("Session not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Question not found"));
+
+        if (!session.getInterview().getId().equals(interviewId)) {
+            throw new ResourceNotFoundException("Question not found");
+        }
+
+        if (session.getStatus() == InterviewSession.Status.ANSWERED
+                || session.getStatus() == InterviewSession.Status.EVALUATED) {
+            // Idempotent retry: never evaluate twice, never advance the index twice.
+            if (session.getEvaluation() == null) {
+                evaluateSession(session, interview);
+                sessionRepository.save(session);
+            }
+            return mapToSessionResponse(session, false);
+        }
+
+        if (!session.getQuestionOrder().equals(interview.getCurrentQuestionIndex() + 1)) {
+            throw new ConflictException("Answers must be submitted in order");
+        }
 
         session.setCandidateAnswer(request.getAnswer());
         session.setStatus(InterviewSession.Status.ANSWERED);
         session.setAnsweredAt(LocalDateTime.now());
+        session = sessionRepository.save(session);
 
+        evaluateSession(session, interview);
+
+        interview.setCurrentQuestionIndex(session.getQuestionOrder());
+        interviewRepository.save(interview);
+
+        return mapToSessionResponse(session, false);
+    }
+
+    /** Best-effort evaluation. Failure leaves the answer saved (status ANSWERED) so a retry can evaluate it. */
+    private void evaluateSession(InterviewSession session, Interview interview) {
         try {
             String followUp = aiServiceClient.generateFollowUp(
                     session.getQuestion().getText(),
-                    request.getAnswer()
+                    session.getCandidateAnswer()
             );
-            session.setAiFollowUp(followUp);
+            if (followUp != null) {
+                session.setAiFollowUp(followUp);
+            }
         } catch (Exception e) {
-            // No follow-up if AI service fails
+            // No follow-up if the AI service fails.
         }
 
-        session = sessionRepository.save(session);
-
-        // Evaluate the answer and save to DB
         try {
+            String jobContext = interview.getJobDescription() != null
+                    ? interview.getJobDescription().getTitle() : "";
             Map<String, Object> evalResult = aiServiceClient.evaluateAnswer(
                     session.getQuestion().getText(),
-                    request.getAnswer(),
-                    session.getQuestion().getExpectedAnswer()
+                    session.getCandidateAnswer(),
+                    session.getQuestion().getExpectedAnswer(),
+                    session.getQuestion().getType().name(),
+                    session.getQuestion().getDifficulty().name(),
+                    jobContext
             );
 
-            if (evalResult != null && !evalResult.isEmpty()) {
-                Evaluation                 evaluation = Evaluation.builder()
+            if (evalResult != null && !evalResult.isEmpty() && evalResult.get("score") != null) {
+                Evaluation evaluation = Evaluation.builder()
                         .session(session)
-                        .score(evalResult.get("score") != null ? ((Number) evalResult.get("score")).intValue() : 0)
+                        .score(((Number) evalResult.get("score")).intValue())
                         .grade((String) evalResult.getOrDefault("grade", "F"))
                         .feedback((String) evalResult.getOrDefault("feedback", ""))
                         .skillScores(evalResult.get("skill_scores") != null ? toJson(evalResult.get("skill_scores")) : null)
@@ -201,13 +274,8 @@ public class InterviewService {
                 sessionRepository.save(session);
             }
         } catch (Exception e) {
-            // Evaluation failed but answer was saved
+            // Answer is preserved; a later retry will try the evaluation again.
         }
-
-        interview.setCurrentQuestionIndex(interview.getCurrentQuestionIndex() + 1);
-        interviewRepository.save(interview);
-
-        return mapToSessionResponse(session);
     }
 
     @Transactional
@@ -217,30 +285,43 @@ public class InterviewService {
             return existing;
         }
 
-        Map<String, Object> reportData = null;
-        try {
-            reportData = aiServiceClient.generateReport(interview);
-        } catch (Exception ignored) {
+        List<InterviewSession> evaluated = interview.getSessions().stream()
+                .filter(s -> s.getEvaluation() != null && s.getEvaluation().getScore() != null)
+                .toList();
+
+        int overallScore = 0;
+        String overallGrade = "N/A";
+        String recommendationLevel = "INSUFFICIENT_DATA";
+        String summary;
+        if (evaluated.isEmpty()) {
+            summary = "No answers were evaluated for this interview, so no score can be calculated. "
+                    + "This is not a judgement of the candidate.";
+        } else {
+            overallScore = (int) Math.round(evaluated.stream()
+                    .mapToInt(s -> s.getEvaluation().getScore()).average().orElse(0));
+            overallGrade = gradeFor(overallScore);
+            recommendationLevel = overallScore >= 70 ? "RECOMMENDED"
+                    : overallScore >= 50 ? "BORDERLINE" : "NOT_RECOMMENDED";
+            summary = "Score computed from " + evaluated.size() + " evaluated answer(s) out of "
+                    + interview.getSessions().size() + " question(s).";
         }
 
-        int overallScore = 75;
-        String overallGrade = "B";
-        String summary = "The candidate has completed the interview assessment. Good foundational knowledge demonstrated.";
-        String skillRadar = "[{\"skill\":\"Problem Solving\",\"score\":75},{\"skill\":\"Technical Depth\",\"score\":80},{\"skill\":\"Communication\",\"score\":70},{\"skill\":\"System Design\",\"score\":70},{\"skill\":\"Code Quality\",\"score\":80}]";
-        String categoryScores = "[{\"category\":\"Technical\",\"score\":75},{\"category\":\"Communication\",\"score\":70},{\"category\":\"Problem Solving\",\"score\":80}]";
-        String strengths = "[\"Solid grasp of fundamental technical concepts\",\"Clear communication during responses\"]";
-        String weaknesses = "[\"Can provide more in-depth examples for complex edge cases\",\"Continue practice on architectural trade-offs\"]";
-        String recommendations = "Focus on advanced system design patterns and real-world optimizations.";
-        String recLevel = "RECOMMENDED";
-        String breakdown = "[]";
+        String recommendations = "Review the per-question feedback for concrete next steps.";
+        String skillRadar = "[]";
+        String categoryScores = "[]";
+        String strengths = "[]";
+        String weaknesses = "[]";
+        String breakdown = toJson(buildQuestionBreakdown(interview));
+
+        Map<String, Object> reportData;
+        try {
+            reportData = aiServiceClient.generateReport(interview);
+        } catch (Exception e) {
+            reportData = null;
+        }
 
         if (reportData != null && !reportData.isEmpty()) {
-            if (reportData.get("overall_score") != null) {
-                overallScore = ((Number) reportData.get("overall_score")).intValue();
-            }
-            if (reportData.get("overall_grade") != null) {
-                overallGrade = (String) reportData.get("overall_grade");
-            }
+            // Text fields may come from the model; the numeric score stays computed from real evaluations.
             if (reportData.get("summary") != null) {
                 summary = (String) reportData.get("summary");
             }
@@ -259,12 +340,6 @@ public class InterviewService {
             if (reportData.get("recommendations") != null) {
                 recommendations = (String) reportData.get("recommendations");
             }
-            if (reportData.get("recommendation_level") != null) {
-                recLevel = (String) reportData.get("recommendation_level");
-            }
-            if (reportData.get("question_breakdown") != null) {
-                breakdown = toJson(reportData.get("question_breakdown"));
-            }
         }
 
         Report report = Report.builder()
@@ -277,31 +352,63 @@ public class InterviewService {
                 .strengths(strengths)
                 .weaknesses(weaknesses)
                 .recommendations(recommendations)
-                .recommendationLevel(recLevel)
+                .recommendationLevel(recommendationLevel)
                 .questionBreakdown(breakdown)
                 .build();
 
         return reportRepository.save(report);
     }
 
+    private List<Map<String, Object>> buildQuestionBreakdown(Interview interview) {
+        List<Map<String, Object>> breakdown = new ArrayList<>();
+        for (InterviewSession session : interview.getSessions()) {
+            Map<String, Object> item = new LinkedHashMap<>();
+            item.put("question", session.getQuestion().getText());
+            item.put("questionOrder", session.getQuestionOrder());
+            item.put("status", session.getStatus().name());
+            if (session.getEvaluation() != null) {
+                item.put("score", session.getEvaluation().getScore());
+                item.put("grade", session.getEvaluation().getGrade());
+                item.put("feedback", session.getEvaluation().getFeedback());
+                item.put("improvementSuggestions", session.getEvaluation().getImprovementSuggestions());
+            }
+            breakdown.add(item);
+        }
+        return breakdown;
+    }
+
+    private String gradeFor(int score) {
+        if (score >= 90) return "A+";
+        if (score >= 80) return "A";
+        if (score >= 70) return "B+";
+        if (score >= 60) return "B";
+        if (score >= 50) return "C+";
+        if (score >= 40) return "C";
+        if (score >= 30) return "D";
+        return "F";
+    }
+
     @Transactional
-    public InterviewResponse endInterview(Long interviewId) {
-        Interview interview = interviewRepository.findById(interviewId)
-                .orElseThrow(() -> new RuntimeException("Interview not found"));
+    public InterviewResponse endInterview(Long interviewId, Long userId) {
+        Interview interview = requireOwnedInterview(interviewId, userId);
+
+        if (interview.getStatus() == Interview.Status.COMPLETED) {
+            return mapToInterviewResponse(interview);
+        }
+        if (interview.getStatus() != Interview.Status.IN_PROGRESS) {
+            throw new ConflictException("Interview cannot be completed in status " + interview.getStatus());
+        }
 
         interview.setStatus(Interview.Status.COMPLETED);
         interview.setCompletedAt(LocalDateTime.now());
         interview = interviewRepository.save(interview);
 
-        // Generate and save report
-        try {
-            generateReportForInterview(interview);
-        } catch (Exception ignored) {
-        }
+        generateReportForInterview(interview);
 
         return mapToInterviewResponse(interview);
     }
 
+    @Transactional(readOnly = true)
     public List<InterviewResponse> getUserInterviews(Long userId) {
         return interviewRepository.findByCandidateIdOrderByCreatedAtDesc(userId)
                 .stream()
@@ -309,13 +416,15 @@ public class InterviewService {
                 .collect(Collectors.toList());
     }
 
-    public InterviewResponse getInterview(Long interviewId) {
-        Interview interview = interviewRepository.findById(interviewId)
-                .orElseThrow(() -> new RuntimeException("Interview not found"));
-        return mapToInterviewResponse(interview);
+    @Transactional(readOnly = true)
+    public InterviewResponse getInterview(Long interviewId, Long userId) {
+        return mapToInterviewResponse(requireOwnedInterview(interviewId, userId));
     }
 
     private InterviewResponse mapToInterviewResponse(Interview interview) {
+        boolean completed = interview.getStatus() == Interview.Status.COMPLETED;
+        Report report = interview.getReport();
+
         return InterviewResponse.builder()
                 .id(interview.getId())
                 .title(interview.getTitle())
@@ -327,22 +436,24 @@ public class InterviewService {
                 .createdAt(interview.getCreatedAt())
                 .startedAt(interview.getStartedAt())
                 .completedAt(interview.getCompletedAt())
+                .overallScore(report != null ? report.getOverallScore() : null)
+                .overallGrade(report != null ? report.getOverallGrade() : null)
                 .jobDescriptionTitle(interview.getJobDescription() != null ? interview.getJobDescription().getTitle() : null)
                 .companyName(interview.getJobDescription() != null ? interview.getJobDescription().getCompany() : null)
                 .sessions(interview.getSessions().stream()
-                        .map(this::mapToSessionResponse)
+                        .map(session -> mapToSessionResponse(session, completed))
                         .collect(Collectors.toList()))
                 .build();
     }
 
-    private SessionResponse mapToSessionResponse(InterviewSession session) {
+    private SessionResponse mapToSessionResponse(InterviewSession session, boolean includeExpectedAnswer) {
         SessionResponse.SessionResponseBuilder builder = SessionResponse.builder()
                 .id(session.getId())
                 .questionOrder(session.getQuestionOrder())
                 .questionText(session.getQuestion().getText())
                 .questionType(session.getQuestion().getType().name())
                 .difficulty(session.getQuestion().getDifficulty().name())
-                .expectedAnswer(session.getQuestion().getExpectedAnswer())
+                .expectedAnswer(includeExpectedAnswer ? session.getQuestion().getExpectedAnswer() : null)
                 .candidateAnswer(session.getCandidateAnswer())
                 .aiFollowUp(session.getAiFollowUp())
                 .followUpAnswer(session.getFollowUpAnswer())
@@ -354,7 +465,13 @@ public class InterviewService {
                     .score(session.getEvaluation().getScore())
                     .grade(session.getEvaluation().getGrade())
                     .feedback(session.getEvaluation().getFeedback())
+                    .strengths(session.getEvaluation().getStrengths())
+                    .weaknesses(session.getEvaluation().getWeaknesses())
+                    .improvementSuggestions(session.getEvaluation().getImprovementSuggestions())
                     .sampleResponse(session.getEvaluation().getSampleResponse())
+                    .confidenceLevel(session.getEvaluation().getConfidenceLevel())
+                    .communicationScore(session.getEvaluation().getCommunicationScore())
+                    .technicalDepth(session.getEvaluation().getTechnicalDepth())
                     .build());
         }
 

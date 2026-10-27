@@ -20,10 +20,10 @@ api.interceptors.response.use(
   (response) => response,
   (error) => {
     const status = error.response?.status
-    const hasAuthHeader = Boolean(error.config?.headers?.Authorization)
 
-    // Spring Security may return 403 for an expired token instead of 401.
-    if ((status === 401 || status === 403) && hasAuthHeader) {
+    // Only 401 means the session is gone. A 403 is a normal authorization
+    // denial and must not log the user out.
+    if (status === 401 && Boolean(error.config?.headers?.Authorization)) {
       localStorage.removeItem('token')
       localStorage.removeItem('user')
       const returnTo = `${window.location.pathname}${window.location.search}`

@@ -4,6 +4,7 @@ import com.interviewer.dto.JobDescriptionRequest;
 import com.interviewer.dto.JobDescriptionResponse;
 import com.interviewer.entity.JobDescription;
 import com.interviewer.entity.User;
+import com.interviewer.exception.ResourceNotFoundException;
 import com.interviewer.repository.JobDescriptionRepository;
 import com.interviewer.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -22,7 +23,7 @@ public class JobDescriptionService {
     @Transactional
     public JobDescriptionResponse create(Long userId, JobDescriptionRequest request) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
         JobDescription.ExperienceLevel level;
         try {
@@ -53,16 +54,21 @@ public class JobDescriptionService {
                 .toList();
     }
 
-    public JobDescriptionResponse getJobDescription(Long id) {
-        JobDescription jd = jobDescriptionRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Job description not found"));
-        return JobDescriptionResponse.from(jd);
+    public JobDescriptionResponse getJobDescription(Long id, Long userId) {
+        return JobDescriptionResponse.from(requireOwned(id, userId));
     }
 
     @Transactional
-    public void deleteJobDescription(Long id) {
+    public void deleteJobDescription(Long id, Long userId) {
+        jobDescriptionRepository.delete(requireOwned(id, userId));
+    }
+
+    private JobDescription requireOwned(Long id, Long userId) {
         JobDescription jd = jobDescriptionRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Job description not found"));
-        jobDescriptionRepository.delete(jd);
+                .orElseThrow(() -> new ResourceNotFoundException("Job description not found"));
+        if (jd.getCreatedBy() == null || !jd.getCreatedBy().getId().equals(userId)) {
+            throw new ResourceNotFoundException("Job description not found");
+        }
+        return jd;
     }
 }

@@ -3,6 +3,7 @@ package com.interviewer.service;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
+import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.*;
@@ -17,7 +18,14 @@ public class CodingService {
     @Value("${judge0.api.key:}")
     private String judge0ApiKey;
 
-    private final RestTemplate restTemplate = new RestTemplate();
+    private final RestTemplate restTemplate;
+
+    public CodingService() {
+        SimpleClientHttpRequestFactory factory = new SimpleClientHttpRequestFactory();
+        factory.setConnectTimeout(5000);
+        factory.setReadTimeout(30000);
+        this.restTemplate = new RestTemplate(factory);
+    }
     private final ExecutorService executor = Executors.newFixedThreadPool(4);
 
     private record TestCase(String name, String stdin, String expectedOutput) {}
@@ -66,6 +74,8 @@ public class CodingService {
             request.put("language_id", languageId);
             request.put("source_code", sourceCode);
             request.put("stdin", stdin);
+            request.put("cpu_time_limit", 5);
+            request.put("memory_limit", 262144);
 
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);

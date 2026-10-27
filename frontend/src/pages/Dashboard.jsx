@@ -17,12 +17,13 @@ const Dashboard = () => {
     finally { setLoading(false) }
   }
 
+  const scored = interviews.filter(i => i.status === 'COMPLETED' && typeof i.overallScore === 'number')
   const stats = {
     total: interviews.length,
     completed: interviews.filter(i => i.status === 'COMPLETED').length,
     inProgress: interviews.filter(i => i.status === 'IN_PROGRESS').length,
-    avgScore: interviews.filter(i => i.status === 'COMPLETED').length > 0
-      ? Math.round(interviews.filter(i => i.status === 'COMPLETED').reduce((a, i) => a + (i.overallScore || 75), 0) / interviews.filter(i => i.status === 'COMPLETED').length) : 0,
+    avgScore: scored.length > 0
+      ? Math.round(scored.reduce((a, i) => a + i.overallScore, 0) / scored.length) : null,
   }
 
   const getStatusIcon = (s) => {
@@ -72,7 +73,7 @@ const Dashboard = () => {
             { label: 'Total', value: stats.total, icon: BarChart3 },
             { label: 'Completed', value: stats.completed, icon: CheckCircle },
             { label: 'In Progress', value: stats.inProgress, icon: Clock },
-            { label: 'Avg Score', value: `${stats.avgScore}%`, icon: TrendingUp },
+            { label: 'Avg Score', value: stats.avgScore === null ? '—' : `${stats.avgScore}%`, icon: TrendingUp },
           ].map((stat, i) => (
             <motion.div key={stat.label} initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.08 }}>
               <GlassCard className="p-5">

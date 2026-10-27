@@ -3,22 +3,28 @@ package com.interviewer.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.interviewer.entity.Resume;
 import com.interviewer.entity.User;
+import com.interviewer.exception.ConflictException;
+import com.interviewer.exception.ResourceNotFoundException;
 import com.interviewer.repository.ResumeRepository;
 import com.interviewer.repository.UserRepository;
-import com.interviewer.security.JwtUtil;
+import com.interviewer.security.CurrentUser;
 import com.interviewer.service.AiServiceClient;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -27,11 +33,20 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class ResumeController {
 
+    private static final long MAX_UPLOAD_BYTES = 5L * 1024 * 1024;
+    private static final int MAX_PASTED_TEXT = 100_000;
+
+    /** Formats we can turn into plain text without extra dependencies. */
+    private static final Set<String> TEXT_EXTENSIONS = Set.of("txt", "md", "text");
+
     private final ResumeRepository resumeRepository;
     private final UserRepository userRepository;
     private final AiServiceClient aiServiceClient;
-    private final JwtUtil jwtUtil;
+    private final CurrentUser currentUser;
     private final ObjectMapper objectMapper;
+
+    @Value("${app.upload.dir:./uploads}")
+    private String uploadDir;
 
     private String toJson(Map<String, Object> map) {
         try {
@@ -42,105 +57,100 @@ public class ResumeController {
     }
 
     @PostMapping("/upload")
-    public ResponseEntity<?> uploadResume(
+    public ResponseEntity<Map<String, Object>> uploadResume(
             @RequestParam("file") MultipartFile file,
             @RequestParam(value = "text", required = false) String directText) {
-        try {
-            Long userId = getCurrentUserId();
-            User user = userRepository.findById(userId)
-                    .orElseThrow(() -> new RuntimeException("User not found"));
+        Long userId = currentUser.id();
+        User user = requireUser(userId);
 
-            Resume resume = Resume.builder()
-                    .user(user)
-                    .fileName(file.getOriginalFilename())
-                    .fileType(file.getContentType())
-                    .fileSize(String.valueOf(file.getSize()))
-                    .status(Resume.Status.UPLOADED)
-                    .build();
+        Resume resume = Resume.builder()
+                .user(user)
+                .fileName(sanitizeFileName(file.getOriginalFilename()))
+                .fileType(file.getContentType())
+                .fileSize(String.valueOf(file.getSize()))
+                .status(Resume.Status.UPLOADED)
+                .build();
 
-            if (directText != null && !directText.isEmpty()) {
-                resume.setExtractedText(directText);
-                resume.setStatus(Resume.Status.PARSING);
-            } else {
-                // Store file and extract text
-                String uploadDir = "uploads/resumes/";
-                Files.createDirectories(Paths.get(uploadDir));
-                String fileName = UUID.randomUUID() + "_" + file.getOriginalFilename();
-                Path filePath = Paths.get(uploadDir, fileName);
-                Files.copy(file.getInputStream(), filePath);
-                resume.setFilePath(filePath.toString());
-
-                // Try to extract text from the file content
-                String textContent = new String(file.getBytes());
-                resume.setExtractedText(textContent);
-                resume.setStatus(Resume.Status.PARSING);
+        if (directText != null && !directText.isBlank()) {
+            resume.setExtractedText(limitText(directText));
+            resume.setStatus(Resume.Status.PARSING);
+        } else {
+            if (file.isEmpty()) {
+                throw new IllegalArgumentException("File is required");
+            }
+            if (file.getSize() > MAX_UPLOAD_BYTES) {
+                throw new IllegalArgumentException("File is larger than 5 MB");
+            }
+            String extension = extensionOf(resume.getFileName());
+            if (!TEXT_EXTENSIONS.contains(extension)) {
+                throw new ConflictException(
+                        "Only text resumes can be parsed right now. Paste your resume text or upload a .txt/.md file.");
             }
 
-            // Parse the resume
             try {
-                Map<String, Object> parsed = aiServiceClient.parseResume(
-                        resume.getExtractedText() != null ? resume.getExtractedText() : ""
-                );
-                resume.setParsedData(parsed != null ? toJson(parsed) : null);
-                resume.setStatus(Resume.Status.PARSED);
-            } catch (Exception e) {
-                resume.setStatus(Resume.Status.FAILED);
-                resume.setErrorMessage(e.getMessage());
+                byte[] bytes = file.getBytes();
+                resume.setExtractedText(limitText(new String(bytes, StandardCharsets.UTF_8)));
+                resume.setStatus(Resume.Status.PARSING);
+
+                Path baseDir = Paths.get(uploadDir, "resumes").toAbsolutePath().normalize();
+                Files.createDirectories(baseDir);
+                Path target = baseDir.resolve(UUID.randomUUID() + "." + extension).normalize();
+                if (!target.startsWith(baseDir)) {
+                    throw new ConflictException("Invalid upload path");
+                }
+                Files.write(target, bytes);
+                resume.setFilePath(target.toString());
+            } catch (IOException e) {
+                throw new IllegalStateException("Could not store the uploaded file", e);
             }
-
-            resume = resumeRepository.save(resume);
-
-            Map<String, Object> response = new HashMap<>();
-            response.put("id", resume.getId());
-            response.put("fileName", resume.getFileName());
-            response.put("status", resume.getStatus().name());
-            response.put("parsedData", resume.getParsedData());
-            return ResponseEntity.ok(response);
-
-        } catch (IOException e) {
-            return ResponseEntity.badRequest().body(Map.of("error", "Failed to upload file: " + e.getMessage()));
         }
+
+        parseWithAi(resume);
+        resume = resumeRepository.save(resume);
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("id", resume.getId());
+        response.put("fileName", resume.getFileName());
+        response.put("status", resume.getStatus().name());
+        response.put("parsedData", resume.getParsedData());
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping("/parse-text")
-    public ResponseEntity<?> parseResumeText(@RequestBody Map<String, String> request) {
-        try {
-            Long userId = getCurrentUserId();
-            User user = userRepository.findById(userId)
-                    .orElseThrow(() -> new RuntimeException("User not found"));
+    public ResponseEntity<Map<String, Object>> parseResumeText(@RequestBody Map<String, String> request) {
+        Long userId = currentUser.id();
+        User user = requireUser(userId);
 
-            String text = request.get("text");
-            if (text == null || text.isEmpty()) {
-                return ResponseEntity.badRequest().body(Map.of("error", "Text is required"));
-            }
-
-            Map<String, Object> parsed = aiServiceClient.parseResume(text);
-
-            Resume resume = Resume.builder()
-                    .user(user)
-                    .fileName("pasted-resume.txt")
-                    .filePath("pasted")
-                    .fileType("text/plain")
-                    .extractedText(text)
-                    .parsedData(parsed != null ? toJson(parsed) : null)
-                    .status(Resume.Status.PARSED)
-                    .build();
-            resume = resumeRepository.save(resume);
-
-            Map<String, Object> response = new HashMap<>();
-            response.put("id", resume.getId());
-            response.put("parsedData", parsed);
-            return ResponseEntity.ok(response);
-
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        String text = request.get("text");
+        if (text == null || text.isBlank()) {
+            throw new IllegalArgumentException("Text is required");
         }
+        if (text.length() > MAX_PASTED_TEXT) {
+            throw new IllegalArgumentException("Resume text is too long (max " + MAX_PASTED_TEXT + " characters)");
+        }
+
+        Map<String, Object> parsed = aiServiceClient.parseResume(text);
+
+        Resume resume = Resume.builder()
+                .user(user)
+                .fileName("pasted-resume.txt")
+                .filePath("pasted")
+                .fileType("text/plain")
+                .extractedText(text)
+                .parsedData(parsed != null ? toJson(parsed) : null)
+                .status(Resume.Status.PARSED)
+                .build();
+        resume = resumeRepository.save(resume);
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("id", resume.getId());
+        response.put("parsedData", parsed);
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping
     public ResponseEntity<List<Map<String, Object>>> getUserResumes() {
-        Long userId = getCurrentUserId();
-        List<Resume> resumes = resumeRepository.findByUserIdOrderByCreatedAtDesc(userId);
+        List<Resume> resumes = resumeRepository.findByUserIdOrderByCreatedAtDesc(currentUser.id());
         List<Map<String, Object>> response = resumes.stream().map(r -> {
             Map<String, Object> map = new HashMap<>();
             map.put("id", r.getId());
@@ -154,9 +164,8 @@ public class ResumeController {
     }
 
     @GetMapping("/{resumeId}")
-    public ResponseEntity<?> getResume(@PathVariable Long resumeId) {
-        Resume resume = resumeRepository.findById(resumeId)
-                .orElseThrow(() -> new RuntimeException("Resume not found"));
+    public ResponseEntity<Map<String, Object>> getResume(@PathVariable Long resumeId) {
+        Resume resume = requireOwnedResume(resumeId);
 
         Map<String, Object> response = new HashMap<>();
         response.put("id", resume.getId());
@@ -168,25 +177,52 @@ public class ResumeController {
     }
 
     @DeleteMapping("/{resumeId}")
-    public ResponseEntity<?> deleteResume(@PathVariable Long resumeId) {
-        Resume resume = resumeRepository.findById(resumeId)
-                .orElseThrow(() -> new RuntimeException("Resume not found"));
-        resumeRepository.delete(resume);
+    public ResponseEntity<Map<String, Object>> deleteResume(@PathVariable Long resumeId) {
+        resumeRepository.delete(requireOwnedResume(resumeId));
         return ResponseEntity.ok(Map.of("message", "Resume deleted"));
     }
 
-    private Long getCurrentUserId() {
-        org.springframework.web.context.request.RequestAttributes attrs =
-                org.springframework.web.context.request.RequestContextHolder.getRequestAttributes();
-        if (attrs instanceof org.springframework.web.context.request.ServletRequestAttributes servletAttrs) {
-            String auth = servletAttrs.getRequest().getHeader("Authorization");
-            if (auth != null && auth.startsWith("Bearer ")) {
-                try {
-                    return jwtUtil.extractUserId(auth.substring(7));
-                } catch (Exception ignored) {
-                }
-            }
+    private void parseWithAi(Resume resume) {
+        try {
+            Map<String, Object> parsed = aiServiceClient.parseResume(
+                    resume.getExtractedText() != null ? resume.getExtractedText() : "");
+            resume.setParsedData(parsed != null ? toJson(parsed) : null);
+            resume.setStatus(Resume.Status.PARSED);
+        } catch (Exception e) {
+            resume.setStatus(Resume.Status.FAILED);
+            resume.setErrorMessage("Resume parsing is temporarily unavailable");
         }
-        return null;
+    }
+
+    private Resume requireOwnedResume(Long resumeId) {
+        Resume resume = resumeRepository.findById(resumeId)
+                .orElseThrow(() -> new ResourceNotFoundException("Resume not found"));
+        if (!resume.getUser().getId().equals(currentUser.id())) {
+            throw new ResourceNotFoundException("Resume not found");
+        }
+        return resume;
+    }
+
+    private User requireUser(Long userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+    }
+
+    private String limitText(String text) {
+        return text.length() > MAX_PASTED_TEXT ? text.substring(0, MAX_PASTED_TEXT) : text;
+    }
+
+    private String sanitizeFileName(String original) {
+        if (original == null || original.isBlank()) {
+            return "resume";
+        }
+        String name = Paths.get(original).getFileName().toString();
+        name = name.replaceAll("[^A-Za-z0-9._-]", "_");
+        return name.length() > 120 ? name.substring(name.length() - 120) : name;
+    }
+
+    private String extensionOf(String fileName) {
+        int dot = fileName.lastIndexOf('.');
+        return dot >= 0 ? fileName.substring(dot + 1).toLowerCase(Locale.ROOT) : "";
     }
 }

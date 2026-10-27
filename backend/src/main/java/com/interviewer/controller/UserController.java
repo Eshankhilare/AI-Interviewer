@@ -41,9 +41,9 @@ public class UserController {
     }
 
     private User findUser(UserDetails principal) {
-        if (principal == null) throw new RuntimeException("Authenticated user required");
+        if (principal == null) throw new com.interviewer.exception.ResourceNotFoundException("User not found");
         return userRepository.findByEmail(principal.getUsername())
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new com.interviewer.exception.ResourceNotFoundException("User not found"));
     }
 
     private ProfileResponse toResponse(User user) {

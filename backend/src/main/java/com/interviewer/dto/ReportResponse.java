@@ -17,12 +17,12 @@ public class ReportResponse {
     private Integer overallScore;
     private String overallGrade;
     private String summary;
-    private String skillRadarData;
-    private String categoryScores;
-    private String strengths;
-    private String weaknesses;
+    private Object skillRadarData;
+    private Object categoryScores;
+    private Object strengths;
+    private Object weaknesses;
     private String recommendations;
     private String recommendationLevel;
-    private String questionBreakdown;
+    private Object questionBreakdown;
     private LocalDateTime createdAt;
 }

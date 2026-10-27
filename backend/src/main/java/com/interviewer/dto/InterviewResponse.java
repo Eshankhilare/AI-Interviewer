@@ -23,6 +23,8 @@ public class InterviewResponse {
     private LocalDateTime createdAt;
     private LocalDateTime startedAt;
     private LocalDateTime completedAt;
+    private Integer overallScore;
+    private String overallGrade;
     private String jobDescriptionTitle;
     private String companyName;
     private List<SessionResponse> sessions;

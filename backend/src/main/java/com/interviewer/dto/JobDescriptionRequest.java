@@ -16,6 +16,7 @@ public class JobDescriptionRequest {
     private String company;
 
     @NotBlank(message = "Description is required")
+    @Size(max = 20000, message = "Description must be at most 20000 characters")
     private String description;
 
     private String experienceLevel = "MID";

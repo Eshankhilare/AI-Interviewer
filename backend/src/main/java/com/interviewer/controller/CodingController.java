@@ -12,6 +12,8 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class CodingController {
 
+    private static final int MAX_SOURCE_CHARS = 50_000;
+
     private final CodingService codingService;
 
     @PostMapping("/execute")
@@ -20,8 +22,12 @@ public class CodingController {
         String sourceCode = (String) request.get("sourceCode");
         String stdin = (String) request.getOrDefault("stdin", "");
 
-        Map<String, Object> result = codingService.executeCode(languageId, sourceCode, stdin);
-        return ResponseEntity.ok(result);
+        validate(languageId, sourceCode);
+        if (stdin != null && stdin.length() > MAX_SOURCE_CHARS) {
+            throw new IllegalArgumentException("Input is too large");
+        }
+
+        return ResponseEntity.ok(codingService.executeCode(languageId, sourceCode, stdin));
     }
 
     @PostMapping("/submit")
@@ -32,8 +38,9 @@ public class CodingController {
         String language = (String) request.get("language");
         String sourceCode = (String) request.get("sourceCode");
 
-        Map<String, Object> result = codingService.submitCode(problemId, languageId, language, sourceCode);
-        return ResponseEntity.ok(result);
+        validate(languageId, sourceCode);
+
+        return ResponseEntity.ok(codingService.submitCode(problemId, languageId, language, sourceCode));
     }
 
     @GetMapping("/languages")
@@ -49,5 +56,17 @@ public class CodingController {
     @GetMapping("/problems/{id}")
     public ResponseEntity<Object> getProblem(@PathVariable Long id) {
         return ResponseEntity.ok(codingService.getProblem(id));
+    }
+
+    private void validate(Integer languageId, String sourceCode) {
+        if (languageId == null) {
+            throw new IllegalArgumentException("languageId is required");
+        }
+        if (sourceCode == null || sourceCode.isBlank()) {
+            throw new IllegalArgumentException("sourceCode is required");
+        }
+        if (sourceCode.length() > MAX_SOURCE_CHARS) {
+            throw new IllegalArgumentException("Source code is too large");
+        }
     }
 }

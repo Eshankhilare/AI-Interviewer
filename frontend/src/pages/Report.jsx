@@ -259,22 +259,9 @@ const Report = () => {
     )
   }
 
-  const defaultRadar = [
-    { skill: 'Technical Depth', score: report.overallScore || 75 },
-    { skill: 'Problem Solving', score: Math.min(100, (report.overallScore || 75) + 5) },
-    { skill: 'Communication', score: Math.max(0, (report.overallScore || 75) - 5) },
-    { skill: 'System Design', score: report.overallScore || 70 },
-    { skill: 'Code Quality', score: report.overallScore || 80 },
-  ]
-
-  const defaultCategories = [
-    { category: 'Technical', score: report.overallScore || 75 },
-    { category: 'Communication', score: Math.max(50, (report.overallScore || 75) - 10) },
-    { category: 'Problem Solving', score: Math.min(95, (report.overallScore || 75) + 5) },
-  ]
-
-  const radarData = safeParseChartData(report.skillRadarData, defaultRadar)
-  const categoryScores = safeParseChartData(report.categoryScores, defaultCategories)
+  // Never invent skill scores: if the report has no per-skill data, say so.
+  const radarData = safeParseChartData(report.skillRadarData, [])
+  const categoryScores = safeParseChartData(report.categoryScores, [])
   const strengths = safeParseArray(report.strengths)
   const weaknesses = safeParseArray(report.weaknesses)
   const questionBreakdown = (() => {
@@ -368,6 +355,11 @@ const Report = () => {
             <span className="text-xs" style={{ color: 'oklch(100% 0 0 / 0.4)' }}>Proficiency Breakdown</span>
           </div>
           <div className="h-[280px] w-full">
+            {radarData.length === 0 ? (
+              <p className="h-full flex items-center justify-center text-sm text-center px-6" style={{ color: 'oklch(100% 0 0 / 0.45)' }}>
+                No per-skill breakdown was recorded for this interview.
+              </p>
+            ) : (
             <ResponsiveContainer width="100%" height="100%">
               <RadarChart data={radarData}>
                 <PolarGrid stroke="oklch(30% 0.008 40)" />
@@ -376,6 +368,7 @@ const Report = () => {
                 <Radar name="Proficiency" dataKey="score" stroke="#6366f1" fill="#6366f1" fillOpacity={0.3} />
               </RadarChart>
             </ResponsiveContainer>
+            )}
           </div>
         </div>
 
@@ -386,6 +379,11 @@ const Report = () => {
             <span className="text-xs" style={{ color: 'oklch(100% 0 0 / 0.4)' }}>Scores by Domain</span>
           </div>
           <div className="h-[280px] w-full">
+            {categoryScores.length === 0 ? (
+              <p className="h-full flex items-center justify-center text-sm text-center px-6" style={{ color: 'oklch(100% 0 0 / 0.45)' }}>
+                No category scores were recorded for this interview.
+              </p>
+            ) : (
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={categoryScores} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="oklch(25% 0.008 40)" />
@@ -395,6 +393,7 @@ const Report = () => {
                 <Bar dataKey="score" fill="#6366f1" radius={[4, 4, 0, 0]} name="Score" />
               </BarChart>
             </ResponsiveContainer>
+            )}
           </div>
         </div>
       </div>

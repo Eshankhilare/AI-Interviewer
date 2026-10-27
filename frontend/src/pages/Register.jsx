@@ -78,7 +78,7 @@ const Register = () => {
               <label className="block text-sm font-medium mb-1.5" style={{ color: 'rgba(255,255,255,.6)' }}>Password</label>
               <div className="relative">
                 <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4" style={{ color: 'rgba(255,255,255,.25)' }} />
-                <GlassInput type="password" required name="password" minLength={6} value={formData.password} onChange={handleChange} className="pl-10" placeholder="••••••••" />
+                <GlassInput type="password" required name="password" minLength={8} value={formData.password} onChange={handleChange} className="pl-10" placeholder="At least 8 characters" />
               </div>
             </div>
 

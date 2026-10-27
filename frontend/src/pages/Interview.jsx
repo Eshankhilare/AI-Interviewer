@@ -10,14 +10,20 @@ import ProctoringMonitor from '../components/interview/ProctoringMonitor'
 import SpeechEmotionAnalyzer from '../components/interview/SpeechEmotionAnalyzer'
 import InterviewerOrb from '../components/interview/InterviewerOrb'
 import AntiCheatModal from '../components/interview/AntiCheatModal'
+import ErrorBoundary from '../components/common/ErrorBoundary'
 import { motion } from 'framer-motion'
 import { GlassCard, WhiteButton, GlassBadge, GlassInput, BackgroundVideo } from '../components/ui/glass'
+
+/** Prefer the backend's message so the candidate sees an actionable reason. */
+const errorText = (error, fallback) =>
+  error?.response?.data?.message || (error?.code === 'ECONNABORTED' ? 'The server took too long to answer. Please retry.' : fallback)
 
 const Interview = () => {
   const { id } = useParams()
   const navigate = useNavigate()
   const [interview, setInterview] = useState(null)
   const [currentQuestion, setCurrentQuestion] = useState(null)
+  const [error, setError] = useState(null)
   const [answer, setAnswer] = useState('')
   const [loading, setLoading] = useState(true)
   const [submitting, setSubmitting] = useState(false)
@@ -50,18 +56,23 @@ const Interview = () => {
   }, [id])
 
   const fetchInterview = async () => {
+    setError(null)
     try {
       const response = await api.get(`/interviews/${id}`)
       setInterview(response.data)
 
+      if (response.data.status === 'COMPLETED') {
+        navigate(`/report/${id}`, { replace: true })
+        return
+      }
       if (response.data.status === 'SCHEDULED') {
         await api.post(`/interviews/${id}/begin`)
       }
 
       const questionResponse = await api.get(`/interviews/${id}/next-question`)
       setCurrentQuestion(questionResponse.data)
-    } catch (error) {
-      console.error('Failed to fetch interview:', error)
+    } catch (err) {
+      setError(errorText(err, 'Could not load this interview. Check your connection and retry.'))
     } finally {
       setLoading(false)
     }
@@ -79,8 +90,8 @@ const Interview = () => {
         const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
         audioStreamRef.current = stream
         setAudioStream(stream)
-      } catch (err) {
-        console.error('Error getting audio stream:', err)
+      } catch {
+        setError('Microphone access was denied. You can type your answer instead.')
       }
     } else if (audioStreamRef.current) {
       audioStreamRef.current.getTracks().forEach((track) => track.stop())
@@ -100,8 +111,9 @@ const Interview = () => {
   }
 
   const handleSubmitAnswer = async () => {
-    if (!answer.trim()) return
+    if (!answer.trim() || submitting) return
 
+    setError(null)
     setSubmitting(true)
     try {
       const response = await api.post(`/interviews/${id}/answer`, {
@@ -122,40 +134,48 @@ const Interview = () => {
           technicalDepth: evalData.technicalDepth,
         })
       } else {
-        setFeedback({ score: 0, grade: '-', feedback: 'Answer submitted.' })
+        setFeedback({
+          score: null,
+          grade: null,
+          feedback: 'Answer saved, but the AI evaluator is unavailable. You can continue; the report will say so instead of inventing a score.',
+        })
       }
-    } catch (error) {
-      console.error('Failed to submit answer:', error)
+    } catch (err) {
+      setError(errorText(err, 'Your answer was not saved. Please retry.'))
     } finally {
       setSubmitting(false)
     }
   }
 
   const handleContinue = async () => {
-    setFeedback(null)
-    setAnswer('')
-
-    if (interview.currentQuestionIndex + 1 >= interview.totalQuestions) {
-      setSubmitting(true)
-      try {
+    if (submitting) return
+    setError(null)
+    setSubmitting(true)
+    try {
+      if (interview.currentQuestionIndex + 1 >= interview.totalQuestions) {
         await api.post(`/interviews/${id}/end`)
-      } catch (e) {
-        console.error('Failed to end interview:', e)
+        navigate(`/report/${id}`)
+        return
       }
-      navigate(`/report/${id}`)
-    } else {
       const res = await api.get(`/interviews/${id}/next-question`)
       setCurrentQuestion(res.data)
       setInterview({ ...interview, currentQuestionIndex: interview.currentQuestionIndex + 1 })
+      setFeedback(null)
+      setAnswer('')
+    } catch (err) {
+      setError(errorText(err, 'Could not move to the next question. Please retry.'))
+    } finally {
+      setSubmitting(false)
     }
   }
 
   const handleEndInterview = async () => {
+    setError(null)
     try {
       await api.post(`/interviews/${id}/end`)
       navigate(`/report/${id}`)
-    } catch (error) {
-      console.error('Failed to end interview:', error)
+    } catch (err) {
+      setError(errorText(err, 'Could not end the interview. Please retry.'))
     }
   }
 
@@ -165,6 +185,24 @@ const Interview = () => {
         <BackgroundVideo />
         <div className="relative z-10 flex items-center justify-center h-64">
           <div className="animate-spin rounded-full h-8 w-8" style={{ border: '2px solid rgba(255,255,255,.1)', borderTopColor: '#fff' }} />
+        </div>
+      </div>
+    )
+  }
+
+  if (error && (!interview || !currentQuestion)) {
+    return (
+      <div className="min-h-screen relative" style={{ background: "#000", isolation: "isolate" }}>
+        <BackgroundVideo />
+        <div className="relative z-10 max-w-md mx-auto px-4 py-24 text-center">
+          <div role="alert" className="p-6 rounded-2xl" style={{ background: 'rgba(255,255,255,.04)', border: '1px solid rgba(255,255,255,.1)' }}>
+            <p className="font-semibold mb-2" style={{ color: '#fff' }}>Interview could not be loaded</p>
+            <p className="text-sm mb-5" style={{ color: 'rgba(255,255,255,.6)' }}>{error}</p>
+            <div className="flex justify-center gap-3">
+              <WhiteButton onClick={() => { setLoading(true); fetchInterview() }} className="px-4 py-2 text-sm">Retry</WhiteButton>
+              <button onClick={() => navigate('/')} className="px-4 py-2 text-sm rounded-xl" style={{ color: 'rgba(255,255,255,.6)' }}>Back to dashboard</button>
+            </div>
+          </div>
         </div>
       </div>
     )
@@ -195,6 +233,11 @@ const Interview = () => {
       <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
         {/* Main Interview Area */}
         <div className="xl:col-span-2">
+          {error && (
+            <div role="alert" className="mb-6 p-4 rounded-xl text-sm" style={{ background: 'rgba(239,68,68,.12)', border: '1px solid rgba(239,68,68,.35)', color: '#fecaca' }}>
+              {error}
+            </div>
+          )}
           {/* Header */}
           <GlassCard className="mb-6 p-6">
             <div className="flex justify-between items-center mb-4">
@@ -311,9 +354,11 @@ const Interview = () => {
 
         {/* Sidebar */}
         <div className="space-y-6">
-          <SpeechEmotionAnalyzer audioStream={audioStream} onEmotionChange={handleEmotionChange} enabled={inputMode === 'voice'} />
-          {showBodyLanguage && <BodyLanguageAnalyzer enabled={true} onAnalysisUpdate={setBodyAnalysis} />}
-          {showProctoring && <ProctoringMonitor onViolation={async (v) => { if (v.type === 'interview_end') { try { await api.post(`/interviews/${id}/end`) } catch (e) {} alert('Interview terminated.'); navigate('/') } }} enabled={showProctoring} />}
+          <ErrorBoundary label="analysis-panels" compact>
+            <SpeechEmotionAnalyzer audioStream={audioStream} onEmotionChange={handleEmotionChange} enabled={inputMode === 'voice'} />
+            {showBodyLanguage && <BodyLanguageAnalyzer enabled={true} onAnalysisUpdate={setBodyAnalysis} />}
+            {showProctoring && <ProctoringMonitor onViolation={async (v) => { if (v.type === 'interview_end') { try { await api.post(`/interviews/${id}/end`) } catch (e) { console.error(e) } alert('Interview terminated.'); navigate('/') } }} enabled={showProctoring} />}
+          </ErrorBoundary>
           <GlassCard className="p-4">
             <h3 className="font-medium mb-3" style={{ color: '#fff' }}>Analysis Panels</h3>
             <div className="space-y-2">

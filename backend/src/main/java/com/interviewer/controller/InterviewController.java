@@ -1,17 +1,12 @@
 package com.interviewer.controller;
 
 import com.interviewer.dto.*;
-import com.interviewer.entity.User;
-import com.interviewer.security.JwtUtil;
+import com.interviewer.security.CurrentUser;
 import com.interviewer.service.InterviewService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.context.request.RequestContextHolder;
-import org.springframework.web.context.request.ServletRequestAttributes;
 
 import java.util.List;
 
@@ -21,66 +16,42 @@ import java.util.List;
 public class InterviewController {
 
     private final InterviewService interviewService;
-    private final JwtUtil jwtUtil;
+    private final CurrentUser currentUser;
 
     @PostMapping("/start")
     public ResponseEntity<InterviewResponse> startInterview(@Valid @RequestBody InterviewStartRequest request) {
-        Long userId = getCurrentUserId();
-        InterviewResponse response = interviewService.startInterview(userId, request);
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(interviewService.startInterview(currentUser.id(), request));
     }
 
     @PostMapping("/{interviewId}/begin")
     public ResponseEntity<InterviewResponse> beginInterview(@PathVariable Long interviewId) {
-        InterviewResponse response = interviewService.startInterviewSession(interviewId);
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(interviewService.startInterviewSession(interviewId, currentUser.id()));
     }
 
     @GetMapping("/{interviewId}/next-question")
     public ResponseEntity<SessionResponse> getNextQuestion(@PathVariable Long interviewId) {
-        SessionResponse response = interviewService.getNextQuestion(interviewId);
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(interviewService.getNextQuestion(interviewId, currentUser.id()));
     }
 
     @PostMapping("/{interviewId}/answer")
     public ResponseEntity<SessionResponse> submitAnswer(
             @PathVariable Long interviewId,
             @Valid @RequestBody AnswerSubmitRequest request) {
-        SessionResponse response = interviewService.submitAnswer(interviewId, request);
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(interviewService.submitAnswer(interviewId, currentUser.id(), request));
     }
 
     @PostMapping("/{interviewId}/end")
     public ResponseEntity<InterviewResponse> endInterview(@PathVariable Long interviewId) {
-        InterviewResponse response = interviewService.endInterview(interviewId);
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(interviewService.endInterview(interviewId, currentUser.id()));
     }
 
     @GetMapping
     public ResponseEntity<List<InterviewResponse>> getUserInterviews() {
-        Long userId = getCurrentUserId();
-        List<InterviewResponse> responses = interviewService.getUserInterviews(userId);
-        return ResponseEntity.ok(responses);
+        return ResponseEntity.ok(interviewService.getUserInterviews(currentUser.id()));
     }
 
     @GetMapping("/{interviewId}")
     public ResponseEntity<InterviewResponse> getInterview(@PathVariable Long interviewId) {
-        InterviewResponse response = interviewService.getInterview(interviewId);
-        return ResponseEntity.ok(response);
-    }
-
-    private Long getCurrentUserId() {
-        ServletRequestAttributes attrs = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
-        if (attrs != null) {
-            String auth = attrs.getRequest().getHeader("Authorization");
-            if (auth != null && auth.startsWith("Bearer ")) {
-                try {
-                    return jwtUtil.extractUserId(auth.substring(7));
-                } catch (Exception ignored) {
-                }
-            }
-        }
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        return Long.parseLong(authentication.getName());
+        return ResponseEntity.ok(interviewService.getInterview(interviewId, currentUser.id()));
     }
 }
