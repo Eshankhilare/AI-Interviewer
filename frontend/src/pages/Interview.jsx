@@ -12,6 +12,7 @@ import InterviewerOrb from '../components/interview/InterviewerOrb'
 import ErrorBoundary from '../components/common/ErrorBoundary'
 import AnswerInsights from '../components/interview/AnswerInsights'
 import LiveAnswerHints from '../components/interview/LiveAnswerHints'
+import EvaluationProgress from '../components/interview/EvaluationProgress'
 import { analyzeAnswer } from '../utils/answerInsights'
 import { motion } from 'framer-motion'
 import { GlassCard, WhiteButton, GlassBadge, GlassInput, BackgroundVideo } from '../components/ui/glass'
@@ -417,14 +418,17 @@ const Interview = () => {
                   </WhiteButton>
                 </GlassCard>
               ) : (
+                <>
                 <div className="mt-4 flex justify-between">
-                  <button onClick={handleEndInterview} className="px-4 py-2 text-sm font-medium rounded-xl" style={{ color: 'rgba(255,255,255,.5)' }}>
+                  <button onClick={handleEndInterview} className="px-4 py-2 text-sm font-medium rounded-xl" style={{ color: 'rgba(255,255,255,.65)' }}>
                     <SkipForward className="h-4 w-4 mr-2 inline" />End Interview
                   </button>
                   <WhiteButton onClick={handleSubmitAnswer} disabled={submitting || !answer.trim()} className="px-5 py-2.5 text-sm">
                     <Send className="h-4 w-4 mr-2 inline" />{submitting ? 'Submitting...' : 'Submit Answer'}
                   </WhiteButton>
                 </div>
+                {submitting && <EvaluationProgress active />}
+                </>
               )}
             </GlassCard>
           )}

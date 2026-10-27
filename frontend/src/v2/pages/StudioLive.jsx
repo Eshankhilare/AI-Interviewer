@@ -11,6 +11,7 @@ import BodyLanguageAnalyzer from '../../components/interview/BodyLanguageAnalyze
 import ProctoringMonitor from '../../components/interview/ProctoringMonitor'
 import AnswerInsights from '../../components/interview/AnswerInsights'
 import LiveAnswerHints from '../../components/interview/LiveAnswerHints'
+import EvaluationProgress from '../../components/interview/EvaluationProgress'
 import CrystalizedBall from '../../components/ui/CrystalizedBall'
 import { useBackground } from '../store'
 import { analyzeAnswer } from '../../utils/answerInsights'
@@ -417,6 +418,7 @@ export default function StudioLive() {
                     <Send size={14} /> {submitting ? 'Scoring…' : 'Submit answer'}
                   </button>
                 </div>
+                {submitting && <EvaluationProgress active />}
               </>
             )}
           </motion.div>
