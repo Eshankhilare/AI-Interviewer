@@ -33,4 +33,20 @@ api.interceptors.response.use(
   }
 )
 
+/**
+ * A message that is safe to show a candidate. Prefers the server's own wording
+ * (it distinguishes 429, validation and conflicts), then a readable fallback for
+ * timeouts, offline and 5xx so the user is never left with "Request failed".
+ */
+export const errorMessage = (error, fallback = 'Something went wrong. Please retry.') => {
+  const status = error?.response?.status
+  const serverMessage = error?.response?.data?.message
+  if (status === 429) return serverMessage || 'Too many attempts. Wait a minute and try again.'
+  if (serverMessage) return serverMessage
+  if (error?.code === 'ECONNABORTED') return 'The server took too long to answer. Please retry.'
+  if (status >= 500) return 'The server hit an error. Please retry in a moment.'
+  if (!error?.response) return 'Cannot reach the server. Check your connection and retry.'
+  return fallback
+}
+
 export default api

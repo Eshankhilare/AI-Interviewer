@@ -25,6 +25,9 @@ const Layout = () => {
   return (
     <div style={{ position: 'fixed', inset: 0, background: 'transparent', isolation: 'isolate' }}>
       <div style={{ position: 'relative', zIndex: 1, height: '100%', overflowY: 'auto' }}>
+        {/* Skip link: first tab stop, invisible until focused */}
+        <a href="#main-content" className="skip-link">Skip to content</a>
+
         {/* Header */}
         <motion.header
           initial={{ y: -10, opacity: 0 }}
@@ -48,9 +51,10 @@ const Layout = () => {
               <div className="hidden sm:flex sm:items-center sm:space-x-1">
                 {navLinks.map(({ path, label, icon: Icon }) => (
                   <Link key={path} to={path}
+                    aria-current={location.pathname === path ? 'page' : undefined}
                     className="relative px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200"
                     style={{ color: location.pathname === path ? '#fff' : 'rgba(255,255,255,.5)', background: location.pathname === path ? 'rgba(255,255,255,.06)' : 'transparent' }}>
-                    <Icon className="h-4 w-4 inline mr-1.5" />{label}
+                    <Icon className="h-4 w-4 inline mr-1.5" aria-hidden="true" />{label}
                   </Link>
                 ))}
               </div>
@@ -62,11 +66,11 @@ const Layout = () => {
                   </div>
                   <span className="text-sm font-medium" style={{ color: 'rgba(255,255,255,.7)' }}>{user?.fullName}</span>
                 </div>
-                <button onClick={handleLogout} className="inline-flex items-center px-3 py-2 text-sm font-medium rounded-xl transition-all duration-200" style={{ color: 'rgba(255,255,255,.4)' }}>
-                  <LogOut className="h-4 w-4" />
+                <button onClick={handleLogout} aria-label="Log out" title="Log out" className="inline-flex items-center px-3 py-2 text-sm font-medium rounded-xl transition-all duration-200" style={{ color: 'rgba(255,255,255,.4)' }}>
+                  <LogOut className="h-4 w-4" aria-hidden="true" />
                 </button>
-                <button onClick={() => setMobileOpen(!mobileOpen)} className="sm:hidden p-2 rounded-xl" style={{ color: 'rgba(255,255,255,.5)' }}>
-                  {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+                <button onClick={() => setMobileOpen(!mobileOpen)} aria-label={mobileOpen ? 'Close menu' : 'Open menu'} aria-expanded={mobileOpen} aria-controls="mobile-nav" className="sm:hidden p-2 rounded-xl" style={{ color: 'rgba(255,255,255,.5)' }}>
+                  {mobileOpen ? <X className="h-5 w-5" aria-hidden="true" /> : <Menu className="h-5 w-5" aria-hidden="true" />}
                 </button>
               </div>
             </div>
@@ -75,11 +79,13 @@ const Layout = () => {
           <AnimatePresence>
             {mobileOpen && (
               <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.2 }} className="sm:hidden overflow-hidden" style={{ borderTop: '1px solid rgba(255,255,255,.05)' }}>
-                <div className="px-4 py-3 space-y-1">
+                <div id="mobile-nav" className="px-4 py-3 space-y-1">
                   {navLinks.map(({ path, label, icon: Icon }) => (
-                    <Link key={path} to={path} onClick={() => setMobileOpen(false)} className="flex items-center px-3 py-2.5 rounded-xl text-sm font-medium transition-all"
+                    <Link key={path} to={path} onClick={() => setMobileOpen(false)}
+                      aria-current={location.pathname === path ? 'page' : undefined}
+                      className="flex items-center px-3 py-2.5 rounded-xl text-sm font-medium transition-all"
                       style={{ color: location.pathname === path ? '#fff' : 'rgba(255,255,255,.5)', background: location.pathname === path ? 'rgba(255,255,255,.06)' : 'transparent' }}>
-                      <Icon className="h-4 w-4 mr-2" />{label}
+                      <Icon className="h-4 w-4 mr-2" aria-hidden="true" />{label}
                     </Link>
                   ))}
                 </div>
@@ -88,7 +94,7 @@ const Layout = () => {
           </AnimatePresence>
         </motion.header>
 
-        <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+        <main id="main-content" tabIndex={-1} className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
           <AnimatePresence mode="wait">
             <motion.div key={location.pathname} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -12 }} transition={{ duration: 0.3, ease: [.16,1,.3,1] }}>
               <Outlet />

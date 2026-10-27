@@ -4,6 +4,7 @@ import { useAuth } from '../context/AuthContext'
 import { UserPlus, Mail, Lock, User, Phone } from 'lucide-react'
 import { motion } from 'framer-motion'
 import { GlassCard, WhiteButton, GlassInput, BackgroundVideo } from '../components/ui/glass'
+import { errorMessage } from '../services/api'
 
 const Register = () => {
   const [formData, setFormData] = useState({
@@ -24,7 +25,7 @@ const Register = () => {
       await register(formData)
       navigate('/')
     } catch (err) {
-      setError(err.response?.data?.message || 'Registration failed.')
+      setError(errorMessage(err, 'Registration failed.'))
     } finally {
       setLoading(false)
     }

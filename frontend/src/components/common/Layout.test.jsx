@@ -62,8 +62,7 @@ describe('Layout profile navigation', () => {
       </MemoryRouter>,
     )
 
-    const unnamedButtons = screen.getAllByRole('button', { name: '' })
-    fireEvent.click(unnamedButtons.at(-1))
+    fireEvent.click(screen.getByRole('button', { name: 'Open menu' }))
     const profileLinks = screen.getAllByRole('link', { name: 'Profile' })
     expect(profileLinks).toHaveLength(2)
 

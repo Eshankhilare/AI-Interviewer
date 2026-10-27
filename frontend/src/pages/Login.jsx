@@ -4,6 +4,7 @@ import { useAuth } from '../context/AuthContext'
 import { Mail, Lock, ArrowRight } from 'lucide-react'
 import { motion } from 'framer-motion'
 import { GlassCard, WhiteButton, GlassInput, BackgroundVideo } from '../components/ui/glass'
+import { errorMessage } from '../services/api'
 
 const Login = () => {
   const [email, setEmail] = useState('')
@@ -22,7 +23,7 @@ const Login = () => {
       await login(email, password)
       navigate(searchParams.get('returnTo') || '/', { replace: true })
     } catch (err) {
-      setError(err.response?.data?.message || 'Login failed.')
+      setError(errorMessage(err, 'Login failed.'))
     } finally {
       setLoading(false)
     }

@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import api from '../services/api'
+import api, { errorMessage } from '../services/api'
 import { Send, SkipForward, MessageSquare, Mic, Code, ChevronRight, ThumbsUp, ThumbsDown, Minus } from 'lucide-react'
 import VoiceRecorder from '../components/interview/VoiceRecorder'
 import VoicePlayer from '../components/interview/VoicePlayer'
@@ -9,14 +9,9 @@ import BodyLanguageAnalyzer from '../components/interview/BodyLanguageAnalyzer'
 import ProctoringMonitor from '../components/interview/ProctoringMonitor'
 import SpeechEmotionAnalyzer from '../components/interview/SpeechEmotionAnalyzer'
 import InterviewerOrb from '../components/interview/InterviewerOrb'
-import AntiCheatModal from '../components/interview/AntiCheatModal'
 import ErrorBoundary from '../components/common/ErrorBoundary'
 import { motion } from 'framer-motion'
 import { GlassCard, WhiteButton, GlassBadge, GlassInput, BackgroundVideo } from '../components/ui/glass'
-
-/** Prefer the backend's message so the candidate sees an actionable reason. */
-const errorText = (error, fallback) =>
-  error?.response?.data?.message || (error?.code === 'ECONNABORTED' ? 'The server took too long to answer. Please retry.' : fallback)
 
 const Interview = () => {
   const { id } = useParams()
@@ -35,8 +30,7 @@ const Interview = () => {
   const [avatarSpeaking, setAvatarSpeaking] = useState(false)
   const [audioStream, setAudioStream] = useState(null)
   const [bodyAnalysis, setBodyAnalysis] = useState(null)
-  const [showAntiCheat, setShowAntiCheat] = useState(false)
-  const [antiCheatAccepted, setAntiCheatAccepted] = useState(false)
+  const [proctoringAccepted, setProctoringAccepted] = useState(false)
   const [feedback, setFeedback] = useState(null)
 
   const audioStreamRef = useRef(null)
@@ -46,8 +40,6 @@ const Interview = () => {
     // Pre-warm ai-service (wakes up Render free tier in background)
     const aiUrl = import.meta.env.VITE_AI_SERVICE_URL || 'https://ai-interviewer-ai-service-qpxr.onrender.com'
     fetch(`${aiUrl}/ai/voices`).catch(() => {})
-    // Anti-cheat modal disabled for testing
-    setAntiCheatAccepted(true)
     return () => {
       if (audioStreamRef.current) {
         audioStreamRef.current.getTracks().forEach(track => track.stop())
@@ -72,7 +64,7 @@ const Interview = () => {
       const questionResponse = await api.get(`/interviews/${id}/next-question`)
       setCurrentQuestion(questionResponse.data)
     } catch (err) {
-      setError(errorText(err, 'Could not load this interview. Check your connection and retry.'))
+      setError(errorMessage(err, 'Could not load this interview. Check your connection and retry.'))
     } finally {
       setLoading(false)
     }
@@ -141,7 +133,7 @@ const Interview = () => {
         })
       }
     } catch (err) {
-      setError(errorText(err, 'Your answer was not saved. Please retry.'))
+      setError(errorMessage(err, 'Your answer was not saved. Please retry.'))
     } finally {
       setSubmitting(false)
     }
@@ -163,7 +155,7 @@ const Interview = () => {
       setFeedback(null)
       setAnswer('')
     } catch (err) {
-      setError(errorText(err, 'Could not move to the next question. Please retry.'))
+      setError(errorMessage(err, 'Could not move to the next question. Please retry.'))
     } finally {
       setSubmitting(false)
     }
@@ -175,7 +167,7 @@ const Interview = () => {
       await api.post(`/interviews/${id}/end`)
       navigate(`/report/${id}`)
     } catch (err) {
-      setError(errorText(err, 'Could not end the interview. Please retry.'))
+      setError(errorMessage(err, 'Could not end the interview. Please retry.'))
     }
   }
 
@@ -222,12 +214,28 @@ const Interview = () => {
     <div className="min-h-screen relative" style={{ background: "#000", isolation: "isolate" }}>
       <BackgroundVideo />
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-      {/* Anti-Cheat Modal */}
-      {showAntiCheat && (
-        <AntiCheatModal
-          onAccept={() => { setAntiCheatAccepted(true); setShowAntiCheat(false) }}
-          onCancel={() => navigate('/')}
-        />
+      {!proctoringAccepted && (
+        <div role="region" aria-label="Proctoring notice" className="mb-6 p-5 rounded-2xl max-w-3xl"
+          style={{ background: 'rgba(255,255,255,.04)', border: '1px solid rgba(255,255,255,.12)' }}>
+          <h2 className="font-semibold mb-2" style={{ color: '#fff' }}>Interview integrity notice</h2>
+          <p className="text-sm mb-2" style={{ color: 'rgba(255,255,255,.65)' }}>
+            If you enable proctoring, your browser checks — without uploading any video — whether one face is
+            present and looking at the screen, and it logs tab switches and clipboard copy/paste. Three repeated
+            alerts of the same kind end the interview.
+          </p>
+          <p className="text-sm mb-4" style={{ color: 'rgba(255,255,255,.45)' }}>
+            Proctoring is optional. The interview and its score work the same without it.
+          </p>
+          <div className="flex flex-wrap gap-3">
+            <WhiteButton onClick={() => { setProctoringAccepted(true); setShowProctoring(true) }} className="px-4 py-2 text-sm">
+              Enable proctoring
+            </WhiteButton>
+            <button onClick={() => { setProctoringAccepted(true); setShowProctoring(false) }}
+              className="px-4 py-2 text-sm rounded-xl" style={{ color: 'rgba(255,255,255,.6)' }}>
+              Continue without it
+            </button>
+          </div>
+        </div>
       )}
 
       <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
@@ -357,7 +365,7 @@ const Interview = () => {
           <ErrorBoundary label="analysis-panels" compact>
             <SpeechEmotionAnalyzer audioStream={audioStream} onEmotionChange={handleEmotionChange} enabled={inputMode === 'voice'} />
             {showBodyLanguage && <BodyLanguageAnalyzer enabled={true} onAnalysisUpdate={setBodyAnalysis} />}
-            {showProctoring && <ProctoringMonitor onViolation={async (v) => { if (v.type === 'interview_end') { try { await api.post(`/interviews/${id}/end`) } catch (e) { console.error(e) } alert('Interview terminated.'); navigate('/') } }} enabled={showProctoring} />}
+            {showProctoring && proctoringAccepted && <ProctoringMonitor onViolation={async (v) => { if (v.type === 'interview_end') { try { await api.post(`/interviews/${id}/end`) } catch (e) { console.error(e) } alert('Interview terminated.'); navigate('/') } }} enabled={showProctoring} />}
           </ErrorBoundary>
           <GlassCard className="p-4">
             <h3 className="font-medium mb-3" style={{ color: '#fff' }}>Analysis Panels</h3>
