@@ -1,11 +1,12 @@
 import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { ContainerScroll } from '../components/ui/container-scroll-animation'
+import ScrollExpand from '../components/ui/ScrollExpand'
 import { ArrowRight, Play, Shield, Brain, Mic, BarChart3, CheckCircle2, ChevronRight, Video, FileText, Users, Zap } from 'lucide-react'
 
 const Landing = () => {
   return (
-    <div className="min-h-screen bg-black text-white overflow-hidden">
+    <div className="min-h-screen bg-black text-white" style={{ overflowX: 'clip' }}>
       {/* Background Video */}
       <video
         className="fixed inset-0 w-full h-full object-cover pointer-events-none z-0"
@@ -179,6 +180,32 @@ const Landing = () => {
             draggable={false}
           />
         </ContainerScroll>
+      </section>
+
+      {/* Full-bleed scroll expand */}
+      <section className="relative z-10">
+        <ScrollExpand
+          src="https://images.unsplash.com/photo-1521737604893-d14cc237f11d?auto=format&fit=crop&w=2400&q=80"
+          alt="Team working together in a studio"
+          title="Every session, scored."
+          scrollHint="Scroll to open the studio"
+          useWindowScroll
+          mediaZoom={1.15}
+          overlayScrim={0.55}
+        >
+          <h2 className="text-3xl md:text-5xl font-semibold text-white mb-4">
+            A studio, not a form.
+          </h2>
+          <p className="text-white/65 max-w-xl text-base md:text-lg">
+            Pick a role, answer in text or voice, and get a report that shows the rubric, the quotes and the next drill.
+          </p>
+          <Link
+            to="/register"
+            className="mt-7 inline-flex items-center gap-2 px-8 py-3.5 bg-white text-black font-medium rounded-xl hover:bg-white/90 transition-all"
+          >
+            Start Practicing Free <ChevronRight className="w-4 h-4" />
+          </Link>
+        </ScrollExpand>
       </section>
 
       {/* How It Works */}

@@ -12,6 +12,7 @@ import ProctoringMonitor from '../../components/interview/ProctoringMonitor'
 import AnswerInsights from '../../components/interview/AnswerInsights'
 import LiveAnswerHints from '../../components/interview/LiveAnswerHints'
 import CrystalizedBall from '../../components/ui/CrystalizedBall'
+import { useBackground } from '../store'
 import { analyzeAnswer } from '../../utils/answerInsights'
 import { ScoreRing, SkeletonBlock } from '../ui'
 
@@ -37,6 +38,7 @@ export default function StudioLive() {
   const [deadline, setDeadline] = useState(null)
   const audioRef = useRef(null)
   const reduce = useReducedMotion()
+  const { background } = useBackground()
 
   useEffect(() => {
     let alive = true
@@ -268,7 +270,7 @@ export default function StudioLive() {
               <div className="st-orb-ball" aria-hidden="true">
                 <CrystalizedBall
                   preset="plasma"
-                  color="#F25BD0"
+                  color={background === 'flux' ? '#22D3EE' : '#8B5CF6'}
                   size={0.78}
                   crackle={0.85}
                   fill={0.5}

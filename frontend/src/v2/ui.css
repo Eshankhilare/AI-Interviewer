@@ -423,6 +423,12 @@
   -webkit-text-fill-color: transparent; color: transparent;
 }
 .st-stage { display: flex; align-items: center; gap: 18px; margin-bottom: 14px; }
+.st-orb-ball {
+  width: 86px; height: 86px; flex-shrink: 0; border-radius: 50%; overflow: hidden;
+  position: relative;
+  box-shadow: 0 0 42px rgba(242, 91, 208, .35), 0 0 0 1px rgba(242, 91, 208, .18) inset;
+}
+.st-orb-ball .crystalized-ball { position: absolute; inset: 0; }
 .st-composer-tabs { display: flex; gap: 4px; padding: 4px; background: rgba(8, 10, 14, .55); border-radius: 12px; border: 1px solid rgba(255, 255, 255, .09); width: fit-content; }
 .st-signals > summary { cursor: pointer; list-style: none; display: flex; align-items: center; justify-content: space-between; font-size: 13px; font-weight: 600; }
 .st-signals > summary::-webkit-details-marker { display: none; }
