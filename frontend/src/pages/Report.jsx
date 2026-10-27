@@ -535,6 +535,7 @@ const Report = () => {
                         View Expected Answer
                       </summary>
                       <p className="mt-2 text-sm card" style={{ color: 'oklch(100% 0 0 / 0.6)' }}>
+                        {q.expectedAnswer}
                       </p>
                     </details>
                   )}

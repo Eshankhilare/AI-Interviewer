@@ -471,17 +471,20 @@ public class InterviewService {
         return Character.toUpperCase(lower.charAt(0)) + lower.substring(1);
     }
 
-    private List<Map<String, Object>> buildQuestionBreakdown(Interview interview) {        List<Map<String, Object>> breakdown = new ArrayList<>();
+    private List<Map<String, Object>> buildQuestionBreakdown(Interview interview) {
+        List<Map<String, Object>> breakdown = new ArrayList<>();
         for (InterviewSession session : interview.getSessions()) {
             Map<String, Object> item = new LinkedHashMap<>();
             item.put("question", session.getQuestion().getText());
             item.put("questionOrder", session.getQuestionOrder());
             item.put("status", session.getStatus().name());
+            item.put("expectedAnswer", session.getQuestion().getExpectedAnswer());
             if (session.getEvaluation() != null) {
                 item.put("score", session.getEvaluation().getScore());
                 item.put("grade", session.getEvaluation().getGrade());
                 item.put("feedback", session.getEvaluation().getFeedback());
                 item.put("improvementSuggestions", session.getEvaluation().getImprovementSuggestions());
+                item.put("sampleResponse", session.getEvaluation().getSampleResponse());
             }
             breakdown.add(item);
         }
