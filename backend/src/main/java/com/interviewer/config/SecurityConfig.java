@@ -23,6 +23,7 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -86,8 +87,17 @@ public class SecurityConfig {
             // Browsers reject "*" together with credentials; never send credentials in that mode.
             configuration.addAllowedOriginPattern("*");
         } else {
-            configuration.setAllowedOrigins(
-                    Arrays.stream(allowedOrigins.split(",")).map(String::trim).filter(s -> !s.isEmpty()).toList());
+            List<String> origins = new ArrayList<>(Arrays.stream(allowedOrigins.split(","))
+                    .map(String::trim).filter(s -> !s.isEmpty()).toList());
+            // A Vercel deployment calls its own API on a domain that is only known at
+            // runtime, so allow its generated hosts (production, branch and deployment).
+            for (String key : List.of("VERCEL_PROJECT_PRODUCTION_URL", "VERCEL_BRANCH_URL", "VERCEL_URL")) {
+                String host = System.getenv(key);
+                if (host != null && !host.isBlank()) {
+                    origins.add("https://" + host.trim());
+                }
+            }
+            configuration.setAllowedOrigins(origins);
         }
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
         configuration.setAllowedHeaders(List.of("*"));
