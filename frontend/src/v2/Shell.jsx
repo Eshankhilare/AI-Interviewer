@@ -1,111 +1,74 @@
-import { NavLink, Outlet, Link, useLocation, useNavigate } from 'react-router-dom'
+import { useState } from 'react'
+import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom'
 import { Home, Plus, FolderOpen, Settings, ArrowLeftRight } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
 import { setUIVersion } from './store'
+import { LiquidNavbar } from '../components/ui/liquid-glass-navbar'
+import Onboarding, { needsOnboarding } from './Onboarding'
 import './ui.css'
 
-const TITLES = [
-  [/^\/interview\/new/, 'New session'],
-  [/^\/interview\//, 'Live session'],
-  [/^\/report\//, 'Report'],
-  [/^\/(job-descriptions|resumes)/, 'Library'],
-  [/^\/profile/, 'Settings'],
-  [/^\/$/, 'Today'],
-]
-
-const titleFor = (pathname) => {
-  const match = TITLES.find(([pattern]) => pattern.test(pathname))
-  return match ? match[1] : 'Studio'
+const activeIndex = (pathname) => {
+  if (pathname === '/') return 0
+  if (pathname.startsWith('/interview')) return 1
+  if (pathname.startsWith('/report')) return 0
+  if (pathname.startsWith('/job-descriptions') || pathname.startsWith('/resumes')) return 2
+  if (pathname.startsWith('/profile')) return 3
+  return 0
 }
-
-const NAV = [
-  { to: '/', label: 'Today', icon: Home, end: true },
-  { to: '/interview/new', label: 'New session', icon: Plus },
-  { to: '/job-descriptions', label: 'Library', icon: FolderOpen, match: /^\/(job-descriptions|resumes)/ },
-  { to: '/profile', label: 'Settings', icon: Settings },
-]
 
 export default function StudioShell() {
   const { user } = useAuth()
   const location = useLocation()
   const navigate = useNavigate()
+  const [showIntro, setShowIntro] = useState(needsOnboarding)
   const isLive = /^\/interview\//.test(location.pathname) && location.pathname !== '/interview/new'
+
+  const items = [
+    { label: 'Today', icon: <Home size={17} strokeWidth={1.9} />, fx: 'glow', href: '/' },
+    { label: 'New', icon: <Plus size={17} strokeWidth={1.9} />, fx: 'drop', href: '/interview/new' },
+    { label: 'Library', icon: <FolderOpen size={17} strokeWidth={1.9} />, fx: 'spin', href: '/job-descriptions' },
+    { label: 'Settings', icon: <Settings size={17} strokeWidth={1.9} />, fx: 'wave', href: '/profile' },
+  ]
 
   return (
     <div className="ui-studio">
       <div className="st-ambient" aria-hidden="true" />
-      <div className="st-shell">
-        <nav className="st-rail" aria-label="Studio">
-          <Link to="/" className="st-rail-logo" aria-label="AI Interviewer home">AI</Link>
-          {NAV.map(({ to, label, icon: Icon, end, match }) => {
-            const active = match
-              ? match.test(location.pathname)
-              : end ? location.pathname === to : location.pathname.startsWith(to)
-            return (
-              <NavLink
-                key={to}
-                to={to}
-                end={end}
-                data-label={label}
-                aria-label={label}
-                aria-current={active ? 'page' : undefined}
-                className={`st-rail-item${active ? ' is-active' : ''}`}
-              >
-                <Icon size={19} strokeWidth={1.8} />
-              </NavLink>
-            )
-          })}
-          <div className="st-rail-spacer" />
-          <button
-            type="button"
-            className="st-rail-item st-rail-logout"
-            data-label="Classic UI"
-            aria-label="Switch to classic UI"
-            onClick={() => setUIVersion('classic')}
-          >
-            <ArrowLeftRight size={18} strokeWidth={1.8} />
-          </button>
-          <Link to="/profile" className="st-rail-item" data-label={user?.fullName || 'Account'} aria-label="Account settings">
-            <span style={{
-              width: 26, height: 26, borderRadius: 999, display: 'grid', placeItems: 'center',
-              background: 'linear-gradient(135deg,#7c6cf6,#a78bfa)', color: '#fff', fontSize: 11, fontWeight: 700,
-            }}>
-              {(user?.fullName || 'U').charAt(0).toUpperCase()}
-            </span>
-          </Link>
-        </nav>
 
-        <div className="st-main">
-          <header className="st-topbar">
-            <div className="st-crumb">
-              <span>Studio</span>
-              <span aria-hidden="true">/</span>
-              <strong>{titleFor(location.pathname)}</strong>
-            </div>
-            <div className="st-topbar-actions">
-              {!isLive && (
-                <button
-                  type="button"
-                  className="st-btn st-btn-ghost st-btn-sm"
-                  onClick={() => setUIVersion('classic')}
-                  title="Switch back to the original UI"
-                >
-                  <ArrowLeftRight size={14} /> <span>Classic UI</span>
-                </button>
-              )}
-              {!isLive && (
-                <button type="button" className="st-btn st-btn-primary st-btn-sm" onClick={() => navigate('/interview/new')}>
-                  <Plus size={15} /> <span>New session</span>
-                </button>
-              )}
-            </div>
-          </header>
+      <header className="st-topbar st-topbar-v2">
+        <Link to="/" className="st-brand" aria-label="AI Interviewer home">
+          <span className="st-rail-logo" style={{ marginBottom: 0 }}>AI</span>
+          <span className="st-brand-name">AI Interviewer</span>
+        </Link>
 
-          <main id="main-content" tabIndex={-1}>
-            <Outlet />
-          </main>
+        <div className="st-nav-wrap">
+          <LiquidNavbar
+            tone="dark"
+            items={items}
+            active={activeIndex(location.pathname)}
+            onChange={(index, item) => { if (item.href) navigate(item.href) }}
+            sound={false}
+          />
         </div>
-      </div>
+
+        <div className="st-topbar-actions">
+          {!isLive && (
+            <button
+              type="button"
+              className="st-btn st-btn-ghost st-btn-sm st-classic-switch"
+              onClick={() => setUIVersion('classic')}
+              title="Switch back to the original UI"
+            >
+              <ArrowLeftRight size={14} /> <span>Classic</span>
+            </button>
+          )}
+        </div>
+      </header>
+
+      <main id="main-content" tabIndex={-1}>
+        <Outlet />
+      </main>
+
+      {showIntro && <Onboarding onDone={() => setShowIntro(false)} />}
     </div>
   )
 }

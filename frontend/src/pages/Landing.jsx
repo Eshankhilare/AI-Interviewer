@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
+import { ContainerScroll } from '../components/ui/container-scroll-animation'
 import { ArrowRight, Play, Shield, Brain, Mic, BarChart3, CheckCircle2, ChevronRight, Video, FileText, Users, Zap } from 'lucide-react'
 
 const Landing = () => {
@@ -153,6 +154,32 @@ const Landing = () => {
           ))}
         </motion.div>
       </div>
+
+      {/* Product scroll showcase */}
+      <section className="relative z-10">
+        <ContainerScroll
+          titleComponent={
+            <div className="max-w-4xl mx-auto text-center">
+              <p className="text-xs font-semibold uppercase tracking-[.18em] text-white/40 mb-4">The interview studio</p>
+              <h2 className="text-4xl md:text-6xl font-semibold text-white leading-[1.05]">
+                Meet your AI interviewer.
+                <br />
+                <span className="text-white/45">Evidence, not vibes.</span>
+              </h2>
+              <p className="mt-5 text-white/50 max-w-xl mx-auto">
+                Every score comes from a five-criterion rubric and quotes from your own answer.
+              </p>
+            </div>
+          }
+        >
+          <img
+            src="/studio-report.png"
+            alt="AI Interviewer assessment report with rubric radar and evidence"
+            className="mx-auto h-full w-full object-cover object-top rounded-xl"
+            draggable={false}
+          />
+        </ContainerScroll>
+      </section>
 
       {/* How It Works */}
       <div id="how-it-works" className="relative z-10 max-w-7xl mx-auto px-8 py-24">

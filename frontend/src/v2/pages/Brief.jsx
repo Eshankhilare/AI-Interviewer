@@ -30,7 +30,13 @@ export default function Brief() {
     return Number.isFinite(value) && value >= 3 && value <= 30 ? value : 10
   })
   const [title, setTitle] = useState('')
-  const [notes, setNotes] = useState(() => (params.get('focus') ? `Focus on ${params.get('focus')}` : ''))
+  const [notes, setNotes] = useState(() => {
+    const focus = params.get('focus')
+    if (focus) return `Focus on ${focus}`
+    if (prefs.note) return prefs.note
+    if (Array.isArray(prefs.focus) && prefs.focus.length) return `Focus on ${prefs.focus.join(', ')}`
+    return ''
+  })
   const [starting, setStarting] = useState(false)
   const [error, setError] = useState('')
 

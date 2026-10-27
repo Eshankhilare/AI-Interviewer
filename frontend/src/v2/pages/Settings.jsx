@@ -73,7 +73,12 @@ export default function Settings() {
                 <h2 className="st-h2">Profile</h2>
                 <p className="st-sub">{user?.email}</p>
               </div>
-              <span className="st-chip"><ShieldCheck size={12} /> {user?.role || 'CANDIDATE'}</span>
+              <div className="st-row">
+                <button type="button" className="st-btn st-btn-sm" onClick={() => { localStorage.removeItem('studio-onboarded'); window.location.reload() }}>
+                  Retake intro
+                </button>
+                <span className="st-chip"><ShieldCheck size={12} /> {user?.role || 'CANDIDATE'}</span>
+              </div>
             </div>
             <form onSubmit={save}>
               <div className="st-grid-2">
