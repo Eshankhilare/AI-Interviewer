@@ -215,6 +215,12 @@ body {
   color: rgba(255, 255, 255, .35);
 }
 
+/* No Tailwind preflight here, so width:100% plus padding overflows its grid cell
+   and the Name/Email fields overlap. */
+.contact-input {
+  box-sizing: border-box;
+}
+
 /* Keep raw controls (inputs, selects) from falling back to native light chrome.
    Class utilities still win because this rule is not !important. */
 *, *::before, *::after {
