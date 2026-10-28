@@ -124,12 +124,14 @@ public class ResumeController {
         if (text.length() > MAX_PASTED_TEXT) {
             throw new IllegalArgumentException("Resume text is too long (max " + MAX_PASTED_TEXT + " characters)");
         }
+        String requestedName = request.get("fileName");
 
         Map<String, Object> parsed = aiServiceClient.parseResume(text);
 
         Resume resume = Resume.builder()
                 .user(user)
-                .fileName("pasted-resume.txt")
+                .fileName(requestedName == null || requestedName.isBlank()
+                        ? "pasted-resume.txt" : sanitizeFileName(requestedName))
                 .filePath("pasted")
                 .fileType("text/plain")
                 .extractedText(text)
@@ -142,6 +144,18 @@ public class ResumeController {
         response.put("id", resume.getId());
         response.put("parsedData", parsed);
         return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/generate")
+    public ResponseEntity<Map<String, Object>> generateResume(@RequestBody Map<String, Object> request) {
+        if (request == null || request.get("full_name") == null || request.get("role") == null) {
+            throw new IllegalArgumentException("Full name and target role are required");
+        }
+        Map<String, Object> generated = aiServiceClient.generateResume(request);
+        if (generated == null || generated.isEmpty()) {
+            throw new ConflictException("Resume generation is unavailable. Use the offline template.");
+        }
+        return ResponseEntity.ok(generated);
     }
 
     @GetMapping

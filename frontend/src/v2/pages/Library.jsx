@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { Briefcase, FileText, Plus, Trash2 } from 'lucide-react'
+import { Briefcase, FileText, Plus, Sparkles, Trash2 } from 'lucide-react'
 import api, { errorMessage } from '../../services/api'
+import { JOB_ROLES } from '../../data/jobRoles'
 import { Empty, PageHead, SkeletonBlock } from '../ui'
 
 const LEVELS = ['JUNIOR', 'MID', 'SENIOR']
@@ -13,6 +14,7 @@ export default function Library({ initialTab = 'jobs' }) {
   const [resumes, setResumes] = useState([])
   const [error, setError] = useState('')
   const [busy, setBusy] = useState(false)
+  const [catalogBusy, setCatalogBusy] = useState(false)
   const [showJobForm, setShowJobForm] = useState(false)
   const [showResumeForm, setShowResumeForm] = useState(false)
   const [job, setJob] = useState({ title: '', company: '', description: '', experienceLevel: 'MID' })
@@ -70,8 +72,35 @@ export default function Library({ initialTab = 'jobs' }) {
     }
   }
 
-  const remove = async (kind, id) => {
-    if (busy) return
+  const startFromRole = async (role) => {
+    if (catalogBusy) return
+    const existing = (jobs || []).find(
+      (item) => item.title.toLowerCase() === role.title.toLowerCase())
+    if (existing) {
+      navigate(`/interview/new?job=${existing.id}`)
+      return
+    }
+    setCatalogBusy(true)
+    setError('')
+    try {
+      const { data } = await api.post('/job-descriptions', {
+        title: role.title,
+        company: 'Self',
+        description: role.description,
+        experienceLevel: 'MID',
+        location: '',
+        employmentType: 'Full-time',
+      })
+      await load()
+      navigate(`/interview/new?job=${data.id}`)
+    } catch (err) {
+      setError(errorMessage(err, 'Could not start from this role.'))
+    } finally {
+      setCatalogBusy(false)
+    }
+  }
+
+  const remove = async (kind, id) => {    if (busy) return
     setBusy(true)
     setError('')
     try {
@@ -101,13 +130,24 @@ export default function Library({ initialTab = 'jobs' }) {
         title="Roles and resumes"
         sub="Everything the studio draws on. Roles set the difficulty tier; resumes personalise the questions."
         actions={
-          <button
-            type="button"
-            className="st-btn st-btn-primary"
-            onClick={() => (tab === 'jobs' ? setShowJobForm((v) => !v) : setShowResumeForm((v) => !v))}
-          >
-            <Plus size={15} /> {tab === 'jobs' ? 'New role' : 'Add resume'}
-          </button>
+          tab === 'jobs' ? (
+            <button
+              type="button"
+              className="st-btn st-btn-primary"
+              onClick={() => setShowJobForm((v) => !v)}
+            >
+              <Plus size={15} /> New role
+            </button>
+          ) : (
+            <div className="st-row">
+              <button type="button" className="st-btn st-btn-ghost" onClick={() => navigate('/resume-builder')}>
+                <Sparkles size={14} /> Build with AI
+              </button>
+              <button type="button" className="st-btn st-btn-primary" onClick={() => setShowResumeForm((v) => !v)}>
+                <Plus size={15} /> Add resume
+              </button>
+            </div>
+          )
         }
       />
 
@@ -126,6 +166,31 @@ export default function Library({ initialTab = 'jobs' }) {
 
       {tab === 'jobs' && (
         <>
+          <div className="st-card" style={{ padding: 18, marginBottom: 16 }}>
+            <div className="st-between">
+              <h2 className="st-h2" style={{ margin: 0 }}>Start from a role</h2>
+              <span className="st-dim" style={{ fontSize: 11 }}>{JOB_ROLES.length} templates</span>
+            </div>
+            <p className="st-dim" style={{ fontSize: 12, margin: '5px 0 12px' }}>
+              Pick a role to create it and open the brief. Your own role form is still below.
+            </p>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(205px, 1fr))', gap: 7, maxHeight: 232, overflowY: 'auto' }}>
+              {JOB_ROLES.map((role) => (
+                <button
+                  key={role.title}
+                  type="button"
+                  className="st-btn st-btn-sm st-btn-ghost"
+                  disabled={catalogBusy}
+                  onClick={() => startFromRole(role)}
+                  style={{ width: '100%', justifyContent: 'space-between', textAlign: 'left' }}
+                >
+                  <span>{role.title}</span>
+                  <span className="st-dim" style={{ fontSize: 9.5 }}>{role.category}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+
           {showJobForm && (
             <form className="st-card" onSubmit={createJob} style={{ marginBottom: 16 }}>
               <h2 className="st-h2">New role</h2>
@@ -224,7 +289,7 @@ export default function Library({ initialTab = 'jobs' }) {
               </div>
             )) : (
               <Empty icon={FileText} title="No resumes yet"
-                action={<button type="button" className="st-btn st-btn-sm" onClick={() => setShowResumeForm(true)}>Paste one</button>}>
+                action={<div className="st-row"><button type="button" className="st-btn st-btn-sm" onClick={() => setShowResumeForm(true)}>Paste one</button><button type="button" className="st-btn st-btn-sm st-btn-ghost" onClick={() => navigate('/resume-builder')}><Sparkles size={13} /> Build with AI</button></div>}>
                 Attach a resume to get questions about your actual work.
               </Empty>
             )}
@@ -238,3 +303,4 @@ export default function Library({ initialTab = 'jobs' }) {
     </div>
   )
 }
+

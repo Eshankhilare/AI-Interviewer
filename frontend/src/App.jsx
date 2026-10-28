@@ -14,6 +14,7 @@ const Interview = lazy(() => import('./pages/Interview'))
 const Report = lazy(() => import('./pages/Report'))
 const JobDescriptions = lazy(() => import('./pages/JobDescriptions'))
 const Resumes = lazy(() => import('./pages/Resumes'))
+const ResumeBuilder = lazy(() => import('./pages/ResumeBuilder'))
 const Practice = lazy(() => import('./pages/Practice'))
 const Profile = lazy(() => import('./pages/Profile'))
 const AuthCallback = lazy(() => import('./pages/AuthCallback'))
@@ -74,6 +75,7 @@ function AppRoutes() {
             <Route path="report/:id" element={<UIPage classic={<Report />} studio={<StudioReport />} />} />
             <Route path="job-descriptions" element={<UIPage classic={<JobDescriptions />} studio={<StudioLibrary initialTab="jobs" />} />} />
             <Route path="resumes" element={<UIPage classic={<Resumes />} studio={<StudioLibrary initialTab="resumes" />} />} />
+            <Route path="resume-builder" element={<ResumeBuilder />} />
             <Route path="practice" element={<UIPage classic={<Practice />} studio={<Practice />} />} />
             <Route path="profile" element={<UIPage classic={<Profile />} studio={<StudioSettings />} />} />
           </>

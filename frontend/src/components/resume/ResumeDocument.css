@@ -1,0 +1,156 @@
+/* A4 resume sheet: 794 x 1123 px at 96 dpi, 210 x 297 mm in print. */
+.rs {
+  width: 794px;
+  min-height: 1123px;
+  box-sizing: border-box;
+  background: #ffffff;
+  color: #111111;
+  font-family: "Inter", "Segoe UI", Arial, sans-serif;
+  font-size: 12px;
+  line-height: 1.55;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+
+.rs * { box-sizing: border-box; }
+.rs h1, .rs h2, .rs p, .rs ul { margin: 0; }
+.rs ul { padding-left: 16px; }
+.rs li { margin: 3px 0; }
+.rs section { margin-top: 22px; }
+.rs h2 {
+  margin-bottom: 8px;
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+}
+.rs-role { font-size: 11px; letter-spacing: .08em; text-transform: uppercase; }
+.rs-contact { font-size: 10.5px; color: #555555; }
+.rs-summary { color: #333333; }
+.rs-skill-line { color: #333333; }
+.rs-experience { display: grid; gap: 14px; }
+.rs-exp-head { display: flex; justify-content: space-between; gap: 16px; align-items: baseline; }
+.rs-exp-title { font-weight: 700; font-size: 12.5px; }
+.rs-exp-period { color: #666666; font-size: 10.5px; white-space: nowrap; }
+.rs-exp-company { color: #555555; font-size: 11px; margin-bottom: 3px; }
+.rs-education { display: grid; gap: 8px; }
+.rs-edu-degree { font-weight: 600; }
+.rs-edu-school { color: #666666; font-size: 10.5px; }
+.rs-skills { display: flex; flex-wrap: wrap; gap: 5px; }
+.rs-skills span {
+  border: 1px solid #d8d8d8;
+  border-radius: 999px;
+  padding: 2px 8px;
+  font-size: 10.5px;
+  color: #333333;
+}
+.rs-projects { display: grid; gap: 8px; }
+.rs-project strong { display: block; font-size: 11.5px; }
+.rs-project span { color: #555555; font-size: 11px; }
+
+/* Classic */
+.rs-classic { padding: 48px 54px; font-family: "Georgia", "Times New Roman", serif; }
+.rs-classic-head { text-align: center; padding-bottom: 18px; border-bottom: 3px double #222222; }
+.rs-classic h1 { font-size: 34px; font-weight: 700; letter-spacing: -.01em; }
+.rs-classic .rs-role { margin-top: 4px; }
+.rs-classic .rs-contact { margin-top: 8px; }
+.rs-classic section { margin-top: 20px; }
+.rs-classic h2 { border-bottom: 1px solid #c9c9c9; padding-bottom: 4px; color: #222222; }
+.rs-classic .rs-summary, .rs-classic li { font-size: 12px; }
+
+/* Modern */
+.rs-modern { padding: 0; }
+.rs-modern-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 28px;
+  padding: 42px 52px 24px;
+  border-top: 8px solid #4f46e5;
+}
+.rs-modern h1 { font-size: 36px; font-weight: 800; letter-spacing: -.03em; }
+.rs-modern .rs-role { color: #4f46e5; font-weight: 700; margin-top: 4px; }
+.rs-modern .rs-contact { text-align: right; white-space: pre-line; line-height: 1.7; }
+.rs-modern-body { display: grid; grid-template-columns: 1.9fr 1fr; gap: 34px; padding: 8px 52px 46px; }
+.rs-modern aside { border-left: 1px solid #e5e7eb; padding-left: 26px; }
+.rs-modern h2 { color: #4f46e5; }
+.rs-modern .rs-skills span { border-color: #c7d2fe; background: #eef2ff; color: #3730a3; }
+.rs-modern .rs-exp-title { font-size: 13px; }
+
+/* Minimal */
+.rs-minimal { padding: 58px 66px; font-weight: 400; }
+.rs-minimal header { padding-bottom: 26px; border-bottom: 1px solid #111111; }
+.rs-minimal h1 { font-size: 32px; font-weight: 500; letter-spacing: -.02em; }
+.rs-minimal .rs-role { margin-top: 5px; color: #555555; }
+.rs-minimal .rs-contact { margin-top: 12px; }
+.rs-minimal section { margin-top: 26px; }
+.rs-minimal h2 { font-size: 8.5px; letter-spacing: .28em; color: #666666; }
+.rs-minimal .rs-summary { max-width: 620px; }
+.rs-minimal .rs-exp-title { font-weight: 600; }
+.rs-minimal .rs-skills { gap: 8px; }
+.rs-minimal .rs-skills span { border: 0; padding: 0; font-size: 11px; color: #222222; }
+.rs-minimal .rs-skills span + span::before { content: "/"; color: #bbbbbb; margin-right: 8px; }
+
+/* Sidebar */
+.rs-sidebar { display: flex; padding: 0; }
+.rs-side {
+  width: 34%;
+  background: #111827;
+  color: #e5e7eb;
+  padding: 38px 28px;
+}
+.rs-side h1 { color: #ffffff; font-size: 25px; line-height: 1.15; }
+.rs-side .rs-role { color: #a5b4fc; margin-top: 6px; font-size: 10px; }
+.rs-side-block { margin-top: 28px; }
+.rs-side h2 { color: #94a3b8; font-size: 8.5px; }
+.rs-side p { color: #cbd5e1; font-size: 10.5px; margin: 2px 0; overflow-wrap: anywhere; }
+.rs-side .rs-edu-degree { color: #f8fafc; font-size: 11px; }
+.rs-side .rs-edu-school { color: #94a3b8; }
+.rs-skills-dark span { border-color: #334155; background: #1e293b; color: #e2e8f0; }
+.rs-side-main { flex: 1; padding: 42px 38px; }
+.rs-side-main h2 { color: #111827; border-bottom: 1px solid #e5e7eb; padding-bottom: 4px; }
+
+/* Technical */
+.rs-technical { padding: 42px 50px; font-family: "Segoe UI", Arial, sans-serif; }
+.rs-technical header {
+  display: flex;
+  justify-content: space-between;
+  gap: 24px;
+  align-items: flex-end;
+  padding-bottom: 14px;
+  border-bottom: 3px solid #0f766e;
+}
+.rs-technical h1 { font-size: 29px; font-weight: 800; letter-spacing: -.03em; }
+.rs-technical .rs-role { color: #0f766e; font-weight: 700; margin-top: 3px; }
+.rs-technical .rs-contact { text-align: right; font-family: "Consolas", "Courier New", monospace; font-size: 9.5px; }
+.rs-technical h2 { color: #0f766e; font-family: "Consolas", "Courier New", monospace; letter-spacing: .1em; }
+.rs-technical .rs-skills span {
+  border-color: #99f6e4;
+  background: #f0fdfa;
+  color: #115e59;
+  font-family: "Consolas", "Courier New", monospace;
+  font-size: 9.5px;
+}
+.rs-technical section { margin-top: 18px; }
+.rs-technical .rs-exp { padding-left: 10px; border-left: 2px solid #ccfbf1; }
+
+/* Preview vs print */
+.rs-preview { width: 100%; overflow: auto; background: rgba(255, 255, 255, .04); border-radius: 14px; }
+.rs-preview .rs { zoom: .78; margin: 0 auto; box-shadow: 0 22px 60px rgba(0, 0, 0, .45); }
+
+@media print {
+  @page { size: A4; margin: 0; }
+  html, body { background: #ffffff !important; }
+  body * { visibility: hidden !important; }
+  .rs-print, .rs-print * { visibility: visible !important; }
+  .rs-print {
+    position: fixed;
+    inset: 0;
+    width: 210mm;
+    min-height: 297mm;
+    margin: 0;
+    box-shadow: none !important;
+    zoom: 1 !important;
+  }
+  .no-print { display: none !important; }
+  .rs-exp, .rs-project, .rs-edu { break-inside: avoid; }
+}

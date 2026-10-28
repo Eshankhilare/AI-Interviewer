@@ -20,7 +20,10 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 /** Email/phone login and the Google provider contract. */
-@SpringBootTest
+@SpringBootTest(properties = {
+        "app.google.client-id=",
+        "app.google.client-secret="
+})
 @AutoConfigureMockMvc
 @ActiveProfiles("local")
 class AuthFlowTest {

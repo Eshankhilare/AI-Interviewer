@@ -209,6 +209,15 @@ public class AiServiceClient {
         }
     }
 
+    /** Rewrites the candidate's own facts into a resume draft; never invents facts. */
+    public Map<String, Object> generateResume(Map<String, Object> resumeDraft) {
+        try {
+            return post("/ai/generate-resume", resumeDraft);
+        } catch (Exception e) {
+            return Collections.emptyMap();
+        }
+    }
+
     public Map<String, Object> analyzeJobDescription(String jdText) {
         try {
             Map<String, Object> request = new HashMap<>();

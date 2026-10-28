@@ -7,6 +7,7 @@ from typing import List, Optional
 from app.security import require_service_token
 from app.services.llm_service import LLMService
 from app.services.resume_parser import ResumeParser
+from app.services.resume_writer import ResumeWriter
 from app.services.evaluation_service import EvaluationService
 from app.services.voice_service import VoiceService
 from app.services.emotion_service import EmotionService
@@ -24,6 +25,7 @@ def _internal_error(exc: Exception) -> HTTPException:
 
 llm_service = LLMService()
 resume_parser = ResumeParser()
+resume_writer = ResumeWriter()
 evaluation_service = EvaluationService()
 voice_service = VoiceService()
 emotion_service = EmotionService()
@@ -49,6 +51,39 @@ class EvaluationRequest(BaseModel):
 
 class ResumeParseRequest(BaseModel):
     resume_text: str = Field(max_length=100000)
+
+
+class ResumeExperienceItem(BaseModel):
+    title: str = Field(default="", max_length=120)
+    company: str = Field(default="", max_length=120)
+    period: str = Field(default="", max_length=60)
+    description: str = Field(default="", max_length=3000)
+
+
+class ResumeEducationItem(BaseModel):
+    degree: str = Field(default="", max_length=120)
+    school: str = Field(default="", max_length=120)
+    period: str = Field(default="", max_length=60)
+
+
+class ResumeProjectItem(BaseModel):
+    name: str = Field(default="", max_length=120)
+    detail: str = Field(default="", max_length=400)
+
+
+class ResumeGenerateRequest(BaseModel):
+    full_name: str = Field(default="", max_length=100)
+    role: str = Field(default="", max_length=120)
+    email: str = Field(default="", max_length=200)
+    phone: str = Field(default="", max_length=40)
+    location: str = Field(default="", max_length=100)
+    linkedin: str = Field(default="", max_length=200)
+    github: str = Field(default="", max_length=200)
+    summary: str = Field(default="", max_length=2000)
+    skills: str = Field(default="", max_length=2000)
+    experience: List[ResumeExperienceItem] = Field(default_factory=list, max_length=10)
+    education: List[ResumeEducationItem] = Field(default_factory=list, max_length=5)
+    projects: List[ResumeProjectItem] = Field(default_factory=list, max_length=8)
 
 
 class JDAnalysisRequest(BaseModel):
@@ -119,6 +154,14 @@ async def parse_resume(request: ResumeParseRequest):
     try:
         parsed_data = resume_parser.parse(request.resume_text)
         return parsed_data
+    except Exception as e:
+        raise _internal_error(e)
+
+
+@router.post("/generate-resume")
+async def generate_resume(request: ResumeGenerateRequest):
+    try:
+        return await resume_writer.generate(request.model_dump())
     except Exception as e:
         raise _internal_error(e)
 

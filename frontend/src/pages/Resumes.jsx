@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import api from '../services/api'
-import { Plus, FileText, Upload, Trash2, ArrowLeft } from 'lucide-react'
+import { Plus, FileText, Upload, Trash2, ArrowLeft, Sparkles } from 'lucide-react'
 import { motion } from 'framer-motion'
 import { GlassCard, WhiteButton, GlassInput, BackgroundVideo } from '../components/ui/glass'
 
@@ -56,9 +56,14 @@ const Resumes = () => {
             <h1 className="text-2xl font-bold" style={{ color: '#fff', fontFamily: '"Fraunces", "Reference Display", serif', fontWeight: 500 }}>Resumes</h1>
             <p className="mt-1" style={{ color: 'rgba(255,255,255,.5)' }}>Upload or paste your resume</p>
           </div>
-          <WhiteButton onClick={() => setShowForm(!showForm)} className="px-4 py-2.5 flex items-center gap-2 text-sm">
-            <Plus className="h-4 w-4" /> Add Resume
-          </WhiteButton>
+          <div className="flex gap-2">
+            <button onClick={() => navigate('/resume-builder')} className="px-4 py-2.5 rounded-xl text-sm font-medium inline-flex items-center gap-2" style={{ color: 'rgba(255,255,255,.7)', border: '1px solid rgba(255,255,255,.14)' }}>
+              <Sparkles className="h-4 w-4" /> Build with AI
+            </button>
+            <WhiteButton onClick={() => setShowForm(!showForm)} className="px-4 py-2.5 flex items-center gap-2 text-sm">
+              <Plus className="h-4 w-4" /> Add Resume
+            </WhiteButton>
+          </div>
         </div>
 
         {success && <div className="mb-4 p-3 rounded-xl" style={{ background: 'rgba(34,197,94,.1)', border: '1px solid rgba(34,197,94,.2)' }}><p className="text-sm" style={{ color: '#4ade80' }}>{success}</p></div>}
