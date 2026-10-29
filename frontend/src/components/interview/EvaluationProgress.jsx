@@ -29,9 +29,9 @@ const EvaluationProgress = ({ active }) => {
 
   return (
     <div className="mt-3" role="status" aria-live="polite">
-      <div className="flex items-center justify-between gap-3 text-xs" style={{ color: 'rgba(255,255,255,.55)' }}>
+      <div className="flex items-center justify-between gap-3 text-xs" style={{ color: 'rgba(255,255,255,.78)' }}>
         <span>{stage.label}</span>
-        <span style={{ color: 'rgba(255,255,255,.35)' }}>{seconds}s</span>
+        <span style={{ color: 'rgba(255,255,255,.7)' }}>{seconds}s</span>
       </div>
       <div className="h-1.5 rounded-full overflow-hidden mt-1.5" style={{ background: 'rgba(255,255,255,.08)' }}>
         <div className="h-full rounded-full transition-all duration-700" style={{ width: `${width}%`, background: '#6366f1' }} />

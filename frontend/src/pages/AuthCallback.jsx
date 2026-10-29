@@ -32,7 +32,7 @@ const AuthCallback = () => {
         {failed ? (
           <>
             <p className="text-white font-semibold mb-2">Google sign-in did not complete</p>
-            <p className="text-sm mb-5" style={{ color: 'rgba(255,255,255,.5)' }}>
+            <p className="text-sm mb-5" style={{ color: 'rgba(255,255,255,.76)' }}>
               The Google account may not have shared a verified email. Try again or use email and password.
             </p>
             <Link to="/login?error=google_failed" className="text-sm font-medium" style={{ color: '#a5b4fc' }}>
@@ -42,7 +42,7 @@ const AuthCallback = () => {
         ) : (
           <>
             <div className="animate-spin rounded-full h-8 w-8 border-2 border-white/20 border-t-white mx-auto" />
-            <p className="mt-4 text-sm" style={{ color: 'rgba(255,255,255,.5)' }}>Signing you in…</p>
+            <p className="mt-4 text-sm" style={{ color: 'rgba(255,255,255,.76)' }}>Signing you in…</p>
           </>
         )}
       </div>

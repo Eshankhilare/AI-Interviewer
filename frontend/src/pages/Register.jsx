@@ -47,7 +47,7 @@ const Register = () => {
             <img src="/logo.jpeg" alt="AI Interviewer" className="w-14 h-14 mx-auto rounded-2xl object-cover mb-4"
               style={{ border: '1px solid rgba(245,158,11,.35)', boxShadow: '0 4px 20px rgba(245,158,11,.3)' }} />
             <h2 className="text-2xl font-bold" style={{ color: '#fff', fontWeight: 500 }}>Create your account</h2>
-            <p className="mt-1" style={{ color: 'rgba(255,255,255,.5)' }}>Start practicing interviews with AI</p>
+            <p className="mt-1" style={{ color: 'rgba(255,255,255,.76)' }}>Start practicing interviews with AI</p>
           </motion.div>
 
           {error && (
@@ -61,7 +61,7 @@ const Register = () => {
             <div>
               <label className="block text-sm font-medium mb-1.5" style={{ color: 'rgba(255,255,255,.6)' }}>Full Name</label>
               <div className="relative">
-                <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4" style={{ color: 'rgba(255,255,255,.25)' }} />
+                <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4" style={{ color: 'rgba(255,255,255,.64)' }} />
                 <GlassInput type="text" required name="fullName" value={formData.fullName} onChange={handleChange} className="pl-10" placeholder="John Doe" />
               </div>
             </div>
@@ -69,7 +69,7 @@ const Register = () => {
             <div>
               <label className="block text-sm font-medium mb-1.5" style={{ color: 'rgba(255,255,255,.6)' }}>Email</label>
               <div className="relative">
-                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4" style={{ color: 'rgba(255,255,255,.25)' }} />
+                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4" style={{ color: 'rgba(255,255,255,.64)' }} />
                 <GlassInput type="email" required name="email" value={formData.email} onChange={handleChange} className="pl-10" placeholder="you@example.com" />
               </div>
             </div>
@@ -77,7 +77,7 @@ const Register = () => {
             <div>
               <label className="block text-sm font-medium mb-1.5" style={{ color: 'rgba(255,255,255,.6)' }}>Password</label>
               <div className="relative">
-                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4" style={{ color: 'rgba(255,255,255,.25)' }} />
+                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4" style={{ color: 'rgba(255,255,255,.64)' }} />
                 <GlassInput type="password" required name="password" minLength={8} value={formData.password} onChange={handleChange} className="pl-10" placeholder="At least 8 characters" />
               </div>
             </div>
@@ -85,10 +85,10 @@ const Register = () => {
             <div>
               <label className="block text-sm font-medium mb-1.5" style={{ color: 'rgba(255,255,255,.6)' }}>Phone (optional)</label>
               <div className="relative">
-                <Phone className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4" style={{ color: 'rgba(255,255,255,.25)' }} />
+                <Phone className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4" style={{ color: 'rgba(255,255,255,.64)' }} />
                 <GlassInput type="tel" name="phone" value={formData.phone} onChange={handleChange} className="pl-10" placeholder="+1 234 567 8900" />
               </div>
-              <p className="mt-1.5 text-xs" style={{ color: 'rgba(255,255,255,.35)' }}>
+              <p className="mt-1.5 text-xs" style={{ color: 'rgba(255,255,255,.7)' }}>
                 You can sign in with this number and your password. It is not SMS-verified yet.
               </p>
             </div>
@@ -100,10 +100,10 @@ const Register = () => {
 
           <GoogleButton label="Sign up with Google" />
 
-          <p className="mt-6 text-center text-sm" style={{ color: 'rgba(255,255,255,.4)' }}>
+          <p className="mt-6 text-center text-sm" style={{ color: 'rgba(255,255,255,.72)' }}>
             Already have an account? <Link to="/login" className="font-semibold hover:opacity-80" style={{ color: '#fff' }}>Sign in</Link>
           </p>
-          <p className="mt-4 text-center text-xs" style={{ color: 'rgba(255,255,255,.3)' }}>
+          <p className="mt-4 text-center text-xs" style={{ color: 'rgba(255,255,255,.66)' }}>
             <Link to="/privacy">Privacy</Link> · <Link to="/terms">Terms</Link> · <Link to="/cookies">Cookies</Link>
           </p>
         </GlassCard>

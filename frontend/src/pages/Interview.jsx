@@ -268,7 +268,7 @@ const Interview = () => {
             present and looking at the screen, and it logs tab switches and clipboard copy/paste. Three repeated
             alerts of the same kind end the interview.
           </p>
-          <p className="text-sm mb-4" style={{ color: 'rgba(255,255,255,.45)' }}>
+          <p className="text-sm mb-4" style={{ color: 'rgba(255,255,255,.74)' }}>
             Proctoring is optional. The interview and its score work the same without it.
           </p>
           <div className="flex flex-wrap gap-3">
@@ -296,7 +296,7 @@ const Interview = () => {
             <div className="flex justify-between items-center mb-4">
               <h1 className="text-xl font-bold" style={{ color: '#fff' }}>{interview.title}</h1>
               <div className="flex items-center gap-3">
-                <span className="inline-flex items-center gap-1 text-xs" style={{ color: 'rgba(255,255,255,.4)' }}>
+                <span className="inline-flex items-center gap-1 text-xs" style={{ color: 'rgba(255,255,255,.72)' }}>
                   <Clock className="h-3.5 w-3.5" />
                   {Math.floor(elapsed / 60)}:{String(elapsed % 60).padStart(2, '0')}
                 </span>
@@ -388,7 +388,7 @@ const Interview = () => {
               {!feedback && (
                 <>
                   <LiveAnswerHints text={answer} question={currentQuestion.questionText} behavioral={currentQuestion.questionType === 'BEHAVIORAL'} />
-                  <p className="text-[11px] mt-1" style={{ color: 'rgba(255,255,255,.25)' }}>
+                  <p className="text-[11px] mt-1" style={{ color: 'rgba(255,255,255,.64)' }}>
                     Draft saves on this device · Ctrl/⌘ + Enter to submit
                   </p>
                 </>

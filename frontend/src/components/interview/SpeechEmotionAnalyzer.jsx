@@ -2,7 +2,7 @@ import { useState, useRef, useEffect, useCallback } from 'react'
 import { Smile, Frown, Meh, Angry, Heart, Zap, Loader2 } from 'lucide-react'
 
 const EMOTIONS = {
-  neutral: { label: 'Neutral', color: 'text-gray-500', icon: Meh },
+  neutral: { label: 'Neutral', color: 'text-gray-300', icon: Meh },
   happy: { label: 'Happy', color: 'text-green-500', icon: Smile },
   sad: { label: 'Sad', color: 'text-blue-500', icon: Frown },
   angry: { label: 'Angry', color: 'text-red-500', icon: Angry },

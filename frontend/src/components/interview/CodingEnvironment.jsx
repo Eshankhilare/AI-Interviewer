@@ -304,7 +304,7 @@ const CodingEnvironment = ({ problem, onSubmit, timeLimit = 30 }) => {
   }
 
   const getStatusColor = (status) => {
-    if (!status) return 'text-gray-500'
+    if (!status) return 'text-gray-400'
     const desc = status.description?.toLowerCase() || ''
     if (desc.includes('accepted') || desc.includes('success')) return 'text-green-600'
     if (desc.includes('error') || desc.includes('wrong')) return 'text-red-600'
@@ -329,7 +329,7 @@ const CodingEnvironment = ({ problem, onSubmit, timeLimit = 30 }) => {
             ))}
           </select>
 
-          <div className="flex items-center space-x-2 text-gray-400">
+          <div className="flex items-center space-x-2 text-gray-300">
             <Clock className="w-4 h-4" />
             <span className={`font-mono ${timeRemaining < 60 ? 'text-red-400' : ''}`}>
               {formatTime(timeRemaining)}
@@ -378,12 +378,12 @@ const CodingEnvironment = ({ problem, onSubmit, timeLimit = 30 }) => {
           <h3 className="text-white font-medium mb-2">{problem.title}</h3>
           <p className="text-gray-300 text-sm">{problem.description}</p>
           {(problem.inputFormat || problem.outputFormat) && (
-            <div className="mt-2 text-xs text-gray-400 space-y-1">
+            <div className="mt-2 text-xs text-gray-300 space-y-1">
               {problem.inputFormat && (
-                <p><span className="text-gray-500">Input format:</span> <span className="whitespace-pre-wrap">{problem.inputFormat}</span></p>
+                <p><span className="text-gray-400">Input format:</span> <span className="whitespace-pre-wrap">{problem.inputFormat}</span></p>
               )}
               {problem.outputFormat && (
-                <p><span className="text-gray-500">Output format:</span> <span className="whitespace-pre-wrap">{problem.outputFormat}</span></p>
+                <p><span className="text-gray-400">Output format:</span> <span className="whitespace-pre-wrap">{problem.outputFormat}</span></p>
               )}
             </div>
           )}
@@ -391,7 +391,7 @@ const CodingEnvironment = ({ problem, onSubmit, timeLimit = 30 }) => {
             <div className="mt-2">
               {problem.examples.map((example, idx) => (
                 <div key={idx} className="mt-2 p-2 bg-gray-700 rounded text-xs font-mono">
-                  <p className="text-gray-400">Example {idx + 1}:</p>
+                  <p className="text-gray-300">Example {idx + 1}:</p>
                   <p className="text-gray-300 whitespace-pre-wrap">Input: {example.input}</p>
                   <p className="text-gray-300 whitespace-pre-wrap">Output: {example.output}</p>
                 </div>
@@ -434,7 +434,7 @@ const CodingEnvironment = ({ problem, onSubmit, timeLimit = 30 }) => {
             <Terminal className="w-4 h-4" />
             <span className="text-sm">Output</span>
           </div>
-          <span className="text-gray-500 text-xs">
+          <span className="text-gray-400 text-xs">
             {showTerminal ? '▼' : '▲'}
           </span>
         </div>
@@ -443,7 +443,7 @@ const CodingEnvironment = ({ problem, onSubmit, timeLimit = 30 }) => {
           <div className="h-36 overflow-y-auto bg-gray-900 p-4 font-mono text-sm">
             {/* Input */}
             <div className="mb-3">
-              <label className="text-gray-500 text-xs block mb-1">Input (stdin):</label>
+              <label className="text-gray-400 text-xs block mb-1">Input (stdin):</label>
               <textarea
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
@@ -456,7 +456,7 @@ const CodingEnvironment = ({ problem, onSubmit, timeLimit = 30 }) => {
             {output && (
               <div className="space-y-2">
                 <div className="flex items-center space-x-2">
-                  <span className="text-gray-500">Status:</span>
+                  <span className="text-gray-400">Status:</span>
                   <span className={getStatusColor(output.status)}>
                     {output.status?.description || 'Unknown'}
                   </span>
@@ -464,27 +464,27 @@ const CodingEnvironment = ({ problem, onSubmit, timeLimit = 30 }) => {
 
                 {output.stdout && (
                   <div>
-                    <span className="text-gray-500">Output:</span>
+                    <span className="text-gray-400">Output:</span>
                     <pre className="text-green-400 whitespace-pre-wrap mt-1">{output.stdout}</pre>
                   </div>
                 )}
 
                 {output.stderr && (
                   <div>
-                    <span className="text-gray-500">Error:</span>
+                    <span className="text-gray-400">Error:</span>
                     <pre className="text-red-400 whitespace-pre-wrap mt-1">{output.stderr}</pre>
                   </div>
                 )}
 
                 {output.compile_output && (
                   <div>
-                    <span className="text-gray-500">Compile Output:</span>
+                    <span className="text-gray-400">Compile Output:</span>
                     <pre className="text-yellow-400 whitespace-pre-wrap mt-1">{output.compile_output}</pre>
                   </div>
                 )}
 
                 {output.time && (
-                  <div className="text-gray-500 text-xs">
+                  <div className="text-gray-400 text-xs">
                     Execution time: {output.time}s | Memory: {output.memory} KB
                   </div>
                 )}
@@ -494,7 +494,7 @@ const CodingEnvironment = ({ problem, onSubmit, timeLimit = 30 }) => {
             {/* Test Results */}
             {testResults.length > 0 && (
               <div className="mt-3 border-t border-gray-700 pt-3">
-                <span className="text-gray-400 text-xs">Test Results:</span>
+                <span className="text-gray-300 text-xs">Test Results:</span>
                 <div className="mt-2 space-y-1">
                   {testResults.map((result, idx) => (
                     <div key={idx} className="text-xs">
@@ -512,7 +512,7 @@ const CodingEnvironment = ({ problem, onSubmit, timeLimit = 30 }) => {
                         )}
                       </div>
                       {!result.passed && result.expectedOutput !== undefined && (
-                        <div className="ml-6 mt-1 text-gray-400 font-mono">
+                        <div className="ml-6 mt-1 text-gray-300 font-mono">
                           <p>Expected: <span className="text-green-400 whitespace-pre-wrap">{result.expectedOutput}</span></p>
                           <p>Actual: <span className="text-red-400 whitespace-pre-wrap">{result.actualOutput || '(no output)'}</span></p>
                         </div>

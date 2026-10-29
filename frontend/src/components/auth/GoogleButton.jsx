@@ -20,7 +20,7 @@ const GoogleButton = ({ label = 'Continue with Google' }) => {
     <>
       <div className="flex items-center gap-3 my-5">
         <div className="h-px flex-1" style={{ background: 'rgba(255,255,255,.1)' }} />
-        <span className="text-xs" style={{ color: 'rgba(255,255,255,.3)' }}>or</span>
+        <span className="text-xs" style={{ color: 'rgba(255,255,255,.66)' }}>or</span>
         <div className="h-px flex-1" style={{ background: 'rgba(255,255,255,.1)' }} />
       </div>
       <a

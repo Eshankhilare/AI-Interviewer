@@ -57,7 +57,7 @@ const InterviewerOrb = ({ state = 'idle', name = 'AI Interviewer', message }) =>
 
         <div className="relative z-10 mt-7 text-center">
           <p className="text-sm font-semibold text-white">{name}</p>
-          <div className="mt-1 flex items-center justify-center gap-1.5 text-xs text-white/50">
+          <div className="mt-1 flex items-center justify-center gap-1.5 text-xs text-white/70">
             <StatusIcon className={`h-3.5 w-3.5 ${state === 'loading' ? 'animate-spin' : ''}`} />
             <span>{copy.label}</span>
           </div>

@@ -99,7 +99,7 @@ function GlobalBackdrop() {
           position: 'absolute', inset: 0,
           width: '100%', height: '100%',
           objectFit: 'cover', objectPosition: 'center',
-          filter: 'blur(2px) brightness(1.4) saturate(1.15)',
+          filter: 'blur(3px) brightness(.92) saturate(1.15)',
           transform: 'scale(1.05)',
           pointerEvents: 'none', userSelect: 'none',
         }}
@@ -107,6 +107,15 @@ function GlobalBackdrop() {
       >
         <source src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260808_064556_051587f1-74a1-4336-8c05-4dde3594ed05.mp4" type="video/mp4" />
       </video>
+      {/* Scrim: keeps the footage visible while giving white text a readable base. */}
+      <div
+        style={{
+          position: 'absolute', inset: 0,
+          background: 'linear-gradient(180deg, rgba(4,5,8,.42), rgba(4,5,8,.55) 55%, rgba(4,5,8,.68))',
+          pointerEvents: 'none',
+        }}
+        aria-hidden="true"
+      />
     </div>
   )
 }

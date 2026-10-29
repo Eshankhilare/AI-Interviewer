@@ -36,14 +36,14 @@ const JobDescriptions = () => {
     <div className="min-h-screen relative" style={{ background: '#000', isolation: 'isolate' }}>
       <BackgroundVideo />
       <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        <button onClick={() => navigate(-1)} className="mb-6 inline-flex items-center gap-2 text-sm font-medium" style={{ color: 'rgba(255,255,255,.5)' }}>
+        <button onClick={() => navigate(-1)} className="mb-6 inline-flex items-center gap-2 text-sm font-medium" style={{ color: 'rgba(255,255,255,.76)' }}>
           <ArrowLeft className="h-4 w-4" /> Back
         </button>
 
         <div className="flex justify-between items-center mb-6">
           <div>
             <h1 className="text-2xl font-bold" style={{ color: '#fff', fontFamily: '"Fraunces", "Reference Display", serif', fontWeight: 500 }}>Job Descriptions</h1>
-            <p className="mt-1" style={{ color: 'rgba(255,255,255,.5)' }}>Manage your job descriptions for interviews</p>
+            <p className="mt-1" style={{ color: 'rgba(255,255,255,.76)' }}>Manage your job descriptions for interviews</p>
           </div>
           <WhiteButton onClick={() => setShowForm(!showForm)} className="px-4 py-2.5 flex items-center gap-2 text-sm">
             <Plus className="h-4 w-4" /> New Job Description
@@ -74,7 +74,7 @@ const JobDescriptions = () => {
                 </div>
               </div>
               <div className="flex justify-end gap-3">
-                <button type="button" onClick={() => setShowForm(false)} className="px-4 py-2.5 text-sm font-medium rounded-xl" style={{ color: 'rgba(255,255,255,.5)' }}>Cancel</button>
+                <button type="button" onClick={() => setShowForm(false)} className="px-4 py-2.5 text-sm font-medium rounded-xl" style={{ color: 'rgba(255,255,255,.76)' }}>Cancel</button>
                 <WhiteButton type="submit" disabled={saving} className="px-5 py-2.5 text-sm">{saving ? 'Creating...' : 'Create'}</WhiteButton>
               </div>
             </form>
@@ -85,9 +85,9 @@ const JobDescriptions = () => {
           <div className="flex justify-center h-32 items-center"><div className="animate-spin rounded-full h-8 w-8" style={{ border: '2px solid rgba(255,255,255,.1)', borderTopColor: '#fff' }} /></div>
         ) : jobDescriptions.length === 0 ? (
           <GlassCard className="text-center py-12">
-            <Briefcase className="mx-auto h-10 w-10 mb-4" style={{ color: 'rgba(255,255,255,.15)' }} />
+            <Briefcase className="mx-auto h-10 w-10 mb-4" style={{ color: 'rgba(255,255,255,.55)' }} />
             <h3 className="text-sm font-medium" style={{ color: '#fff' }}>No job descriptions yet</h3>
-            <p className="mt-1 text-sm" style={{ color: 'rgba(255,255,255,.4)' }}>Create one to start interviews.</p>
+            <p className="mt-1 text-sm" style={{ color: 'rgba(255,255,255,.72)' }}>Create one to start interviews.</p>
           </GlassCard>
         ) : (
           <div className="space-y-3">
@@ -96,13 +96,13 @@ const JobDescriptions = () => {
                 <GlassCard className="flex items-center justify-between p-5">
                   <div className="flex-1">
                     <div className="flex items-center"><Briefcase className="h-5 w-5 mr-2" style={{ color: '#fbbf24' }} /><h3 className="font-medium" style={{ color: '#fff' }}>{jd.title}</h3></div>
-                    <p className="text-sm mt-1" style={{ color: 'rgba(255,255,255,.4)' }}>{jd.company} · {jd.experienceLevel} · {jd.location || 'Remote'}</p>
+                    <p className="text-sm mt-1" style={{ color: 'rgba(255,255,255,.72)' }}>{jd.company} · {jd.experienceLevel} · {jd.location || 'Remote'}</p>
                   </div>
                   <div className="flex items-center gap-2">
                     <button onClick={() => navigate('/interview/new', { state: { jobDescriptionId: jd.id } })} className="px-3 py-1.5 text-sm font-medium rounded-lg flex items-center gap-1" style={{ background: 'rgba(255,255,255,.08)', border: '1px solid rgba(255,255,255,.12)', color: '#fff' }}>
                       Start <ChevronRight className="h-4 w-4" />
                     </button>
-                    <button onClick={() => handleDelete(jd.id)} className="p-2 hover:opacity-80" style={{ color: 'rgba(255,255,255,.3)' }}><Trash2 className="h-4 w-4" /></button>
+                    <button onClick={() => handleDelete(jd.id)} className="p-2 hover:opacity-80" style={{ color: 'rgba(255,255,255,.66)' }}><Trash2 className="h-4 w-4" /></button>
                   </div>
                 </GlassCard>
               </motion.div>

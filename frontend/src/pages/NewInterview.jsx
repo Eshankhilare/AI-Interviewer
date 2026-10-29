@@ -193,7 +193,7 @@ const NewInterview = () => {
             <span className="ml-2 text-sm font-medium" style={{ color: step >= s ? '#fbbf24' : 'rgba(255,255,255,.3)' }}>
               {s === 1 ? 'Job Role' : s === 2 ? 'Resume' : 'Details'}
             </span>
-            {s < 3 && <ChevronRight className="h-4 w-4 mx-3" style={{ color: 'rgba(255,255,255,.15)' }} />}
+            {s < 3 && <ChevronRight className="h-4 w-4 mx-3" style={{ color: 'rgba(255,255,255,.55)' }} />}
           </div>
         ))}
       </div>
@@ -209,7 +209,7 @@ const NewInterview = () => {
           {/* Search / Dropdown */}
           <div className="relative mb-6" ref={dropdownRef}>
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4" style={{ color: 'rgba(255,255,255,.3)' }} />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4" style={{ color: 'rgba(255,255,255,.66)' }} />
               <GlassInput
                 type="text"
                 value={roleSearch}
@@ -220,7 +220,7 @@ const NewInterview = () => {
               />
               {roleSearch && (
                 <button onClick={() => { setRoleSearch(''); setSelectedRole(null); setShowRoleDropdown(false) }}
-                  className="absolute right-3 top-1/2 -translate-y-1/2" style={{ color: 'rgba(255,255,255,.3)' }}>
+                  className="absolute right-3 top-1/2 -translate-y-1/2" style={{ color: 'rgba(255,255,255,.66)' }}>
                   <X className="w-4 h-4" />
                 </button>
               )}
@@ -233,7 +233,7 @@ const NewInterview = () => {
                   <button
                     onClick={() => setActiveCategory(null)}
                     className={`px-3 py-1 rounded-lg text-xs font-medium whitespace-nowrap transition-colors ${
-                      !activeCategory ? 'bg-primary-500/25 text-primary-200' : 'text-white/50 hover:bg-white/5'
+                      !activeCategory ? 'bg-primary-500/25 text-primary-200' : 'text-white/75 hover:bg-white/5'
                     }`}
                   >
                     All
@@ -243,7 +243,7 @@ const NewInterview = () => {
                       key={cat}
                       onClick={() => setActiveCategory(cat)}
                       className={`px-3 py-1 rounded-lg text-xs font-medium whitespace-nowrap transition-colors ${
-                        activeCategory === cat ? 'bg-primary-500/25 text-primary-200' : 'text-white/50 hover:bg-white/5'
+                        activeCategory === cat ? 'bg-primary-500/25 text-primary-200' : 'text-white/75 hover:bg-white/5'
                       }`}
                     >
                       {cat}
@@ -254,7 +254,7 @@ const NewInterview = () => {
                 {/* Role list */}
                 <div className="max-h-60 overflow-y-auto">
                   {groupedRoles.length === 0 ? (
-                    <div className="p-4 text-center text-white/40 text-sm">No roles found</div>
+                    <div className="p-4 text-center text-white/70 text-sm">No roles found</div>
                   ) : (
                     groupedRoles.map(role => (
                       <button
@@ -265,7 +265,7 @@ const NewInterview = () => {
                         }`}
                       >
                         <div className="font-medium text-white text-sm">{role.title}</div>
-                        <div className="text-xs text-white/50 mt-0.5">
+                        <div className="text-xs text-white/70 mt-0.5">
                           {role.skills.slice(0, 4).join(' · ')}
                         </div>
                       </button>
@@ -389,12 +389,12 @@ const NewInterview = () => {
               <div className="h-1.5 rounded-full overflow-hidden mb-3" style={{ background: 'rgba(255,255,255,.08)' }}>
                 <div className="h-full rounded-full" style={{ width: `${roleFit.score}%`, background: '#f59e0b' }} />
               </div>
-              <p className="text-xs mb-2" style={{ color: 'rgba(255,255,255,.5)' }}>
+              <p className="text-xs mb-2" style={{ color: 'rgba(255,255,255,.76)' }}>
                 {roleFit.matched.length} of {roleFit.terms} job-description terms appear in this resume.
                 Keyword overlap only — the interview scores your answers, not your resume.
               </p>
               {roleFit.missing.length > 0 && (
-                <p className="text-xs" style={{ color: 'rgba(255,255,255,.4)' }}>
+                <p className="text-xs" style={{ color: 'rgba(255,255,255,.72)' }}>
                   Not mentioned: {roleFit.missing.slice(0, 8).join(', ')}
                 </p>
               )}

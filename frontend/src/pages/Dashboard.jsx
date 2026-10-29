@@ -52,7 +52,7 @@ const Dashboard = () => {
     if (s === 'COMPLETED') return <CheckCircle className="h-5 w-5" style={{ color: '#4ade80' }} />
     if (s === 'IN_PROGRESS') return <Clock className="h-5 w-5" style={{ color: '#fbbf24' }} />
     if (s === 'CANCELLED') return <XCircle className="h-5 w-5" style={{ color: '#f87171' }} />
-    return <Clock className="h-5 w-5" style={{ color: 'rgba(255,255,255,.3)' }} />
+    return <Clock className="h-5 w-5" style={{ color: 'rgba(255,255,255,.66)' }} />
   }
 
   const getStatusVariant = (s) => {
@@ -81,9 +81,9 @@ const Dashboard = () => {
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
           <motion.div initial={{ opacity: 0, x: -12 }} animate={{ opacity: 1, x: 0 }}>
             <h1 className="text-3xl font-bold" style={{ color: '#fff', fontFamily: '"Fraunces", "Reference Display", serif', fontWeight: 500 }}>Dashboard</h1>
-            <p className="mt-1" style={{ color: 'rgba(255,255,255,.5)' }}>Track your interview progress</p>
+            <p className="mt-1" style={{ color: 'rgba(255,255,255,.76)' }}>Track your interview progress</p>
             {interviews.length > 0 && (
-              <p className="mt-2 inline-flex items-center gap-1.5 text-xs" style={{ color: 'rgba(255,255,255,.45)' }}>
+              <p className="mt-2 inline-flex items-center gap-1.5 text-xs" style={{ color: 'rgba(255,255,255,.74)' }}>
                 <Flame className="h-3.5 w-3.5" style={{ color: '#fbbf24' }} />
                 {streak > 0 ? `${streak}-day streak` : 'Start a streak today'} · {weekly} session{weekly === 1 ? '' : 's'} this week
               </p>
@@ -111,7 +111,7 @@ const Dashboard = () => {
                     <p className="text-sm font-semibold" style={{ color: '#fff' }}>
                       {dueCount} question{dueCount === 1 ? '' : 's'} due for review
                     </p>
-                    <p className="text-xs" style={{ color: 'rgba(255,255,255,.45)' }}>
+                    <p className="text-xs" style={{ color: 'rgba(255,255,255,.74)' }}>
                       Spaced repetition from your reports — ten minutes now saves an hour later.
                     </p>
                   </div>
@@ -132,9 +132,9 @@ const Dashboard = () => {
           ].map((stat, i) => (
             <motion.div key={stat.label} initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.08 }}>
               <GlassCard className="p-5">
-                <stat.icon className="h-5 w-5 mb-3" style={{ color: 'rgba(255,255,255,.35)' }} />
+                <stat.icon className="h-5 w-5 mb-3" style={{ color: 'rgba(255,255,255,.7)' }} />
                 <p className="text-2xl font-bold" style={{ color: '#fff' }}>{stat.value}</p>
-                <p className="text-sm" style={{ color: 'rgba(255,255,255,.45)' }}>{stat.label}</p>
+                <p className="text-sm" style={{ color: 'rgba(255,255,255,.74)' }}>{stat.label}</p>
               </GlassCard>
             </motion.div>
           ))}
@@ -144,9 +144,9 @@ const Dashboard = () => {
         {interviews.length === 0 ? (
           <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}>
             <GlassCard className="text-center py-16">
-              <Clock className="mx-auto h-10 w-10 mb-4" style={{ color: 'rgba(255,255,255,.15)' }} />
+              <Clock className="mx-auto h-10 w-10 mb-4" style={{ color: 'rgba(255,255,255,.55)' }} />
               <h3 className="text-lg font-semibold" style={{ color: '#fff' }}>No interviews yet</h3>
-              <p className="mb-6" style={{ color: 'rgba(255,255,255,.4)' }}>Create your first interview to get started</p>
+              <p className="mb-6" style={{ color: 'rgba(255,255,255,.72)' }}>Create your first interview to get started</p>
               <Link to="/interview/new"><WhiteButton className="px-5 py-2.5 inline-flex items-center gap-2 text-sm"><Plus className="h-4 w-4" /> Create Interview</WhiteButton></Link>
             </GlassCard>
           </motion.div>
@@ -159,7 +159,7 @@ const Dashboard = () => {
                     <div className="flex items-start justify-between mb-3">
                       <div className="flex-1 min-w-0">
                         <h3 className="text-lg font-semibold truncate" style={{ color: '#fff' }}>{interview.title}</h3>
-                        <p className="text-sm mt-0.5 truncate" style={{ color: 'rgba(255,255,255,.4)' }}>
+                        <p className="text-sm mt-0.5 truncate" style={{ color: 'rgba(255,255,255,.72)' }}>
                           {interview.companyName} — {interview.jobDescriptionTitle}
                         </p>
                       </div>
@@ -167,7 +167,7 @@ const Dashboard = () => {
                     </div>
                     <div className="flex items-center justify-between mt-4">
                       <GlassBadge variant={getStatusVariant(interview.status)}>{interview.status.replace('_', ' ')}</GlassBadge>
-                      <span className="text-sm font-medium" style={{ color: 'rgba(255,255,255,.3)' }}>
+                      <span className="text-sm font-medium" style={{ color: 'rgba(255,255,255,.66)' }}>
                         {interview.currentQuestionIndex}/{interview.totalQuestions}
                       </span>
                     </div>
@@ -177,7 +177,7 @@ const Dashboard = () => {
                           style={{ width: `${(interview.currentQuestionIndex / interview.totalQuestions) * 100}%`, background: interview.status === 'COMPLETED' ? '#34d399' : '#f59e0b' }} />
                       </div>
                     )}
-                    <p className="mt-3 text-xs" style={{ color: 'rgba(255,255,255,.25)' }}>
+                    <p className="mt-3 text-xs" style={{ color: 'rgba(255,255,255,.64)' }}>
                       {new Date(interview.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
                     </p>
                   </GlassCard>

@@ -29,16 +29,17 @@ const Landing = () => {
       {/* Background Video */}
       <video
         className="fixed inset-0 w-full h-full object-cover pointer-events-none z-0"
+        style={{ filter: 'brightness(.85) saturate(1.05)' }}
         autoPlay muted loop playsInline
       >
         <source src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260808_064556_051587f1-74a1-4336-8c05-4dde3594ed05.mp4" type="video/mp4" />
       </video>
 
-      {/* Vignette overlay */}
+      {/* Vignette overlay: keeps the footage, gives the copy a readable base. */}
       <div
         className="fixed inset-0 pointer-events-none z-[1]"
         style={{
-          background: 'linear-gradient(180deg, rgba(0,0,0,.03), transparent 24%, transparent 82%, rgba(0,0,0,.05)), radial-gradient(ellipse at 44% 54%, transparent 30%, rgba(0,0,0,.055) 100%)'
+          background: 'linear-gradient(180deg, rgba(0,0,0,.42), rgba(0,0,0,.30) 26%, rgba(0,0,0,.40) 78%, rgba(0,0,0,.62)), radial-gradient(ellipse at 44% 54%, transparent 26%, rgba(0,0,0,.28) 100%)'
         }}
       />
 
@@ -57,15 +58,15 @@ const Landing = () => {
         </div>
 
         <nav className="hidden md:flex items-center gap-8">
-          <a href="#features" className="text-sm text-white/70 hover:text-white transition-colors">Features</a>
-          <a href="#how-it-works" className="text-sm text-white/70 hover:text-white transition-colors">How it Works</a>
-          <a href="#roles" className="text-sm text-white/70 hover:text-white transition-colors">Job Roles</a>
-          <a href="#team" className="text-sm text-white/70 hover:text-white transition-colors">Team</a>
-          <a href="#contact" className="text-sm text-white/70 hover:text-white transition-colors">Contact</a>
+          <a href="#features" className="text-sm text-white/85 hover:text-white transition-colors">Features</a>
+          <a href="#how-it-works" className="text-sm text-white/85 hover:text-white transition-colors">How it Works</a>
+          <a href="#roles" className="text-sm text-white/85 hover:text-white transition-colors">Job Roles</a>
+          <a href="#team" className="text-sm text-white/85 hover:text-white transition-colors">Team</a>
+          <a href="#contact" className="text-sm text-white/85 hover:text-white transition-colors">Contact</a>
         </nav>
 
         <div className="flex items-center gap-4">
-          <Link to="/login" className="text-sm text-white/70 hover:text-white transition-colors">Sign In</Link>
+          <Link to="/login" className="text-sm text-white/85 hover:text-white transition-colors">Sign In</Link>
           <Link
             to="/register"
             className="cta-solid px-5 py-2 bg-white text-black text-sm font-medium rounded-lg hover:bg-white/90 transition-colors"
@@ -83,7 +84,7 @@ const Landing = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.3 }}
           >
-            <span className="inline-block px-4 py-1.5 bg-white/10 backdrop-blur-sm rounded-full text-xs font-medium text-white/80 mb-6 border border-white/10">
+            <span className="inline-block px-4 py-1.5 bg-white/10 backdrop-blur-sm rounded-full text-xs font-medium text-white/90 mb-6 border border-white/10">
               AI-Powered Interview Preparation
             </span>
           </motion.div>
@@ -93,17 +94,19 @@ const Landing = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.4 }}
             className="text-5xl md:text-7xl font-bold tracking-tight leading-[1.05] mb-6"
+            style={{ textShadow: '0 2px 28px rgba(0,0,0,.7)' }}
           >
             Ace Your Next
             <br />
-            <span className="text-white/60">Interview with AI.</span>
+            <span className="text-white/80">Interview with AI.</span>
           </motion.h1>
 
           <motion.p
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.5 }}
-            className="text-lg text-white/75 max-w-xl leading-relaxed mb-10"
+            className="text-lg text-white/90 max-w-xl leading-relaxed mb-10"
+            style={{ textShadow: '0 1px 16px rgba(0,0,0,.7)' }}
           >
             Practice with an AI interviewer that asks real questions, evaluates your
             answers, and gives you detailed feedback — all before the actual interview.
@@ -145,7 +148,7 @@ const Landing = () => {
             <div className="aspect-[4/3] rounded-xl overflow-hidden mb-3 bg-gradient-to-br from-amber-900/50 to-orange-900/50 flex items-center justify-center">
               <div className="text-center p-4">
                 <OrbIcon className="w-12 h-12 text-amber-400 mx-auto mb-2" />
-                <p className="text-xs text-white/60">AI Interview Simulation</p>
+                <p className="text-xs text-white/80">AI Interview Simulation</p>
               </div>
             </div>
             <button className="w-full py-2.5 bg-white/10 backdrop-blur-sm text-white text-sm font-medium rounded-lg border border-white/10 hover:bg-white/15 transition-all">
@@ -182,13 +185,13 @@ const Landing = () => {
         <ContainerScroll
           titleComponent={
             <div className="max-w-4xl mx-auto text-center">
-              <p className="text-xs font-semibold uppercase tracking-[.18em] text-white/40 mb-4">The scoring engine</p>
+              <p className="text-xs font-semibold uppercase tracking-[.18em] text-white/65 mb-4">The scoring engine</p>
               <h2 className="text-4xl md:text-6xl font-semibold text-white leading-[1.05]" style={{ textShadow: '0 2px 24px rgba(0,0,0,.9)' }}>
                 See exactly how an answer is scored.
                 <br />
-                <span className="text-white/45">Evidence, not vibes.</span>
+                <span className="text-white/70">Evidence, not vibes.</span>
               </h2>
-              <p className="mt-5 max-w-xl mx-auto" style={{ color: 'rgba(255,255,255,.7)', textShadow: '0 1px 14px rgba(0,0,0,.9)' }}>
+              <p className="mt-5 max-w-xl mx-auto" style={{ color: 'rgba(255,255,255,.85)', textShadow: '0 1px 14px rgba(0,0,0,.9)' }}>
                 Five criteria, weights computed in code, and quotes verified against your own words.
               </p>
             </div>
@@ -212,7 +215,7 @@ const Landing = () => {
           <h2 className="text-3xl md:text-5xl font-semibold text-white mb-4">
             A studio, not a form.
           </h2>
-          <p className="text-white/65 max-w-xl text-base md:text-lg">
+          <p className="text-white/85 max-w-xl text-base md:text-lg">
             Pick a role, answer in text or voice, and get a report that shows the rubric, the quotes and the next drill.
           </p>
           <Link
@@ -274,7 +277,7 @@ const Landing = () => {
                 <span className="h-px flex-1" style={{ background: 'linear-gradient(90deg, rgba(251,191,36,.55), transparent)' }} />
               </div>
               <h3 className="text-lg font-semibold mb-2">{item.title}</h3>
-              <p className="text-sm" style={{ color: 'rgba(255,255,255,.68)' }}>{item.desc}</p>
+              <p className="text-sm" style={{ color: 'rgba(255,255,255,.82)' }}>{item.desc}</p>
             </motion.div>
           ))}
         </div>
@@ -356,7 +359,7 @@ const Landing = () => {
             >
               <span className="value-medallion"><value.icon className="w-6 h-6" /></span>
               <h3 className="text-base font-semibold mb-2">{value.title}</h3>
-              <p className="text-sm leading-relaxed" style={{ color: 'rgba(255,255,255,.68)' }}>{value.desc}</p>
+              <p className="text-sm leading-relaxed" style={{ color: 'rgba(255,255,255,.82)' }}>{value.desc}</p>
             </motion.div>
           ))}
         </div>
@@ -389,7 +392,7 @@ const Landing = () => {
               <span className="problem-icon"><item.icon className="w-5 h-5" /></span>
               <div>
                 <h3 className="text-sm font-semibold mb-1">{item.title}</h3>
-                <p className="text-xs leading-relaxed" style={{ color: 'rgba(255,255,255,.6)' }}>{item.desc}</p>
+                <p className="text-xs leading-relaxed" style={{ color: 'rgba(255,255,255,.78)' }}>{item.desc}</p>
               </div>
             </div>
           ))}
@@ -415,7 +418,7 @@ const Landing = () => {
           className="text-center mb-12"
         >
           <h2 className="text-3xl md:text-4xl font-bold mb-4">Covering Every Role</h2>
-          <p className="text-white/50 max-w-lg mx-auto">
+          <p className="text-white/75 max-w-lg mx-auto">
             Specialized questions for 20+ engineering and tech roles.
           </p>
         </motion.div>
@@ -448,7 +451,7 @@ const Landing = () => {
         >
           <p className="text-xs font-semibold uppercase tracking-[.2em] mb-4" style={{ color: '#fbbf24' }}>The team</p>
           <h2 className="text-3xl md:text-4xl font-bold mb-4">Three builders. One honest score.</h2>
-          <p className="text-white/60 max-w-xl mx-auto">
+          <p className="text-white/80 max-w-xl mx-auto">
             We built the interviewer we wished we had — evidence, not vibes.
           </p>
         </motion.div>
@@ -488,7 +491,7 @@ const Landing = () => {
                   />
                 </div>
                 <h3 className="mt-5 text-sm font-bold uppercase tracking-[.14em]" style={{ color: '#fff' }}>{member.name}</h3>
-                <p className="mt-1.5 text-xs" style={{ color: 'rgba(255,255,255,.55)' }}>{member.role}</p>
+                <p className="mt-1.5 text-xs" style={{ color: 'rgba(255,255,255,.75)' }}>{member.role}</p>
                 <a
                   href={`mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(`Regarding ${member.name}`)}`}
                   className="mt-3 inline-flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-[.14em]"
@@ -526,7 +529,7 @@ const Landing = () => {
           >
             <p className="text-xs font-semibold uppercase tracking-[.18em]" style={{ color: '#fbbf24' }}>Contact us</p>
             <h2 className="mt-3 text-3xl md:text-4xl font-bold" style={{ color: '#fff' }}>Tell us what you need.</h2>
-            <p className="mt-3 text-sm max-w-md" style={{ color: 'rgba(255,255,255,.6)' }}>
+            <p className="mt-3 text-sm max-w-md" style={{ color: 'rgba(255,255,255,.78)' }}>
               Product questions, feedback or a collaboration idea. Send a note and the team will get back to you.
             </p>
 
@@ -550,31 +553,31 @@ const Landing = () => {
             >
               Send message <ArrowIcon className="w-4 h-4" />
             </button>
-            <p className="mt-3 text-xs" style={{ color: 'rgba(255,255,255,.4)' }}>
+            <p className="mt-3 text-xs" style={{ color: 'rgba(255,255,255,.68)' }}>
               This opens your email app with the message ready to send.
             </p>
           </form>
 
           <aside className="p-8 md:p-10" style={{ background: 'rgba(255,255,255,.025)', borderLeft: '1px solid rgba(255,255,255,.08)' }}>
             <h3 className="text-xs font-semibold uppercase tracking-[.18em]" style={{ color: '#fbbf24' }}>Contact info</h3>
-            <div className="mt-5 space-y-4 text-sm" style={{ color: 'rgba(255,255,255,.6)' }}>
+            <div className="mt-5 space-y-4 text-sm" style={{ color: 'rgba(255,255,255,.78)' }}>
               <div>
-                <p className="text-[11px] uppercase tracking-wider" style={{ color: 'rgba(255,255,255,.4)' }}>Email</p>
+                <p className="text-[11px] uppercase tracking-wider" style={{ color: 'rgba(255,255,255,.68)' }}>Email</p>
                 <a href={`mailto:${CONTACT_EMAIL}`} className="font-medium hover:underline" style={{ color: '#fff' }}>
                   {CONTACT_EMAIL}
                 </a>
               </div>
               <div>
-                <p className="text-[11px] uppercase tracking-wider" style={{ color: 'rgba(255,255,255,.4)' }}>Project</p>
+                <p className="text-[11px] uppercase tracking-wider" style={{ color: 'rgba(255,255,255,.68)' }}>Project</p>
                 <a href={PROJECT_URL} target="_blank" rel="noreferrer" className="font-medium hover:underline" style={{ color: '#fff' }}>
                   GitHub repository
                 </a>
               </div>
               <div>
-                <p className="text-[11px] uppercase tracking-wider" style={{ color: 'rgba(255,255,255,.4)' }}>Response time</p>
+                <p className="text-[11px] uppercase tracking-wider" style={{ color: 'rgba(255,255,255,.68)' }}>Response time</p>
                 <p>1-2 business days</p>
               </div>
-              <p className="pt-4 text-xs leading-relaxed" style={{ borderTop: '1px solid rgba(255,255,255,.08)', color: 'rgba(255,255,255,.4)' }}>
+              <p className="pt-4 text-xs leading-relaxed" style={{ borderTop: '1px solid rgba(255,255,255,.08)', color: 'rgba(255,255,255,.68)' }}>
                 Reporting a scoring problem? Include the interview ID from your report so we can inspect the stored evaluation.
               </p>
             </div>
@@ -614,11 +617,11 @@ const Landing = () => {
       {/* Footer */}
       <footer className="relative z-10 border-t border-white/10 py-8">
         <div className="max-w-7xl mx-auto px-8 flex justify-between items-center">
-          <p className="text-sm text-white/40">2026 AI Interviewer. All rights reserved.</p>
+          <p className="text-sm text-white/65">2026 AI Interviewer. All rights reserved.</p>
           <div className="flex gap-6">
-            <Link to="/privacy" className="text-sm text-white/40 hover:text-white/70">Privacy</Link>
-            <Link to="/terms" className="text-sm text-white/40 hover:text-white/70">Terms</Link>
-            <Link to="/cookies" className="text-sm text-white/40 hover:text-white/70">Cookies</Link>
+            <Link to="/privacy" className="text-sm text-white/65 hover:text-white">Privacy</Link>
+            <Link to="/terms" className="text-sm text-white/65 hover:text-white">Terms</Link>
+            <Link to="/cookies" className="text-sm text-white/65 hover:text-white">Cookies</Link>
           </div>
         </div>
       </footer>

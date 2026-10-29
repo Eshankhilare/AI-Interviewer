@@ -160,10 +160,10 @@ const Practice = () => {
           <div className="flex flex-wrap items-center gap-2 mb-1.5">
             {item.score != null && <GlassBadge variant="warning">{item.score}/100</GlassBadge>}
             <GlassBadge variant="default">{item.questionType || 'QUESTION'}</GlassBadge>
-            <span className="text-xs" style={{ color: 'rgba(255,255,255,.35)' }}>{item.sourceTitle || 'Saved question'}</span>
+            <span className="text-xs" style={{ color: 'rgba(255,255,255,.7)' }}>{item.sourceTitle || 'Saved question'}</span>
           </div>
           <p className="text-sm font-medium" style={{ color: '#fff' }}>{item.question}</p>
-          <p className="text-xs mt-1" style={{ color: 'rgba(255,255,255,.4)' }}>
+          <p className="text-xs mt-1" style={{ color: 'rgba(255,255,255,.72)' }}>
             {dueNow ? 'Due now' : `Due ${when(item.dueAt)}`} · {item.reps} review{item.reps === 1 ? '' : 's'}
           </p>
         </div>
@@ -172,7 +172,7 @@ const Practice = () => {
             Practice
           </WhiteButton>
           <button onClick={() => remove(item.key)} aria-label="Remove from practice" title="Remove from practice"
-            className="p-1.5 rounded-lg" style={{ color: 'rgba(255,255,255,.3)' }}>
+            className="p-1.5 rounded-lg" style={{ color: 'rgba(255,255,255,.66)' }}>
             <Trash2 className="h-3.5 w-3.5" />
           </button>
         </div>
@@ -184,7 +184,7 @@ const Practice = () => {
     <div className="max-w-3xl mx-auto py-6 px-4">
       <div className="mb-6">
         <h1 className="text-2xl font-bold" style={{ color: '#fff' }}>Practice queue</h1>
-        <p className="mt-1 text-sm" style={{ color: 'rgba(255,255,255,.5)' }}>
+        <p className="mt-1 text-sm" style={{ color: 'rgba(255,255,255,.76)' }}>
           Questions you chose to revisit, on a spaced schedule. Self-graded — no model call, nothing leaves this browser.
         </p>
         <div className="flex flex-wrap items-center gap-2 mt-3">
@@ -209,15 +209,15 @@ const Practice = () => {
             className="chip-btn inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs disabled:opacity-40">
             <RotateCcw className="h-3.5 w-3.5" /> Reset
           </button>
-          {notice && <span className="text-xs" style={{ color: 'rgba(255,255,255,.45)' }}>{notice}</span>}
+          {notice && <span className="text-xs" style={{ color: 'rgba(255,255,255,.74)' }}>{notice}</span>}
         </div>
       </div>
 
       {due.length === 0 && upcoming.length === 0 ? (
         <GlassCard className="text-center py-12" hover={false}>
-          <CalendarClock className="mx-auto h-10 w-10 mb-4" style={{ color: 'rgba(255,255,255,.2)' }} />
+          <CalendarClock className="mx-auto h-10 w-10 mb-4" style={{ color: 'rgba(255,255,255,.6)' }} />
           <h2 className="text-base font-semibold mb-2" style={{ color: '#fff' }}>Nothing scheduled yet</h2>
-          <p className="text-sm max-w-md mx-auto" style={{ color: 'rgba(255,255,255,.45)' }}>
+          <p className="text-sm max-w-md mx-auto" style={{ color: 'rgba(255,255,255,.74)' }}>
             Open a finished report and choose <span style={{ color: '#a5b4fc' }}>Practice this question</span>.
             It comes back in 10 minutes, 2 days, then at growing intervals.
           </p>
@@ -232,7 +232,7 @@ const Practice = () => {
               </h2>
             </div>
             {due.length === 0 ? (
-              <p className="text-sm" style={{ color: 'rgba(255,255,255,.35)' }}>Nothing due. The next batch is below.</p>
+              <p className="text-sm" style={{ color: 'rgba(255,255,255,.7)' }}>Nothing due. The next batch is below.</p>
             ) : (
               <div className="space-y-3">{due.map((item) => <Row key={item.key} item={item} dueNow />)}</div>
             )}
@@ -241,8 +241,8 @@ const Practice = () => {
           {upcoming.length > 0 && (
             <section>
               <div className="flex items-center gap-2 mb-3">
-                <CalendarClock className="h-4 w-4" style={{ color: 'rgba(255,255,255,.4)' }} />
-                <h2 className="text-sm font-semibold uppercase tracking-wider" style={{ color: 'rgba(255,255,255,.5)' }}>
+                <CalendarClock className="h-4 w-4" style={{ color: 'rgba(255,255,255,.72)' }} />
+                <h2 className="text-sm font-semibold uppercase tracking-wider" style={{ color: 'rgba(255,255,255,.76)' }}>
                   Scheduled ({upcoming.length})
                 </h2>
               </div>

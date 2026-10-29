@@ -77,7 +77,7 @@ const DigitalAvatar = ({ isSpeaking, emotion, name = 'AI Interviewer', message, 
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-semibold text-white">{name}</p>
-              <p className="text-xs text-white/50">AI Interviewer</p>
+              <p className="text-xs text-white/70">AI Interviewer</p>
             </div>
             <button onClick={() => setIsMuted(!isMuted)} className="p-2 rounded-lg" style={{ background: 'rgba(255,255,255,.1)' }}>
               {isMuted ? <VolumeX className="w-4 h-4 text-white/50" /> : <Volume2 className="w-4 h-4 text-white/70" />}

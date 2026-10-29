@@ -44,14 +44,14 @@ const PracticeDrill = ({ item, onGrade, onBack }) => {
 
   return (
     <GlassCard className="p-6" hover={false}>
-      <button onClick={onBack} className="inline-flex items-center gap-1.5 text-sm mb-4" style={{ color: 'rgba(255,255,255,.5)' }}>
+      <button onClick={onBack} className="inline-flex items-center gap-1.5 text-sm mb-4" style={{ color: 'rgba(255,255,255,.76)' }}>
         <ArrowLeft className="h-4 w-4" /> Back to queue
       </button>
 
       <div className="flex flex-wrap items-center gap-2 mb-3">
         <GlassBadge variant="primary">{item.questionType || 'QUESTION'}</GlassBadge>
         {item.score != null && <GlassBadge variant="warning">last scored {item.score}/100</GlassBadge>}
-        <span className="text-xs" style={{ color: 'rgba(255,255,255,.35)' }}>{item.sourceTitle || 'Saved question'}</span>
+        <span className="text-xs" style={{ color: 'rgba(255,255,255,.7)' }}>{item.sourceTitle || 'Saved question'}</span>
       </div>
 
       <h2 className="text-lg font-semibold mb-4" style={{ color: '#fff' }}>{item.question}</h2>
@@ -85,7 +85,7 @@ const PracticeDrill = ({ item, onGrade, onBack }) => {
 
           {item.feedback && (
             <details className="mt-5">
-              <summary className="text-xs font-semibold uppercase tracking-wider cursor-pointer" style={{ color: 'rgba(255,255,255,.4)' }}>
+              <summary className="text-xs font-semibold uppercase tracking-wider cursor-pointer" style={{ color: 'rgba(255,255,255,.72)' }}>
                 Previous review
               </summary>
               <p className="mt-2 text-sm" style={{ color: 'rgba(255,255,255,.65)' }}>{item.feedback}</p>
@@ -108,7 +108,7 @@ const PracticeDrill = ({ item, onGrade, onBack }) => {
 
           <div className="mt-6" style={{ borderTop: '1px solid rgba(255,255,255,.08)', paddingTop: 16 }}>
             <p className="text-sm font-medium mb-1" style={{ color: 'rgba(255,255,255,.75)' }}>How did that compare?</p>
-            <p className="text-xs mb-3" style={{ color: 'rgba(255,255,255,.35)' }}>
+            <p className="text-xs mb-3" style={{ color: 'rgba(255,255,255,.7)' }}>
               Self-graded, so the next interval follows your judgement.
             </p>
             <div className="flex flex-wrap gap-2">
@@ -121,7 +121,7 @@ const PracticeDrill = ({ item, onGrade, onBack }) => {
                 >
                   <span className="inline-flex flex-col items-start">
                     <span>{option.label}</span>
-                    <span className="text-[11px] font-normal" style={{ color: 'rgba(255,255,255,.4)' }}>{intervalLabel(item, option.id)}</span>
+                    <span className="text-[11px] font-normal" style={{ color: 'rgba(255,255,255,.72)' }}>{intervalLabel(item, option.id)}</span>
                   </span>
                 </button>
               ))}
@@ -136,7 +136,7 @@ const PracticeDrill = ({ item, onGrade, onBack }) => {
       )}
 
       {!revealed && item.expectedAnswer && (
-        <p className="mt-4 text-xs inline-flex items-center gap-1.5" style={{ color: 'rgba(255,255,255,.3)' }}>
+        <p className="mt-4 text-xs inline-flex items-center gap-1.5" style={{ color: 'rgba(255,255,255,.66)' }}>
           <RotateCcw className="h-3 w-3" /> Answer first, then compare — that is what makes recall stick.
         </p>
       )}

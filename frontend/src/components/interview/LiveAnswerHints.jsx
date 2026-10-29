@@ -20,7 +20,7 @@ const LiveAnswerHints = ({ text, question = '', behavioral = false }) => {
 
   if (!text || !text.trim()) {
     return (
-      <p className="text-xs mt-2" style={{ color: 'rgba(255,255,255,.25)' }}>
+      <p className="text-xs mt-2" style={{ color: 'rgba(255,255,255,.64)' }}>
         Counts appear here as you type or speak — words, filler words{behavioral ? ' and STAR parts' : ''}.
       </p>
     )
@@ -32,7 +32,7 @@ const LiveAnswerHints = ({ text, question = '', behavioral = false }) => {
 
   return (
     <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 mt-2 text-xs">
-      <span style={{ color: 'rgba(255,255,255,.45)' }}>
+      <span style={{ color: 'rgba(255,255,255,.74)' }}>
         {insights.words} word{insights.words === 1 ? '' : 's'}
       </span>
       <span style={{ color: lengthTone }}>
@@ -47,13 +47,13 @@ const LiveAnswerHints = ({ text, question = '', behavioral = false }) => {
         fillers {insights.fillerCount} ({insights.fillerRate}%)
       </span>
       {insights.topWords[0] && (
-        <span style={{ color: 'rgba(255,255,255,.35)' }}>
+        <span style={{ color: 'rgba(255,255,255,.7)' }}>
           repeating “{insights.topWords[0].word}” ×{insights.topWords[0].count}
         </span>
       )}
       {behavioral && insights.star && (
         <span className="inline-flex items-center gap-1">
-          <span style={{ color: 'rgba(255,255,255,.35)' }}>STAR</span>
+          <span style={{ color: 'rgba(255,255,255,.7)' }}>STAR</span>
           {insights.star.map((part) => (
             <span
               key={part.key}

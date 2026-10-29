@@ -26,7 +26,7 @@ const Stat = ({ label, value, tone = 'muted', hint }) => (
   <div>
     <div style={{ color: TONE[tone], fontSize: 18, fontWeight: 700, lineHeight: 1.2 }}>{value}</div>
     <div style={{ color: MUTED, fontSize: 11, textTransform: 'uppercase', letterSpacing: '.06em' }}>{label}</div>
-    {hint && <div style={{ color: 'rgba(255,255,255,.3)', fontSize: 11 }}>{hint}</div>}
+    {hint && <div style={{ color: 'rgba(255,255,255,.66)', fontSize: 11 }}>{hint}</div>}
   </div>
 )
 
@@ -40,7 +40,7 @@ const AnswerInsights = ({ insights, behavioral = false, compact = false }) => {
     <div style={{ borderTop: '1px solid rgba(255,255,255,.08)', paddingTop: 12 }}>
       <div className="flex items-center justify-between mb-3">
         <p style={{ color: 'rgba(255,255,255,.8)', fontSize: 13, fontWeight: 600 }}>Answer insights</p>
-        <span style={{ color: 'rgba(255,255,255,.3)', fontSize: 11 }}>counted from your words, no model call</span>
+        <span style={{ color: 'rgba(255,255,255,.66)', fontSize: 11 }}>counted from your words, no model call</span>
       </div>
 
       <div className="flex flex-wrap gap-x-8 gap-y-3 mb-3">
@@ -60,14 +60,14 @@ const AnswerInsights = ({ insights, behavioral = false, compact = false }) => {
           <span key={point.key} style={chip(point.hit)}>{point.hit ? '✓' : '·'} {point.label}</span>
         ))}
         {behavioral && missedPoints.length > 0 && (
-          <span style={{ color: 'rgba(255,255,255,.3)', fontSize: 11, alignSelf: 'center' }}>
+          <span style={{ color: 'rgba(255,255,255,.66)', fontSize: 11, alignSelf: 'center' }}>
             missing: {missedPoints.map((p) => p.label.toLowerCase()).join(', ')}
           </span>
         )}
       </div>
 
       {(weakCount > 0 || longSentences > 0) && (
-        <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs mb-3" style={{ color: 'rgba(255,255,255,.45)' }}>
+        <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs mb-3" style={{ color: 'rgba(255,255,255,.74)' }}>
           {weakCount > 0 && (
             <span>
               <span style={{ color: '#fbbf24' }}>{weakCount} weak word{weakCount === 1 ? '' : 's'}</span>
@@ -100,7 +100,7 @@ const AnswerInsights = ({ insights, behavioral = false, compact = false }) => {
           {topWords.map((item) => (
             <GlassBadge key={item.word} variant="default">{item.word} ×{item.count}</GlassBadge>
           ))}
-          <span style={{ color: 'rgba(255,255,255,.3)', fontSize: 11 }}>3+ repeats · vary the wording</span>
+          <span style={{ color: 'rgba(255,255,255,.66)', fontSize: 11 }}>3+ repeats · vary the wording</span>
         </div>
       )}
     </div>

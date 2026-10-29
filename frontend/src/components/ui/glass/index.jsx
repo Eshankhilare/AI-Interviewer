@@ -10,7 +10,7 @@ export const GlassCard = ({ children, className = '', hover = true, ...props }) 
     style={{
       border: '1px solid rgba(255,255,255,.13)',
       borderRadius: 'clamp(12px, 1.52vh, 18px)',
-      background: 'linear-gradient(145deg, rgba(24,22,20,.55), rgba(5,12,14,.65))',
+      background: 'linear-gradient(145deg, rgba(24,22,20,.75), rgba(5,12,14,.84))',
       boxShadow: '0 2px 10px rgba(0,0,0,.44), 0 0 0 3px rgba(255,255,255,.035) inset, 0 0 0 1px rgba(0,0,0,.9)',
       backdropFilter: 'blur(18px) saturate(120%)',
       transition: hover ? 'all 0.3s cubic-bezier(.16,1,.3,1)' : 'none',
@@ -29,7 +29,7 @@ export const GlassPanel = ({ children, className = '', ...props }) => (
     style={{
       border: '1px solid rgba(255,255,255,.08)',
       borderRadius: '16px',
-      background: 'linear-gradient(145deg, rgba(24,22,20,.6), rgba(10,15,18,.7))',
+      background: 'linear-gradient(145deg, rgba(24,22,20,.76), rgba(10,15,18,.84))',
       backdropFilter: 'blur(18px) saturate(110%)',
       boxShadow: '0 4px 24px rgba(0,0,0,.4), inset 0 1px 0 rgba(255,255,255,.06)',
     }}
@@ -110,7 +110,7 @@ export const GlassInput = ({ className = '', as, style: propStyle, ...props }) =
 // Glass Badge
 export const GlassBadge = ({ children, variant = 'default', className = '' }) => {
   const variants = {
-    default: { bg: 'rgba(255,255,255,.08)', color: 'rgba(255,255,255,.7)', border: 'rgba(255,255,255,.12)' },
+    default: { bg: 'rgba(255,255,255,.08)', color: 'rgba(255,255,255,.85)', border: 'rgba(255,255,255,.18)' },
     success: { bg: 'rgba(34,197,94,.12)', color: '#4ade80', border: 'rgba(34,197,94,.2)' },
     warning: { bg: 'rgba(251,191,36,.12)', color: '#fbbf24', border: 'rgba(251,191,36,.2)' },
     danger: { bg: 'rgba(239,68,68,.12)', color: '#f87171', border: 'rgba(239,68,68,.2)' },

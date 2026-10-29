@@ -24,7 +24,7 @@ const LegalShell = ({ title, intro, children }) => (
             style={{ background: 'linear-gradient(135deg, #6366f1, #8b5cf6)' }}>AI</span>
           <span className="font-bold text-white">Interviewer</span>
         </Link>
-        <Link to="/" className="inline-flex items-center gap-1.5 text-sm" style={{ color: 'rgba(255,255,255,.45)' }}>
+        <Link to="/" className="inline-flex items-center gap-1.5 text-sm" style={{ color: 'rgba(255,255,255,.74)' }}>
           <ArrowLeft className="h-4 w-4" /> Back to app
         </Link>
       </div>
@@ -35,13 +35,13 @@ const LegalShell = ({ title, intro, children }) => (
         <ShieldCheck className="h-3.5 w-3.5" /> Legal
       </div>
       <h1 className="text-3xl font-bold mb-2" style={{ color: '#fff' }}>{title}</h1>
-      <p className="text-sm mb-2" style={{ color: 'rgba(255,255,255,.45)' }}>Last updated: {UPDATED}</p>
-      <p className="text-sm leading-relaxed mb-6" style={{ color: 'rgba(255,255,255,.55)' }}>{intro}</p>
+      <p className="text-sm mb-2" style={{ color: 'rgba(255,255,255,.74)' }}>Last updated: {UPDATED}</p>
+      <p className="text-sm leading-relaxed mb-6" style={{ color: 'rgba(255,255,255,.78)' }}>{intro}</p>
       {children}
 
       <div className="mt-10 p-5 rounded-2xl" style={{ background: 'rgba(255,255,255,.03)', border: '1px solid rgba(255,255,255,.1)' }}>
         <h2 className="text-sm font-semibold mb-2" style={{ color: '#fff' }}>Contact</h2>
-        <p className="text-sm" style={{ color: 'rgba(255,255,255,.55)' }}>
+        <p className="text-sm" style={{ color: 'rgba(255,255,255,.78)' }}>
           Email:{' '}
           <a href={`mailto:${CONTACT_EMAIL}`} style={{ color: '#a5b4fc' }}>{CONTACT_EMAIL}</a>
           {CONTACT_PHONE ? (
@@ -53,12 +53,12 @@ const LegalShell = ({ title, intro, children }) => (
         </p>
       </div>
 
-      <nav className="mt-8 flex flex-wrap gap-x-5 gap-y-2 text-sm" style={{ color: 'rgba(255,255,255,.45)' }}>
+      <nav className="mt-8 flex flex-wrap gap-x-5 gap-y-2 text-sm" style={{ color: 'rgba(255,255,255,.74)' }}>
         <Link to="/privacy" className="hover:opacity-80">Privacy Policy</Link>
         <Link to="/terms" className="hover:opacity-80">Terms of Service</Link>
         <Link to="/cookies" className="hover:opacity-80">Cookie Policy</Link>
       </nav>
-      <p className="mt-6 text-xs" style={{ color: 'rgba(255,255,255,.3)' }}>
+      <p className="mt-6 text-xs" style={{ color: 'rgba(255,255,255,.66)' }}>
         This is a practice tool, not legal advice. The project is a student/hackathon build; have counsel review these pages before commercial use.
       </p>
     </main>

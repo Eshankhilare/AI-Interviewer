@@ -262,7 +262,7 @@ const Report = () => {
         <div className="glass rounded-2xl p-8 shadow-card">
           <AlertCircle className="h-12 w-12 text-amber-500 mx-auto mb-4" />
           <h2 className="text-xl font-bold text-white mb-2">Report Not Available</h2>
-          <p className="text-white/50 mb-6">{error || 'Report could not be found for this interview.'}</p>
+          <p className="text-white/75 mb-6">{error || 'Report could not be found for this interview.'}</p>
           <Link
             to="/"
             className="inline-flex items-center px-4 py-2 bg-gradient-brand text-white rounded-lg font-medium hover:opacity-90 transition-opacity"

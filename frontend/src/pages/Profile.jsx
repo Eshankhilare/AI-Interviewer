@@ -70,7 +70,7 @@ const Profile = () => {
     <div className="relative min-h-screen">
       <BackgroundVideo />
       <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        <button onClick={() => navigate(-1)} className="mb-6 inline-flex items-center gap-2 text-sm font-medium" style={{ color: 'rgba(255,255,255,.5)' }}>
+        <button onClick={() => navigate(-1)} className="mb-6 inline-flex items-center gap-2 text-sm font-medium" style={{ color: 'rgba(255,255,255,.76)' }}>
           <ArrowLeft className="h-4 w-4" /> Back
         </button>
 
@@ -81,7 +81,7 @@ const Profile = () => {
           </div>
           <div>
             <h1 className="text-2xl font-bold" style={{ color: '#fff' }}>{user?.fullName}</h1>
-            <p className="text-sm" style={{ color: 'rgba(255,255,255,.5)' }}>{user?.email}</p>
+            <p className="text-sm" style={{ color: 'rgba(255,255,255,.76)' }}>{user?.email}</p>
           </div>
         </div>
 
@@ -166,10 +166,10 @@ const Profile = () => {
                 <div className="space-y-6">
                   <div className="flex items-center justify-between p-4 rounded-xl" style={{ background: 'oklch(100% 0 0 / 0.03)', border: '1px solid oklch(100% 0 0 / 0.06)' }}>
                     <div className="flex items-center gap-3">
-                      <Lock className="h-5 w-5" style={{ color: 'rgba(255,255,255,.5)' }} />
+                      <Lock className="h-5 w-5" style={{ color: 'rgba(255,255,255,.76)' }} />
                       <div>
                         <p className="text-sm font-medium" style={{ color: '#fff' }}>Password</p>
-                        <p className="text-xs" style={{ color: 'rgba(255,255,255,.4)' }}>Last changed {security.lastPasswordChange}</p>
+                        <p className="text-xs" style={{ color: 'rgba(255,255,255,.72)' }}>Last changed {security.lastPasswordChange}</p>
                       </div>
                     </div>
                     <button className="btn-secondary text-xs px-3 py-1.5">Change</button>
@@ -177,10 +177,10 @@ const Profile = () => {
 
                   <div className="flex items-center justify-between p-4 rounded-xl" style={{ background: 'oklch(100% 0 0 / 0.03)', border: '1px solid oklch(100% 0 0 / 0.06)' }}>
                     <div className="flex items-center gap-3">
-                      <Smartphone className="h-5 w-5" style={{ color: 'rgba(255,255,255,.5)' }} />
+                      <Smartphone className="h-5 w-5" style={{ color: 'rgba(255,255,255,.76)' }} />
                       <div>
                         <p className="text-sm font-medium" style={{ color: '#fff' }}>Two-Factor Authentication</p>
-                        <p className="text-xs" style={{ color: 'rgba(255,255,255,.4)' }}>{security.twoFactor ? 'Enabled' : 'Disabled'}</p>
+                        <p className="text-xs" style={{ color: 'rgba(255,255,255,.72)' }}>{security.twoFactor ? 'Enabled' : 'Disabled'}</p>
                       </div>
                     </div>
                     <button onClick={() => setSecurity({ ...security, twoFactor: !security.twoFactor })}
@@ -221,7 +221,7 @@ const Profile = () => {
                     <div key={key} className="flex items-center justify-between p-3 rounded-xl" style={{ background: 'oklch(100% 0 0 / 0.03)', border: '1px solid oklch(100% 0 0 / 0.06)' }}>
                       <div>
                         <p className="text-sm font-medium" style={{ color: '#fff' }}>{label}</p>
-                        <p className="text-xs" style={{ color: 'rgba(255,255,255,.4)' }}>{desc}</p>
+                        <p className="text-xs" style={{ color: 'rgba(255,255,255,.72)' }}>{desc}</p>
                       </div>
                       <button onClick={() => setNotifications({ ...notifications, [key]: !notifications[key] })}
                         role="switch" aria-checked={notifications[key]} aria-label={label}
@@ -248,7 +248,7 @@ const Profile = () => {
                     <div key={key} className="flex items-center justify-between p-3 rounded-xl" style={{ background: 'oklch(100% 0 0 / 0.03)', border: '1px solid oklch(100% 0 0 / 0.06)' }}>
                       <div>
                         <p className="text-sm font-medium" style={{ color: '#fff' }}>{label}</p>
-                        <p className="text-xs" style={{ color: 'rgba(255,255,255,.4)' }}>{desc}</p>
+                        <p className="text-xs" style={{ color: 'rgba(255,255,255,.72)' }}>{desc}</p>
                       </div>
                       <button onClick={() => setPrivacy({ ...privacy, [key]: !privacy[key] })}
                         role="switch" aria-checked={privacy[key]} aria-label={label}
@@ -302,23 +302,23 @@ const Profile = () => {
                 <div className="space-y-4">
                   <div className="p-4 rounded-xl" style={{ background: 'oklch(100% 0 0 / 0.03)', border: '1px solid oklch(100% 0 0 / 0.06)' }}>
                     <p className="text-sm font-medium" style={{ color: '#fff' }}>Version</p>
-                    <p className="text-xs" style={{ color: 'rgba(255,255,255,.5)' }}>2.0.0</p>
+                    <p className="text-xs" style={{ color: 'rgba(255,255,255,.76)' }}>2.0.0</p>
                   </div>
                   <div className="p-4 rounded-xl" style={{ background: 'oklch(100% 0 0 / 0.03)', border: '1px solid oklch(100% 0 0 / 0.06)' }}>
                     <p className="text-sm font-medium" style={{ color: '#fff' }}>Built with</p>
-                    <p className="text-xs" style={{ color: 'rgba(255,255,255,.5)' }}>React + Spring Boot + Python AI Service</p>
+                    <p className="text-xs" style={{ color: 'rgba(255,255,255,.76)' }}>React + Spring Boot + Python AI Service</p>
                   </div>
                   <div className="p-4 rounded-xl" style={{ background: 'oklch(100% 0 0 / 0.03)', border: '1px solid oklch(100% 0 0 / 0.06)' }}>
                     <p className="text-sm font-medium" style={{ color: '#fff' }}>AI Models</p>
-                    <p className="text-xs" style={{ color: 'rgba(255,255,255,.5)' }}>Gemini 3.5 Flash Lite, Edge-TTS, Deepgram</p>
+                    <p className="text-xs" style={{ color: 'rgba(255,255,255,.76)' }}>Gemini 3.5 Flash Lite, Edge-TTS, Deepgram</p>
                   </div>
                   <div className="p-4 rounded-xl" style={{ background: 'oklch(100% 0 0 / 0.03)', border: '1px solid oklch(100% 0 0 / 0.06)' }}>
                     <p className="text-sm font-medium" style={{ color: '#fff' }}>Question Bank</p>
-                    <p className="text-xs" style={{ color: 'rgba(255,255,255,.5)' }}>3,400+ questions across 20 job roles</p>
+                    <p className="text-xs" style={{ color: 'rgba(255,255,255,.76)' }}>3,400+ questions across 20 job roles</p>
                   </div>
                   <div className="p-4 rounded-xl" style={{ background: 'oklch(100% 0 0 / 0.03)', border: '1px solid oklch(100% 0 0 / 0.06)' }}>
                     <p className="text-sm font-medium" style={{ color: '#fff' }}>GitHub</p>
-                    <p className="text-xs" style={{ color: 'rgba(255,255,255,.5)' }}>github.com/AbhijitK20/AI-Interviewer</p>
+                    <p className="text-xs" style={{ color: 'rgba(255,255,255,.76)' }}>github.com/AbhijitK20/AI-Interviewer</p>
                   </div>
                 </div>
               </GlassCard>

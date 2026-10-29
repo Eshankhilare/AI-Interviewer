@@ -47,14 +47,14 @@ const Resumes = () => {
     <div className="min-h-screen relative" style={{ background: "#000", isolation: "isolate" }}>
       <BackgroundVideo />
       <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        <button onClick={() => navigate(-1)} className="mb-6 inline-flex items-center gap-2 text-sm font-medium" style={{ color: 'rgba(255,255,255,.5)' }}>
+        <button onClick={() => navigate(-1)} className="mb-6 inline-flex items-center gap-2 text-sm font-medium" style={{ color: 'rgba(255,255,255,.76)' }}>
           <ArrowLeft className="h-4 w-4" /> Back
         </button>
 
         <div className="flex justify-between items-center mb-6">
           <div>
             <h1 className="text-2xl font-bold" style={{ color: '#fff', fontFamily: '"Fraunces", "Reference Display", serif', fontWeight: 500 }}>Resumes</h1>
-            <p className="mt-1" style={{ color: 'rgba(255,255,255,.5)' }}>Upload or paste your resume</p>
+            <p className="mt-1" style={{ color: 'rgba(255,255,255,.76)' }}>Upload or paste your resume</p>
           </div>
           <div className="flex gap-2">
             <button onClick={() => navigate('/resume-builder')} className="px-4 py-2.5 rounded-xl text-sm font-medium inline-flex items-center gap-2" style={{ color: 'rgba(255,255,255,.7)', border: '1px solid rgba(255,255,255,.14)' }}>
@@ -81,8 +81,8 @@ const Resumes = () => {
             {error && <div className="mb-4 p-3 rounded-xl" style={{ background: 'rgba(239,68,68,.1)', border: '1px solid rgba(239,68,68,.2)' }}><p className="text-sm" style={{ color: '#f87171' }}>{error}</p></div>}
             {!pasteMode ? (
               <form onSubmit={handleFileUpload}>
-                <input type="file" accept=".pdf,.docx,.txt,.md" onChange={handleFileUpload} className="w-full text-sm" style={{ color: 'rgba(255,255,255,.5)' }} />
-                <p className="mt-2 text-xs" style={{ color: 'rgba(255,255,255,.4)' }}>
+                <input type="file" accept=".pdf,.docx,.txt,.md" onChange={handleFileUpload} className="w-full text-sm" style={{ color: 'rgba(255,255,255,.76)' }} />
+                <p className="mt-2 text-xs" style={{ color: 'rgba(255,255,255,.72)' }}>
                   PDF, DOCX, TXT or MD up to 5 MB. Scanned PDFs without a text layer are rejected — paste the text instead.
                 </p>
               </form>
@@ -101,9 +101,9 @@ const Resumes = () => {
           <div className="flex justify-center h-32 items-center"><div className="animate-spin rounded-full h-8 w-8" style={{ border: '2px solid rgba(255,255,255,.1)', borderTopColor: '#fff' }} /></div>
         ) : resumes.length === 0 ? (
           <GlassCard className="text-center py-12">
-            <FileText className="mx-auto h-10 w-10 mb-4" style={{ color: 'rgba(255,255,255,.15)' }} />
+            <FileText className="mx-auto h-10 w-10 mb-4" style={{ color: 'rgba(255,255,255,.55)' }} />
             <h3 className="text-sm font-medium" style={{ color: '#fff' }}>No resumes yet</h3>
-            <p className="mt-1 text-sm" style={{ color: 'rgba(255,255,255,.4)' }}>Upload a resume to get personalized questions.</p>
+            <p className="mt-1 text-sm" style={{ color: 'rgba(255,255,255,.72)' }}>Upload a resume to get personalized questions.</p>
           </GlassCard>
         ) : (
           <div className="space-y-3">
@@ -112,9 +112,9 @@ const Resumes = () => {
                 <GlassCard className="flex items-center justify-between p-5">
                   <div className="flex-1">
                     <div className="flex items-center"><FileText className="h-5 w-5 mr-2" style={{ color: '#fbbf24' }} /><h3 className="font-medium" style={{ color: '#fff' }}>{resume.name || resume.fileName}</h3></div>
-                    <p className="text-sm mt-1" style={{ color: 'rgba(255,255,255,.4)' }}>{resume.skills ? `${resume.skills.split(',').length} skills detected` : 'Uploaded'}</p>
+                    <p className="text-sm mt-1" style={{ color: 'rgba(255,255,255,.72)' }}>{resume.skills ? `${resume.skills.split(',').length} skills detected` : 'Uploaded'}</p>
                   </div>
-                  <button onClick={() => handleDelete(resume.id)} className="p-2 hover:opacity-80" style={{ color: 'rgba(255,255,255,.3)' }}><Trash2 className="h-4 w-4" /></button>
+                  <button onClick={() => handleDelete(resume.id)} className="p-2 hover:opacity-80" style={{ color: 'rgba(255,255,255,.66)' }}><Trash2 className="h-4 w-4" /></button>
                 </GlassCard>
               </motion.div>
             ))}

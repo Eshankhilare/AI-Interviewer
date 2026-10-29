@@ -15,7 +15,7 @@ const PracticePlan = ({ radar, breakdown }) => {
           </div>
           <h2 className="text-lg font-bold" style={{ color: 'var(--color-ink)' }}>Your practice plan</h2>
         </div>
-        <span className="text-xs" style={{ color: 'rgba(255,255,255,.35)' }}>from this report, no new model call</span>
+        <span className="text-xs" style={{ color: 'rgba(255,255,255,.7)' }}>from this report, no new model call</span>
       </div>
 
       <ol className="space-y-3">
@@ -25,7 +25,7 @@ const PracticePlan = ({ radar, breakdown }) => {
               style={{ background: 'rgba(245,158,11,.18)', color: '#a5b4fc' }}>{index + 1}</span>
             <div>
               <p className="text-sm font-semibold" style={{ color: 'rgba(255,255,255,.85)' }}>{step.title}</p>
-              <p className="text-sm" style={{ color: 'rgba(255,255,255,.5)' }}>{step.detail}</p>
+              <p className="text-sm" style={{ color: 'rgba(255,255,255,.76)' }}>{step.detail}</p>
             </div>
           </li>
         ))}

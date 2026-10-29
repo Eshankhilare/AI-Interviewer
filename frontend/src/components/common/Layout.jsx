@@ -69,10 +69,10 @@ const Layout = () => {
                   <ArrowLeftRight className="h-4 w-4" aria-hidden="true" />
                   <span className="hidden sm:inline">Studio</span>
                 </button>
-                <button onClick={handleLogout} aria-label="Log out" title="Log out" className="inline-flex items-center px-3 py-2 text-sm font-medium rounded-xl transition-all duration-200" style={{ color: 'rgba(255,255,255,.4)' }}>
+                <button onClick={handleLogout} aria-label="Log out" title="Log out" className="inline-flex items-center px-3 py-2 text-sm font-medium rounded-xl transition-all duration-200" style={{ color: 'rgba(255,255,255,.72)' }}>
                   <LogOut className="h-4 w-4" aria-hidden="true" />
                 </button>
-                <button onClick={() => setMobileOpen(!mobileOpen)} aria-label={mobileOpen ? 'Close menu' : 'Open menu'} aria-expanded={mobileOpen} aria-controls="mobile-nav" className="sm:hidden p-2 rounded-xl" style={{ color: 'rgba(255,255,255,.5)' }}>
+                <button onClick={() => setMobileOpen(!mobileOpen)} aria-label={mobileOpen ? 'Close menu' : 'Open menu'} aria-expanded={mobileOpen} aria-controls="mobile-nav" className="sm:hidden p-2 rounded-xl" style={{ color: 'rgba(255,255,255,.76)' }}>
                   {mobileOpen ? <X className="h-5 w-5" aria-hidden="true" /> : <Menu className="h-5 w-5" aria-hidden="true" />}
                 </button>
               </div>
@@ -106,7 +106,7 @@ const Layout = () => {
         </main>
 
         <footer className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          <div className="flex flex-wrap items-center gap-x-5 gap-y-2 text-xs" style={{ color: 'rgba(255,255,255,.3)' }}>
+          <div className="flex flex-wrap items-center gap-x-5 gap-y-2 text-xs" style={{ color: 'rgba(255,255,255,.66)' }}>
             <span>© 2026 AI Interviewer</span>
             <Link to="/privacy" className="hover:opacity-80">Privacy</Link>
             <Link to="/terms" className="hover:opacity-80">Terms</Link>

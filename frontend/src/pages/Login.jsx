@@ -56,7 +56,7 @@ const Login = () => {
             <img src="/logo.jpeg" alt="AI Interviewer" className="w-14 h-14 mx-auto rounded-2xl object-cover mb-4"
               style={{ border: '1px solid rgba(245,158,11,.35)', boxShadow: '0 4px 20px rgba(245,158,11,.3)' }} />
             <h2 className="text-2xl font-bold" style={{ color: '#fff', fontWeight: 500 }}>Welcome back</h2>
-            <p className="mt-1" style={{ color: 'rgba(255,255,255,.5)' }}>Sign in to continue your interview prep</p>
+            <p className="mt-1" style={{ color: 'rgba(255,255,255,.76)' }}>Sign in to continue your interview prep</p>
           </motion.div>
 
           {error && (
@@ -74,7 +74,7 @@ const Login = () => {
             <div>
               <label className="block text-sm font-medium mb-1.5" style={{ color: 'rgba(255,255,255,.6)' }}>Email or phone</label>
               <div className="relative">
-                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4" style={{ color: 'rgba(255,255,255,.25)' }} />
+                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4" style={{ color: 'rgba(255,255,255,.64)' }} />
                 <GlassInput
                   type="text"
                   required
@@ -90,7 +90,7 @@ const Login = () => {
             <div>
               <label className="block text-sm font-medium mb-1.5" style={{ color: 'rgba(255,255,255,.6)' }}>Password</label>
               <div className="relative">
-                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4" style={{ color: 'rgba(255,255,255,.25)' }} />
+                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4" style={{ color: 'rgba(255,255,255,.64)' }} />
                 <GlassInput
                   type="password"
                   required
@@ -117,13 +117,13 @@ const Login = () => {
 
           <GoogleButton />
 
-          <p className="mt-6 text-center text-sm" style={{ color: 'rgba(255,255,255,.4)' }}>
+          <p className="mt-6 text-center text-sm" style={{ color: 'rgba(255,255,255,.72)' }}>
             Don&apos;t have an account?{' '}
             <Link to="/register" className="font-semibold hover:opacity-80" style={{ color: '#fff' }}>
               Create one
             </Link>
           </p>
-          <p className="mt-4 text-center text-xs" style={{ color: 'rgba(255,255,255,.3)' }}>
+          <p className="mt-4 text-center text-xs" style={{ color: 'rgba(255,255,255,.66)' }}>
             <Link to="/privacy">Privacy</Link> · <Link to="/terms">Terms</Link> · <Link to="/cookies">Cookies</Link>
           </p>
         </GlassCard>
