@@ -4,7 +4,7 @@ A comprehensive AI-powered technical interview platform that conducts realistic 
 
 ## Live Demo
 
-🔗 [**https://ai-interviewer-rho-hazel.vercel.app**](https://ai-interviewer-rho-hazel.vercel.app)
+🔗 [**https://ai-interviewer-67mj.vercel.app**](https://ai-interviewer-67mj.vercel.app)
 
 ## Architecture
 
