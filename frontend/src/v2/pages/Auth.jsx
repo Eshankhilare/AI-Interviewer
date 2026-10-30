@@ -1,11 +1,14 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { ArrowLeftRight, ArrowRight } from 'lucide-react'
 import { useAuth } from '../../context/AuthContext'
 import { errorMessage } from '../../services/api'
 import { setUIVersion } from '../store'
 import GoogleButton from '../../components/auth/GoogleButton'
+import { perfEnd, perfStart } from '../../utils/perf'
 import '../ui.css'
+
+const SLOW_REQUEST_MS = 8_000
 
 export default function AuthStudio({ mode = 'login' }) {
   const isLogin = mode === 'login'
@@ -15,12 +18,30 @@ export default function AuthStudio({ mode = 'login' }) {
   const returnTo = params.get('returnTo') || '/'
   const [form, setForm] = useState({ fullName: '', email: '', password: '', phone: '' })
   const [busy, setBusy] = useState(false)
+  const [slow, setSlow] = useState(false)
   const [error, setError] = useState('')
+  const inFlight = useRef(false)
+  const renderStarted = useRef(perfStart())
+  const loggedRender = useRef(false)
+
+  useEffect(() => {
+    if (loggedRender.current) return
+    loggedRender.current = true
+    perfEnd(isLogin ? 'login.initial-render' : 'register.initial-render', renderStarted.current)
+  }, [isLogin])
+
+  useEffect(() => {
+    if (!busy) return undefined
+    const timer = setTimeout(() => setSlow(true), SLOW_REQUEST_MS)
+    return () => clearTimeout(timer)
+  }, [busy])
 
   const submit = async (event) => {
     event.preventDefault()
-    if (busy) return
+    if (inFlight.current) return
+    inFlight.current = true
     setBusy(true)
+    setSlow(false)
     setError('')
     try {
       if (isLogin) {
@@ -36,7 +57,10 @@ export default function AuthStudio({ mode = 'login' }) {
       navigate(returnTo, { replace: true })
     } catch (err) {
       setError(errorMessage(err, isLogin ? 'Could not sign in.' : 'Could not create the account.'))
+    } finally {
+      inFlight.current = false
       setBusy(false)
+      setSlow(false)
     }
   }
 
@@ -114,10 +138,15 @@ export default function AuthStudio({ mode = 'login' }) {
                   <p className="st-dim" style={{ fontSize: 11.5, margin: '6px 0 0' }}>You can sign in with this number and your password. It is not SMS-verified yet.</p>
                 </div>
               )}
-              {error && <div className="st-banner st-banner-bad">{error}</div>}
-              <button type="submit" className="st-btn st-btn-primary st-btn-lg" style={{ width: '100%' }} disabled={busy}>
-                {busy ? 'Working…' : isLogin ? 'Sign in' : 'Create account'} <ArrowRight size={15} />
+              {error && <div className="st-banner st-banner-bad" role="alert">{error}</div>}
+              <button type="submit" className="st-btn st-btn-primary st-btn-lg" style={{ width: '100%' }} disabled={busy} aria-busy={busy}>
+                {busy ? (isLogin ? 'Signing in…' : 'Creating account…') : isLogin ? 'Sign in' : 'Create account'} <ArrowRight size={15} />
               </button>
+              {slow && (
+                <p className="st-dim" style={{ fontSize: 12, margin: 0 }} role="status">
+                  The server is taking longer than usual. Still working…
+                </p>
+              )}
             </form>
 
             <GoogleButton />

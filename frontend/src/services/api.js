@@ -6,6 +6,15 @@ import axios from 'axios'
 const apiRoot = (import.meta.env.VITE_API_URL || '').trim().replace(/\/+$/, '')
 export const API_BASE = apiRoot ? `${apiRoot}/api` : '/api'
 
+// Auth calls should fail visibly in seconds, not sit behind the 2 minute
+// timeout that long-running AI requests need. 30s still covers a Vercel
+// container cold start, and the UI explains the wait after 8s.
+export const AUTH_REQUEST_TIMEOUT_MS = 30_000
+// Provider discovery is a cheap configuration lookup, but it must survive a
+// Vercel container cold start; the result is cached for the rest of the session
+// and the lookup never blocks the form.
+export const PROVIDERS_REQUEST_TIMEOUT_MS = 30_000
+
 const api = axios.create({
   baseURL: API_BASE,
   timeout: 120000,

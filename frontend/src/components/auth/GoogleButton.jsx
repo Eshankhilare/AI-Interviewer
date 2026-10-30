@@ -1,15 +1,48 @@
 import { useEffect, useState } from 'react'
-import api, { API_BASE } from '../../services/api'
+import api, { API_BASE, PROVIDERS_REQUEST_TIMEOUT_MS } from '../../services/api'
+import { perfEnd, perfStart } from '../../utils/perf'
+
+// Provider configuration is identical for login and registration, so it is
+// fetched once per app session and shared by every GoogleButton mount.
+let providersCache = null
+let providersRequest = null
+
+const loadProviders = () => {
+  if (providersCache) return Promise.resolve(providersCache)
+  if (providersRequest) return providersRequest
+
+  const startedAt = perfStart()
+  providersRequest = api.get('/auth/providers', { timeout: PROVIDERS_REQUEST_TIMEOUT_MS })
+    .then(({ data }) => {
+      providersCache = { google: Boolean(data?.google) }
+      perfEnd('auth.providers', startedAt, { google: providersCache.google })
+      return providersCache
+    })
+    .catch((error) => {
+      // Do not cache failures: a later mount (for example after the user
+      // navigates from login to register) may succeed.
+      providersRequest = null
+      perfEnd('auth.providers', startedAt, { ok: false, status: error?.response?.status ?? 'network' })
+      throw error
+    })
+
+  return providersRequest
+}
 
 // Renders only when the backend has GOOGLE_CLIENT_ID/SECRET configured, so no
 // dead button appears on deployments without keys.
 const GoogleButton = ({ label = 'Continue with Google' }) => {
-  const [enabled, setEnabled] = useState(false)
+  const [enabled, setEnabled] = useState(() => Boolean(providersCache?.google))
 
   useEffect(() => {
+    if (providersCache) {
+      setEnabled(Boolean(providersCache.google))
+      return undefined
+    }
+
     let alive = true
-    api.get('/auth/providers')
-      .then(({ data }) => { if (alive) setEnabled(Boolean(data?.google)) })
+    loadProviders()
+      .then((providers) => { if (alive) setEnabled(providers.google) })
       .catch(() => { /* leave the button hidden */ })
     return () => { alive = false }
   }, [])

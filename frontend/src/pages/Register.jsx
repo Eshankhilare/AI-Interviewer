@@ -1,11 +1,14 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { UserPlus, Mail, Lock, User, Phone } from 'lucide-react'
 import { motion } from 'framer-motion'
-import { GlassCard, WhiteButton, GlassInput, BackgroundVideo } from '../components/ui/glass'
+import { GlassCard, WhiteButton, GlassInput } from '../components/ui/glass'
 import GoogleButton from '../components/auth/GoogleButton'
 import { errorMessage } from '../services/api'
+import { perfEnd, perfStart } from '../utils/perf'
+
+const SLOW_REQUEST_MS = 8_000
 
 const Register = () => {
   const [formData, setFormData] = useState({
@@ -13,14 +16,33 @@ const Register = () => {
   })
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
+  const [slow, setSlow] = useState(false)
   const { register } = useAuth()
   const navigate = useNavigate()
+  const inFlight = useRef(false)
+  const renderStarted = useRef(perfStart())
+  const loggedRender = useRef(false)
+
+  useEffect(() => {
+    if (loggedRender.current) return
+    loggedRender.current = true
+    perfEnd('register.initial-render', renderStarted.current)
+  }, [])
+
+  useEffect(() => {
+    if (!loading) return undefined
+    const timer = setTimeout(() => setSlow(true), SLOW_REQUEST_MS)
+    return () => clearTimeout(timer)
+  }, [loading])
 
   const handleChange = (e) => setFormData({ ...formData, [e.target.name]: e.target.value })
 
   const handleSubmit = async (e) => {
     e.preventDefault()
+    if (inFlight.current) return
+    inFlight.current = true
     setError('')
+    setSlow(false)
     setLoading(true)
     try {
       await register(formData)
@@ -28,14 +50,14 @@ const Register = () => {
     } catch (err) {
       setError(errorMessage(err, 'Registration failed.'))
     } finally {
+      inFlight.current = false
       setLoading(false)
+      setSlow(false)
     }
   }
 
   return (
     <div className="min-h-screen flex items-center justify-center relative overflow-hidden" style={{ background: '#000' }}>
-      <BackgroundVideo />
-
       <motion.div
         initial={{ opacity: 0, y: 30, scale: 0.95 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -52,6 +74,7 @@ const Register = () => {
 
           {error && (
             <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }}
+              role="alert"
               className="mb-4 p-3 rounded-xl" style={{ background: 'rgba(239,68,68,.1)', border: '1px solid rgba(239,68,68,.2)' }}>
               <p className="text-sm" style={{ color: '#f87171' }}>{error}</p>
             </motion.div>
@@ -93,9 +116,16 @@ const Register = () => {
               </p>
             </div>
 
-            <WhiteButton type="submit" disabled={loading} className="w-full flex items-center justify-center gap-2 py-3">
-              {loading ? <div className="animate-spin rounded-full h-5 w-5 border-2 border-black/20 border-t-black" /> : <><UserPlus className="h-4 w-4" /> Create account</>}
+            <WhiteButton type="submit" disabled={loading} aria-busy={loading} className="w-full flex items-center justify-center gap-2 py-3">
+              {loading
+                ? <><div className="animate-spin rounded-full h-5 w-5 border-2 border-black/20 border-t-black" aria-hidden="true" /><span>Creating account…</span></>
+                : <><UserPlus className="h-4 w-4" /> Create account</>}
             </WhiteButton>
+            {slow && (
+              <p className="text-xs text-center" role="status" style={{ color: 'rgba(255,255,255,.78)' }}>
+                The server is taking longer than usual. Still working…
+              </p>
+            )}
           </form>
 
           <GoogleButton label="Sign up with Google" />
